@@ -2580,9 +2580,9 @@ function makeQuizLockCard(id, tierType) {
   if (eligible) {
     const btn = document.createElement('button');
     btn.className = `btn btn-sm bac-quiz-btn ${tierType === 'dino' ? 'btn-dino' : 'btn-purple'}`;
-    btn.textContent = '📝 Take Quiz';
+    btn.textContent = '📝 quiz';
     btn.style.width = '100%';
-    btn.style.marginTop = '4px';
+    btn.style.marginTop = '3px';
     btn.onclick = () => {
       state.quizReturnScreen = 'builder';
       openQuiz(id);
