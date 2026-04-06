@@ -140,6 +140,14 @@ const QUIZZES = {
        opts:['About 15 mph','About 25 mph','About 35 mph','About 50 mph'],
        correct:2,
        fact:'Despite weighing up to 1,500 lbs, polar bears can sprint at 35 mph — that\'s faster than Usain Bolt at his world record speed!'},
+      {q:'Polar bear fur looks white, but each hair is actually…',
+       opts:['Painted blue','See-through and hollow — light bounces around','Hot pink','Made of metal'],
+       correct:1,
+       fact:'Their skin is dark under a clever light-trick coat — Arctic camouflage engineering.'},
+      {q:'Mother polar bears often dig a snow den to…',
+       opts:['Store snacks for squirrels','Keep cubs warm while they are tiny','Hide from penguins','Practice karaoke'],
+       correct:1,
+       fact:'Winter babies get a cozy nursery — mom is a walking survival school.'},
     ]
   },
   saltcroc: {
@@ -157,6 +165,14 @@ const QUIZZES = {
        opts:['Only in freshwater rivers','Coastal areas and open ocean','Only in lakes','Underground burrows'],
        correct:1,
        fact:'Despite being reptiles, saltwater crocs can swim hundreds of miles out to sea — they\'ve even been spotted near remote Pacific islands!'},
+      {q:'A saltwater croc waiting at the waterline is using…',
+       opts:['Magic','Ambush — most of its body hides underwater','Loud music','A parachute'],
+       correct:1,
+       fact:'Prey sees “log.” Log says “surprise.”'},
+      {q:'Compared with many animals, a big croc’s heart during a long dive can…',
+       opts:['Explode','Slow way down to save oxygen','Always beat 200 times a minute','Stop forever on purpose'],
+       correct:1,
+       fact:'Slow heart = longer underwater stakeouts — patience weapon unlocked.'},
     ]
   },
   orca: {
@@ -174,6 +190,14 @@ const QUIZZES = {
        opts:['About 10 mph','About 20 mph','About 35 mph','About 55 mph'],
        correct:2,
        fact:'At 35 mph, orcas are fast enough to hunt great white sharks. Great whites have actually been spotted fleeing from orca pods — the ocean\'s top predator runs away from them!'},
+      {q:'Orcas talk to each other using…',
+       opts:['Only fax machines','Clicks, whistles, and pulsed calls','Silent telepathy only','Smoke signals'],
+       correct:1,
+       fact:'Different pods even have favorite sound “accents” — underwater culture is real.'},
+      {q:'Why is an orca’s big dorsal fin (especially on adult males) useful?',
+       opts:['It is just decoration','Stability and steering like a boat rudder','It stores candy','It glows in space'],
+       correct:1,
+       fact:'That tall fin helps a huge body turn without wiping out at speed.'},
     ]
   },
   buffalo: {
@@ -191,6 +215,14 @@ const QUIZZES = {
        opts:['About 500 lbs','About 800 lbs','About 1,400 lbs','About 2,200 lbs'],
        correct:2,
        fact:'At around 1,400 lbs of pure muscle and fury, a Cape Buffalo can absorb enormous punishment and keep charging. Lions frequently lose their lives trying to bring one down.'},
+      {q:'Cape buffalo horns are shaped to…',
+       opts:['Play piano','Hook, lift, and toss a threat during a fight','Pick up Wi-Fi','Hold umbrellas'],
+       correct:1,
+       fact:'Those curved horns turn a headshake into a lion-launching machine.'},
+      {q:'When a buffalo herd fights back, lions learn that…',
+       opts:['Prey is always easy','Team buffalo can be scarier than team lion','Grass is spicy','Birds control the weather'],
+       correct:1,
+       fact:'Buffalo teamwork flips the script — the hunted can become the hunter.'},
     ]
   },
   sibtiger: {
@@ -208,6 +240,14 @@ const QUIZZES = {
        opts:['Down to 0°F','Down to -22°F','Down to -45°F','Down to -70°F'],
        correct:2,
        fact:'With fur up to 3 inches thick and a layer of fat beneath, Siberian Tigers sleep comfortably in -45°F snowstorms — the harshest habitat of any wild cat on Earth.'},
+      {q:'Siberian tigers usually hunt…',
+       opts:['In big noisy parades','Alone — sneak, ambush, finish fast','Only in pairs of twenty','By asking prey politely'],
+       correct:1,
+       fact:'Solo stealth mode: fewer witnesses, fewer chances for dinner to escape.'},
+      {q:'Stripes on a Siberian tiger help it…',
+       opts:['Look taller on camera','Break up its outline in forest and snow edges','Signal airplanes','Store water'],
+       correct:1,
+       fact:'Blurry stripes = harder to spot — nature’s invisibility cheat (almost).'},
     ]
   },
 
@@ -227,6 +267,14 @@ const QUIZZES = {
        opts:['Very small — it was mostly instinct','Average for its size','It had one of the largest smell-processing areas of any dinosaur','It had two brains — one for each half of the body'],
        correct:2,
        fact:'T-Rex had an enormous olfactory bulb — the part of the brain that processes smell. It could track prey from miles away using scent alone, making it a relentless and intelligent hunter.'},
+      {q:'A T-Rex’s banana-sized teeth were great for…',
+       opts:['Brushing hair','Piercing and gripping — then ripping big bites','Typing','Planting flowers'],
+       correct:1,
+       fact:'Those teeth were serrated steak-knives — one chomp changed the whole day.'},
+      {q:'T-Rex binocular vision (two eyes facing forward) mainly helps…',
+       opts:['Seeing behind walls','Judging distance while targeting prey','Reading tiny books','Sleeping'],
+       correct:1,
+       fact:'Depth perception turns “somewhere ahead” into “right there.”'},
     ]
   },
   raptor: {
@@ -244,6 +292,14 @@ const QUIZZES = {
        opts:['Its powerful jaws','Its whip-like tail','Its sickle-shaped retractable claw','Its running speed alone'],
        correct:2,
        fact:'Each foot had a curved "sickle claw" kept sharp by being held off the ground. Scientists think it was used to pin prey and slash repeatedly — like a biological combat knife!'},
+      {q:'Velociraptor lived in a place that was often…',
+       opts:['Frozen tundra only','Sandy deserts with dunes — dune-trap ambush zone','Underwater cities','Inside volcanoes'],
+       correct:1,
+       fact:'Fossils hint at sneaky hunting between dunes — quicksand vibes for prey.'},
+      {q:'Velociraptor’s brain (for a dinosaur) suggests it was…',
+       opts:['Brain-dead','Pretty clever — a calculating little hunter','Only interested in clouds','Unable to learn'],
+       correct:1,
+       fact:'Smart + fast + sharp claws = don’t judge by turkey size.'},
     ]
   },
   spino: {
@@ -261,6 +317,14 @@ const QUIZZES = {
        opts:['Pure cartilage like a shark fin','Bone spines up to 6 feet tall covered in skin','Muscle tissue like a hump','Hollow air pockets for buoyancy'],
        correct:1,
        fact:'Those spectacular spines were solid bone, up to 6 feet tall, and likely covered with skin to form a giant sail. Scientists think it helped regulate body temperature — or was used to show off to mates!'},
+      {q:'Spinosaurus jaws and cone-shaped teeth look built for…',
+       opts:['Only cracking coconuts','Snatching slippery fish and other water prey','Chewing metal','Whistling tunes'],
+       correct:1,
+       fact:'Fish-hook vibes — river monster menu confirmed.'},
+      {q:'Dense bones in Spinosaurus may have helped it…',
+       opts:['Float like a balloon','Sink easier in water — less bobbing around','Fly to the moon','Talk louder'],
+       correct:1,
+       fact:'Heavy bones can be a swim trick — stability beats floating away from lunch.'},
     ]
   },
   ptero: {
@@ -278,6 +342,14 @@ const QUIZZES = {
        opts:['They could only glide from cliffs and high places','A powerful four-limbed pole-vault style push off the ground','They ran along the ground and leapt into the air','They couldn\'t take off from flat ground at all'],
        correct:1,
        fact:'Using all four limbs in a powerful vaulting push-off, large pterosaurs could launch themselves nearly 8 feet into the air instantly. This "quad-launch" meant they could take off from flat ground with ease, unlike birds!'},
+      {q:'A long pterosaur beak could work like…',
+       opts:['A snorkel only','Tweezers in the sky — plucking fish without landing','A parachute','A bicycle pump'],
+       correct:1,
+       fact:'Some species skimmed or speared food on the wing — drive-through fishing.'},
+      {q:'Pterosaur wings were mostly made of…',
+       opts:['Metal sheets','A stretchy membrane supported by an extra-long fourth finger','Feathers only like an eagle','Bubble wrap'],
+       correct:1,
+       fact:'One super-long finger held the wing up — evolution’s kite frame.'},
     ]
   },
   allo: {
@@ -295,6 +367,14 @@ const QUIZZES = {
        opts:['Always bigger','Smaller but still a serious predator','The size of a chicken','A plant eater'],
        correct:1,
        fact:'Allosaurus was big and scary, but T-Rex came later and could grow even larger — different eras, different bosses!'},
+      {q:'Allosaurus might have hunted in…',
+       opts:['Only solo mode forever','Small groups sometimes — team Jurassic terror','Space only','Pure darkness only'],
+       correct:1,
+       fact:'Pack hints show up in the fossil story — more brains, more bites.'},
+      {q:'Allosaurus arms were…',
+       opts:['Longer than its body','Strong grabbers — useful for holding prey while biting','Missing','Made of jelly'],
+       correct:1,
+       fact:'Not tiny T-Rex arms — Allosaurus had more “grab and slash” reach.'},
     ]
   },
   giga: {
@@ -312,6 +392,14 @@ const QUIZZES = {
        opts:['Only goldfish','Other huge dinosaurs — real monster vs monster energy','Empty deserts with no life','Modern cities'],
        correct:1,
        fact:'The Cretaceous wasn\'t fair — enormous predators shared the landscape with enormous plant-eaters.'},
+      {q:'The name Giganotosaurus basically brags about…',
+       opts:['Being tiny','Giant southern lizard vibes','Being a fish','Being invisible'],
+       correct:1,
+       fact:'“Giganto” is not shy — it warns you a huge meat-eater is on the poster.'},
+      {q:'Giganotosaurus skull features suggest it could…',
+       opts:['Only hum lullabies','Deliver wide bites to slice big chunks from prey','Read books','Photosynthesize'],
+       correct:1,
+       fact:'Wide jaws = “meat cleaver” eating style for giant meals.'},
     ]
   },
   stego: {
@@ -329,6 +417,14 @@ const QUIZZES = {
        opts:['A fierce hunter of lions','A plant-eating dinosaur','A fish','A robot'],
        correct:1,
        fact:'Those jaws were built for greens, not grizzlies — but don\'t stand behind one when it is annoyed!'},
+      {q:'Stegosaurus front legs were shorter than its back legs, so its posture looked…',
+       opts:['Perfectly flat like a table','Sloped — head low, big tail high like a seesaw','Upside down','Like a giraffe'],
+       correct:1,
+       fact:'Weird posture, real animal — think living tank with a mood.'},
+      {q:'The thagomizer tail spikes were basically…',
+       opts:['Feather dusters','A “no thanks” sign for hungry predators','Jump ropes','Antennas'],
+       correct:1,
+       fact:'One swing could ruin a predator’s whole week.'},
     ]
   },
   trike: {
@@ -346,6 +442,84 @@ const QUIZZES = {
        opts:['Only meat','Mostly tough plants low to the ground','Pizza','Lightning'],
        correct:1,
        fact:'A beak and rows of teeth sliced through ferns and shrubs — a tank built for salad.'},
+      {q:'If a Triceratops charged, what was it probably saying with its body?',
+       opts:['Let’s be best friends','Back off — I’m not lunch','Please tickle me','I’m lost, call a taxi'],
+       correct:1,
+       fact:'That heavy body + horns turned “run away” into the smart option for hungry predators.'},
+      {q:'Triceratops teeth were best for…',
+       opts:['Slicing steak','Shearing tough leaves and stems','Playing harmonica','Digging tunnels'],
+       correct:1,
+       fact:'Rows of teeth worked like scissors for greenery — a veggie shredder the size of a truck.'},
+    ]
+  },
+  rhino: {
+    intro:'Rhino — armor, attitude, and a charge that shakes the ground. Prove you belong on Team Rhino!',
+    questions:[
+      {q:'Rhino “horns” are mostly made of…',opts:['Bone','Keratin — like tough fingernail stuff','Sugar glass','Rubber'],correct:1,fact:'Same protein family as your nails — just way bigger and scarier-looking.'},
+      {q:'When a rhino runs, it can feel like…',opts:['A sleepy turtle','A furry bulldozer with turbo','A floating balloon','A quiet whisper'],correct:1,fact:'They look heavy — then surprise you with bursts of speed. Physics becomes “uh oh.”'},
+      {q:'Rhinos often roll in mud because…',opts:['They love spa day','It can cool them and shield skin from sun/bugs','They think they’re ghosts','Mud tastes like candy'],correct:1,fact:'A mud coat is sunscreen + bug spray — nature’s skincare routine.'},
+      {q:'A rhino’s hearing and smell help it…',opts:['Ignore everything','Notice danger even when it can’t see well','Talk to satellites','Only find socks'],correct:1,fact:'With so-so eyesight, super senses keep rhinos from being surprised.'},
+      {q:'Baby rhinos stay close to mom mainly to…',opts:['Learn jokes','Stay safer from predators','Practice flying','Hide from homework'],correct:1,fact:'Mom-size backup turns “easy snack” into “bad idea” for hunters.'},
+    ]
+  },
+  anaconda: {
+    intro:'Green anaconda — silent river giant. Show you respect the squeeze!',
+    questions:[
+      {q:'Big anacondas are famous for…',opts:['Singing opera','Hunting near water with stealth power','Living on clouds','Only eating popcorn'],correct:1,fact:'Rivers and swamps are their sneak-attack highways.'},
+      {q:'Constriction works because…',opts:['Hugs are magic','Each breath out lets the snake tighten a bit more','Prey falls asleep from jokes','Gravity turns off'],correct:1,fact:'It is less “crush bones” and more “you can’t breathe back in.” Still game over.'},
+      {q:'Anacondas swallow food…',opts:['One crumb at a time','Whole — then digest slowly like a portable pantry','Only on Tuesdays','Backward only'],correct:1,fact:'A huge meal can last a long time — snake meal prep is extreme.'},
+      {q:'In the water, an anaconda is…',opts:['Helpless','Shockingly agile for its size','Made of bubbles','Afraid of fish'],correct:1,fact:'Water supports that body — suddenly it moves like a shadow.'},
+      {q:'Female anacondas are often much bigger than males — that helps…',opts:['Win staring contests','Carry young and dominate food opportunities','Become birds','Glow in the dark'],correct:1,fact:'In some snakes, ladies are the true heavyweights of the swamp.'},
+    ]
+  },
+  komodo: {
+    intro:'Komodo dragon — island legend with a bite full of tricks. Unlock the real dragon!',
+    questions:[
+      {q:'Komodo dragons are famous for…',opts:['Being harmless plush toys','A toxic bite cocktail plus brute strength','Only eating cotton candy','Living in igloos'],correct:1,fact:'Their bite chemistry helps drop big prey — not just “sharp teeth energy.”'},
+      {q:'Baby komodos sometimes climb trees to…',opts:['Text friends','Escape hungry grown-ups','Practice DJ skills','Become kites'],correct:1,fact:'Adults can be a threat to babies — up a tree is a kid-safe zone.'},
+      {q:'Komodos can smell a dead animal from…',opts:['Only 1 inch away','Surprisingly far away — nose-led GPS','They cannot smell','Only on Sundays'],correct:1,fact:'Forked tongue flicking samples the air like a detective.'},
+      {q:'On islands, komodos are often…',opts:['The bottom of the food chain','Top predators that reshape the whole ecosystem','Strict vegetarians','Underwater only'],correct:1,fact:'When you’re the boss carnivore, everything walks carefully.'},
+      {q:'A komodo’s tail is useful for…',opts:['Balance, swimming, and whipping when needed','Writing essays','Storing juice boxes','Flying long distance'],correct:0,fact:'That muscular tail is a multi-tool — steering, splashing, and “don’t come closer.”'},
+    ]
+  },
+  mantis: {
+    intro:'Mantis shrimp — rainbow eyes and a punch faster than you can blink. Earn the reef warrior!',
+    questions:[
+      {q:'The mantis shrimp strike is wild because…',opts:['It is slower than a snail','It launches incredibly fast — like a underwater spring trap','It only works on homework','It is imaginary'],correct:1,fact:'That punch can make tiny flashes in water — speed meets physics.'},
+      {q:'Some mantis shrimp see…',opts:['Only gray','Polarized light and wild color channels humans don’t have','Nothing at all','Only spreadsheets'],correct:1,fact:'Their eyes are like sci-fi goggles — the reef looks different to them.'},
+      {q:'People split mantis shrimp into “spearers” vs “smashers” because…',opts:['Fashion','Different hunting styles — stabby vs hammer-y','Random naming','They live in space'],correct:1,fact:'Same animal group, different weapons loadout.'},
+      {q:'If you bothered a mantis shrimp, it might…',opts:['Offer tea','Wallop your gear (or finger) hard enough to crack things','Fall asleep instantly','Ask for autographs'],correct:1,fact:'Aquarium glass stories exist for a reason — respect the click.'},
+      {q:'Mantis shrimp live mainly…',opts:['On the moon','In warm coastal waters and burrows','Only in deserts','Inside keyboards'],correct:1,fact:'Reef and sand-bottom homes — peek out, grab prey, vanish.'},
+    ]
+  },
+  badger: {
+    intro:'Honey badger — small package, maximum chaos energy. Pass if you can handle the truth!',
+    questions:[
+      {q:'Honey badgers are legends because they…',opts:['Give up instantly','Pick fights way above their size class','Only nap','Cry when startled'],correct:1,fact:'Tough skin + attitude = predators often regret the encounter.'},
+      {q:'Their skin is surprisingly…',opts:['Paper thin','Tough and loose — hard to grip or puncture','Made of jelly','Invisible'],correct:1,fact:'A bite that should end the fight sometimes… doesn’t.'},
+      {q:'“Honey” in the name hints they…',opts:['Never eat','Raid beehives for larvae and honey when they can','Fear bees','Only drink soda'],correct:1,fact:'Bee stings happen — honey badgers keep snacking anyway.'},
+      {q:'When cornered, a honey badger often…',opts:['Faints','Fights back loud and fierce','Sends email','Turns into mist'],correct:1,fact:'Bold bluff + real toughness = “maybe don’t corner this.”'},
+      {q:'Honey badgers are mostly…',opts:['Ocean fish','Land masters that dig, climb, and roam wide','Arctic penguins','Balloons'],correct:1,fact:'They’re versatile survivors — not just memes, real skill points.'},
+    ]
+  },
+  wolverine: {
+    intro:'Wolverine — snow tank of the north. Prove you know this fierce forest ninja!',
+    questions:[
+      {q:'For its size, a wolverine is…',opts:['Weak','Absurdly strong and stubborn','Made of foam','Only cute'],correct:1,fact:'It can stand up to bigger carnivores for a meal — grit matters.'},
+      {q:'Wolverines love cold wild places partly because…',opts:['They hate trees','They’re built for snow travel and scavenging huge country','They melt in heat instantly','They only eat ice'],correct:1,fact:'Big paws, thick fur, endless stamina — northern survival build.'},
+      {q:'A wolverine’s nickname vibe is…',opts:['Shy bunny','Mini bear that refuses to quit','Slow slug','Sleepy kitten'],correct:1,fact:'They’re not the biggest predator — but they act huge.'},
+      {q:'Wolverines find food by…',opts:['Only photosynthesis','Tracking, scavenging, and stealing when opportunity hits','Waiting for delivery apps','Ignoring smells'],correct:1,fact:'Super smell + fearless attitude = dinner shows up eventually.'},
+      {q:'Climbing and swimming help wolverines…',opts:['Win video games','Cross rough terrain to hunt and escape danger','Avoid moving','Become dolphins'],correct:1,fact:'They’re more agile than they look — don’t underestimate the fluff.'},
+    ]
+  },
+  cassowary: {
+    intro:'Cassowary — dinosaur vibes with feathers. Respect the helmet bird!',
+    questions:[
+      {q:'Why are cassowaries considered dangerous?',opts:['They only eat candy','A kick can slash with a dagger-like claw','They weigh nothing','They cannot move'],correct:1,fact:'Those legs are built to bolt — and the inner toe is serious business.'},
+      {q:'The bony “helmet” on its head may help with…',opts:['Wi-Fi','Pushing through forest brush and maybe showing off','Storing soup','Flying'],correct:1,fact:'Scientists still debate details — but it looks metal.'},
+      {q:'Cassowaries eat a lot of fruit, which makes them…',opts:['Boring','Important seed spreaders for the forest','Unable to walk','Glow'],correct:1,fact:'Poop-and-plant = free tree delivery service.'},
+      {q:'If you meet one in the wild, the smart move is…',opts:['Run straight at it','Give space — don’t feed or corner it','Play loud music','Try to ride it'],correct:1,fact:'They’re shy until threatened — respect beats selfies.'},
+      {q:'Cassowaries can move through jungle by…',opts:['Teleporting','Sprinting and jumping like forest parkour','Only rolling','Sleeping only'],correct:1,fact:'When they decide to go, they’re fast — “slow bird” is a myth.'},
     ]
   },
 };
@@ -362,7 +536,12 @@ let state = {
   battle: null,
   selectedAnimals: [],
   quizReturnScreen: 'builder', // where to go after quiz
+  /** Bumped on each startBattle(); stale finishBattle timers ignore transitions. */
+  battleFlowGen: 0,
 };
+
+/** How many questions each Apex/Dino unlock run uses (picked randomly from a larger pool). */
+const UNLOCK_QUIZ_SESSION_LEN = 3;
 
 // Quiz sub-state
 let quizState = {
@@ -370,6 +549,8 @@ let quizState = {
   currentQ: 0,
   correctCount: 0,
   answered: false,
+  /** Shuffled subset of the bank for this attempt (length UNLOCK_QUIZ_SESSION_LEN). */
+  sessionQuestions: null,
 };
 
 function defaultProgress() {
@@ -1040,122 +1221,212 @@ const PRE_BATTLE_QUESTIONS = {
   wolf: [
     { q: 'How far away can a wolf sometimes hear a howl in open country?', opts: ['Only a few trees away', 'Roughly as far as a loud concert', 'Miles and miles on a clear night', 'Wolves cannot hear howls'], correct: 2, boostStat: 'int', funFact: 'Wolves tune in to packmates from incredibly far away — their ears and brain teamwork is elite.' },
     { q: 'What is wild about a wolf pack’s teamwork?', opts: ['They never share food', 'They can coordinate big hunts like a sports team', 'Only the youngest wolf hunts', 'They avoid each other'], correct: 1, boostStat: 'agi', funFact: 'Real packs split roles: some chase, some block, so dinner does not get away.' },
+    { q: 'A wolf’s paws are like snowshoes because…', opts: ['They are tiny', 'Toes spread wide to spread weight on soft ground', 'They glow', 'They spin'], correct: 1, boostStat: 'agi', funFact: 'Wide paws help wolves cruise snow and sand without sinking — built-in trail gear.' },
+    { q: 'Wolves “test” big prey by…', opts: ['Asking for ID', 'Harassing from many sides to find a weak spot', 'Sending emails', 'Doing nothing'], correct: 1, boostStat: 'int', funFact: 'Team pressure turns panic into a mistake — strategy beats brute rushing.' },
+    { q: 'Why do wolves howl together?', opts: ['To break glass', 'To sync the pack and warn strangers', 'Because the moon pays them', 'They hate music'], correct: 1, boostStat: 'str', funFact: 'A chorus says “we are here and we are family” — long-distance group chat.' },
   ],
   bear: [
     { q: 'A bear’s sense of smell is so strong it can be compared to…', opts: ['A house cat', 'A superhero nose — kilometers away', 'Only what touches its whiskers', 'Nothing special'], correct: 1, boostStat: 'int', funFact: 'Some bears detect food from an insane distance — like finding one snack in a whole stadium.' },
     { q: 'Climbing trees is a bear skill because…', opts: ['They are too heavy to try', 'They are shockingly strong climbers for their size', 'Only cubs fake-climb', 'Bears hate heights'], correct: 1, boostStat: 'str', funFact: 'Big bears can go up trunks to escape danger or steal a beehive snack.' },
+    { q: 'Before winter, many bears focus on…', opts: ['Learning piano', 'Eating a ton to build fat reserves', 'Only drinking soda', 'Growing shorter'], correct: 1, boostStat: 'str', funFact: 'Fat is their battery for months without groceries — nature’s power bank.' },
+    { q: 'A mother bear with cubs is dangerous mostly because…', opts: ['She is always calm', 'She protects babies like a bodyguard on turbo', 'She cannot see', 'She loves selfies'], correct: 1, boostStat: 'spd', funFact: 'Never surprise a cub caravan — mom’s job is “no.”' },
+    { q: 'Bears often flip rocks and tear logs because…', opts: ['They redecorate', 'Insects and grubs are crunchy protein snacks', 'They hate wood', 'They think it is a game show'], correct: 1, boostStat: 'int', funFact: 'Snack hunting is serious work — muscles + patience = calories.' },
   ],
   eagle: [
     { q: 'Eagle eyes are famous because they can…', opts: ['Only see black and white', 'Spot small prey from very high in the sky', 'See behind their head', 'Only work underwater'], correct: 1, boostStat: 'int', funFact: 'Their vision is like built-in zoom lenses — perfect for a sky hunter.' },
     { q: 'How do eagles usually grab moving prey?', opts: ['They kick it', 'They dive with talons locked like grappling hooks', 'They bark until it stops', 'They never grab prey'], correct: 1, boostStat: 'spd', funFact: 'A stooping eagle is a lightning-fast strike from above.' },
+    { q: 'Eagle talons work like…', opts: ['Spoons', 'Locking meat hooks — serious grip strength', 'Feathers only', 'Bubble wands'], correct: 1, boostStat: 'str', funFact: 'Once those toes clamp, escape gets very unlikely.' },
+    { q: 'Big eagles sometimes steal food from smaller hunters — that is called…', opts: ['Sharing nicely', 'Kleptoparasitism — lunch robbery', 'Dancing', 'Gardening'], correct: 1, boostStat: 'agi', funFact: 'Why hunt if you can yoink? (Still rude in animal court.)' },
+    { q: 'An eagle’s sharp beak is best for…', opts: ['Tearing food into swallowable pieces', 'Brushing hair', 'Typing', 'Playing drums'], correct: 0, boostStat: 'int', funFact: 'Beak + talons = fork-and-knife toolkit built in.' },
   ],
   lion: [
     { q: 'A lion’s roar is special because it can…', opts: ['Only work underwater', 'Travel far and warn rivals away', 'Sound like a bird', 'Be heard only 1 foot away'], correct: 1, boostStat: 'str', funFact: 'That deep roar is a long-distance “this pride is taken” broadcast.' },
     { q: 'Lionesses often hunt in a group — why?', opts: ['They are shy alone', 'Teamwork corners fast prey', 'They never eat meat', 'They only hunt at midnight exactly'], correct: 1, boostStat: 'agi', funFact: 'Coordinated flanking is how prides catch speedy animals on the savanna.' },
+    { q: 'Male lions grow manes partly to…', opts: ['Store water balloons', 'Look bigger and protect the neck in fights', 'Hide from fish', 'Cool down instantly'], correct: 1, boostStat: 'str', funFact: 'A fluffy mane screams “I survived battles” to rivals.' },
+    { q: 'Lions rest a lot because…', opts: ['They are lazy only', 'Hunting bursts cost huge energy in heat', 'They cannot move', 'They are nocturnal robots'], correct: 1, boostStat: 'int', funFact: 'Save energy, strike smart — lion economics.' },
+    { q: 'A pride is basically…', opts: ['A random crowd', 'A family team with roles', 'A school bus', 'A cloud'], correct: 1, boostStat: 'int', funFact: 'Related lionesses often stick together — strength in sisterhood.' },
   ],
   cheetah: [
     { q: 'After a cheetah’s famous sprint, what usually happens?', opts: ['It keeps sprinting for hours', 'It overheats fast and needs a breather', 'It falls asleep instantly', 'It grows taller'], correct: 1, boostStat: 'spd', funFact: 'Top speed is a short turbo boost — biology trades endurance for blink-fast bursts.' },
     { q: 'Cheetahs use their long tails while running to…', opts: ['Look fancy', 'Steer and balance like a rudder', 'Store snacks', 'Signal airplanes'], correct: 1, boostStat: 'agi', funFact: 'That tail helps them corner without wiping out at crazy speeds.' },
+    { q: 'Cheetah “tear marks” by the eyes may help with…', opts: ['Fashion week', 'Glare reduction like built-in sunglasses stripes', 'Flying', 'Storing food'], correct: 1, boostStat: 'int', funFact: 'Sharp focus on prey beats squinting in bright sun.' },
+    { q: 'Cheetahs prefer hunting during…', opts: ['Loud parades', 'Cooler hours like dawn and dusk', 'Only underwater', 'Never'], correct: 1, boostStat: 'agi', funFact: 'Less heat = better sprint stats — smart scheduling.' },
+    { q: 'A cheetah’s non-retractable grip claws act like…', opts: ['Crayons', 'Cleats for traction on dirt', 'Umbrellas', 'Headphones'], correct: 1, boostStat: 'spd', funFact: 'Traction turns speed into a controlled drift, not a slip-n-slide.' },
   ],
   gorilla: [
     { q: 'How does gorilla strength compare to most humans?', opts: ['About the same as a toddler', 'Way beyond what a human can match', 'Weaker than a pigeon', 'Only in cartoons'], correct: 1, boostStat: 'str', funFact: 'Adult gorillas can bend metal-looking behavior in the wild — pure power.' },
     { q: 'Gorillas are smart enough to…', opts: ['Forget everything daily', 'Use tools and learn tricky tasks', 'Only count to two forever', 'Never recognize friends'], correct: 1, boostStat: 'int', funFact: 'They have been seen using sticks and solving problems like puzzle pros.' },
+    { q: 'Despite movies, real wild gorillas are usually…', opts: ['Chaos gremlins', 'Gentle plant munchers unless threatened', 'Candy thieves', 'Invisible'], correct: 1, boostStat: 'int', funFact: 'Leafy diet + calm vibes — respect their space and they chill.' },
+    { q: 'Silverback means…', opts: ['A fish', 'A mature male leader with a gray saddle on his back', 'A baby', 'A bird'], correct: 1, boostStat: 'str', funFact: 'That silver cape screams “I run this group.”' },
+    { q: 'Gorilla knuckle-walking helps…', opts: ['Carry suitcases', 'Support heavy bodies while moving through forest', 'Swim faster', 'Climb clouds'], correct: 1, boostStat: 'agi', funFact: 'Strong arms + clever gait = forest SUV mode.' },
   ],
   dolphin: [
     { q: 'Dolphins sleep in a sneaky way — how?', opts: ['They stop breathing', 'One brain half rests while they keep swimming', 'They only sleep on land', 'They never sleep'], correct: 1, boostStat: 'int', funFact: 'Half-awake mode lets them surface to breathe and still get rest. Wild!' },
     { q: 'Dolphin echolocation is basically…', opts: ['Random clicking', 'A sound map that “sees” underwater', 'Only for jokes', 'Useless in the ocean'], correct: 1, boostStat: 'int', funFact: 'Clicks bounce back as a picture of fish hiding in murky water.' },
+    { q: 'Dolphins sometimes surf boat wakes because…', opts: ['They hate fun', 'Free speed boost — smart energy saving', 'They are lost', 'Boats feed them'], correct: 1, boostStat: 'spd', funFact: 'Why swim harder if a wave does the work?' },
+    { q: 'A dolphin pod can herd fish into a ball by…', opts: ['Magic spells', 'Teamwork bubbles and coordinated moves', 'Doing nothing', 'Singing only'], correct: 1, boostStat: 'agi', funFact: 'Cooperative fishing is cafeteria teamwork underwater.' },
+    { q: 'Dolphins learn hunting tricks from…', opts: ['Only books', 'Moms, friends, and pod culture', 'TV ads', 'Random luck'], correct: 1, boostStat: 'int', funFact: 'Young dolphins copy the cool kids — animal school is real.' },
   ],
   croc: [
     { q: 'A crocodile’s bite is best described as…', opts: ['Gentle like a marshmallow', 'One of the strongest crushes in nature', 'Weaker than a human chew', 'Only for plants'], correct: 1, boostStat: 'str', funFact: 'Closing jaw force is monster-level — opening muscles are weaker though.' },
     { q: 'Crocodiles have been around so long they…', opts: ['Arrived last year', 'Outlived the dinosaurs’ main era', 'Only exist in games', 'Hatched from phones'], correct: 1, boostStat: 'int', funFact: 'Survivors from deep time — same vibe as living fossils with attitude.' },
+    { q: 'A croc’s eyes and nostrils on top of its head help it…', opts: ['Wear hats', 'Hide underwater while still peeking and breathing', 'Fly', 'Play piano'], correct: 1, boostStat: 'agi', funFact: 'Looks like a log — actually a surveillance tower.' },
+    { q: 'Baby crocs chirp from the nest to…', opts: ['Call mom for help hatching and safety', 'Order pizza', 'Sing opera', 'Turn invisible'], correct: 0, boostStat: 'int', funFact: 'Mom hears the tiny chirps and digs them out — reptile nursery radio.' },
+    { q: 'Crocs can go a long time without food partly because…', opts: ['They photosynthesize', 'They are cold-blooded and energy-efficient', 'They only drink soda', 'They never move'], correct: 1, boostStat: 'str', funFact: 'Slow burn metabolism = patient ambush lifestyle.' },
   ],
   tiger: [
     { q: 'Tiger stripes are like fingerprints because…', opts: ['They are painted on', 'Each cat’s pattern is unique', 'All tigers match perfectly', 'Stripes mean nothing'], correct: 1, boostStat: 'int', funFact: 'Scientists can tell individuals apart by stripe layout — nature’s barcode.' },
     { q: 'Tigers often hunt by…', opts: ['Loud marching bands', 'Ambush — sneak, then burst', 'Asking politely', 'Only in groups of 50'], correct: 1, boostStat: 'spd', funFact: 'Stealth + sudden speed is the tiger combo meal.' },
+    { q: 'Tigers can swim surprisingly well — useful for…', opts: ['Space travel', 'Crossing rivers and cooling off', 'Flying', 'Digging tunnels'], correct: 1, boostStat: 'agi', funFact: 'Stripes work in water too — sneaky pool mode.' },
+    { q: 'A tiger’s rough tongue helps…', opts: ['Comb fur and scrape meat from bones', 'Play violin', 'Stick to walls', 'Glow'], correct: 0, boostStat: 'str', funFact: 'Sandpaper tongue = grooming + last-bite cleanup.' },
+    { q: 'White tigers are not a separate species — they are…', opts: ['Aliens', 'A rare color form from special genes', 'Painted', 'Birds'], correct: 1, boostStat: 'int', funFact: 'Same tiger, different paint job — genetics surprise.' },
   ],
   shark: [
     { q: 'Shark skeletons are mostly made of…', opts: ['Solid steel', 'Flexible cartilage like your ears', 'Glass', 'Wood'], correct: 1, boostStat: 'agi', funFact: 'Cartilage keeps them lighter and bendy — handy for tight turns.' },
     { q: 'Some sharks can sense…', opts: ['Only color TV', 'Tiny electric fields from prey muscles', 'Nothing at all', 'Only loud music'], correct: 1, boostStat: 'int', funFact: 'Ampullae of Lorenzini sound sci-fi but are real electric detectors.' },
+    { q: 'Sharks must keep water moving over their gills — great whites do it by…', opts: ['Sleeping forever', 'Swimming forward (ram ventilation)', 'Holding breath like humans', 'Clapping'], correct: 1, boostStat: 'spd', funFact: 'Swim or suffocate — motion is oxygen for many big sharks.' },
+    { q: 'Shark teeth rows are like…', opts: ['A conveyor belt of replacements', 'One set forever', 'Cotton candy', 'Magnets only'], correct: 0, boostStat: 'str', funFact: 'Lost tooth? Next one slides in — endless bite factory.' },
+    { q: 'A shark’s oily liver helps…', opts: ['Play music', 'Float easier in salt water', 'Cook soup', 'Talk'], correct: 1, boostStat: 'int', funFact: 'Big liver = natural floatie — saves energy between hunts.' },
   ],
   rhino: [
     { q: 'Rhino horn is made of…', opts: ['Ivory', 'Keratin — the same stuff as fingernails', 'Chocolate', 'Diamond'], correct: 1, boostStat: 'str', funFact: 'Not bone — it grows like a mega-nail, which surprises most people.' },
     { q: 'A rhino charge is dangerous because…', opts: ['It is very slow always', 'It combines weight + surprising speed', 'It is pretend', 'Rhinos never move'], correct: 1, boostStat: 'spd', funFact: 'Tank body + a sudden rush = do not stand in the way.' },
+    { q: 'Rhinos love mud wallows because…', opts: ['They hate water', 'Mud cools skin and blocks biting bugs', 'They think they are hippos', 'Mud is candy'], correct: 1, boostStat: 'int', funFact: 'Spa day with benefits — sunscreen + bug armor.' },
+    { q: 'Rhinos use poop piles as…', opts: ['Art projects', 'Scent bulletin boards for other rhinos', 'Hats', 'Food'], correct: 1, boostStat: 'int', funFact: 'Smell-mail helps neighbors know who is around.' },
+    { q: 'A rhino’s hearing swivels thanks to…', opts: ['Rotating ears like radar dishes', 'No ears', 'Antennae', 'Feet'], correct: 0, boostStat: 'agi', funFact: 'Cupped ears track weird sounds — listen before you charge.' },
   ],
   anaconda: [
     { q: 'How does a big constrictor like an anaconda finish a hunt?', opts: ['It sings a lullaby', 'It squeezes until the prey cannot breathe well', 'It uses laser eyes', 'It only eats plants'], correct: 1, boostStat: 'str', funFact: 'Each exhale tightens the hug — scary-efficient physics.' },
     { q: 'Anacondas shine in…', opts: ['Desert sand surfing', 'Water — sneaky swimming ambushes', 'Mountain climbing only', 'Flying'], correct: 1, boostStat: 'agi', funFact: 'Rivers are their hide-and-seek playground.' },
+    { q: 'After a huge meal, a big anaconda might…', opts: ['Run a marathon', 'Digest slowly for days or weeks', 'Explode', 'Lay eggs on the moon'], correct: 1, boostStat: 'str', funFact: 'Snake food coma is measured in weeks — living pantry mode.' },
+    { q: 'Female green anacondas are often much larger than males — that helps…', opts: ['Win jump rope', 'Carry young and dominate river hunting', 'Become birds', 'Glow'], correct: 1, boostStat: 'int', funFact: 'In some species, the ladies are the true river bosses.' },
+    { q: 'Heat-sensing pits on a snake’s face help…', opts: ['Play music', 'Notice warm-blooded prey even in the dark', 'Fly', 'Swim in lava'], correct: 1, boostStat: 'int', funFact: 'Night vision bonus track — warmth glows like a target.' },
   ],
   komodo: [
     { q: 'Komodo dragons are famous for…', opts: ['Being harmless plush toys', 'Venomous bite chemistry + brute force', 'Only eating salad', 'Living only in ice'], correct: 1, boostStat: 'str', funFact: 'Their bite cocktail helps take down big prey — real dragon energy.' },
     { q: 'Baby komodos sometimes climb trees to…', opts: ['Text friends', 'Escape hungry adults', 'Practice music', 'Become birds'], correct: 1, boostStat: 'agi', funFact: 'Even babies know the floor can be risky around bigger dragons.' },
+    { q: 'Komodos can taste the air with…', opts: ['Their ears', 'A forked tongue flick', 'Their toes', 'Elbows'], correct: 1, boostStat: 'int', funFact: 'Chemical clues on the breeze — dragon detective mode.' },
+    { q: 'Komodos can swallow chunks of meat because…', opts: ['They chew carefully always', 'Their jaws stretch and they gulp big bites', 'They only drink', 'They hate food'], correct: 1, boostStat: 'str', funFact: 'Less chewing, more monster swallow — efficient if messy.' },
+    { q: 'On islands, komodos often scavenge — that means…', opts: ['They only eat salad', 'They happily clean up carcasses too', 'They never eat', 'They farm plants'], correct: 1, boostStat: 'int', funFact: 'Free calories beat risky hunts — smart island economics.' },
   ],
   mantis: [
     { q: 'The mantis shrimp punch is wild because…', opts: ['It is slower than a snail', 'It accelerates like a bullet leaving a barrel', 'It only works on Mondays', 'It is imaginary'], correct: 1, boostStat: 'spd', funFact: 'That strike can make light flashes in water — speed weapon unlocked.' },
     { q: 'Some mantis shrimp eyes see…', opts: ['Only one color', 'Polarized light humans cannot see', 'Nothing', 'Only spreadsheets'], correct: 1, boostStat: 'int', funFact: 'Their vision is a sci-fi filter for the reef.' },
+    { q: '“Smashers” vs “spearers” are names for…', opts: ['Dances', 'Different mantis shrimp hunting styles', 'Fish bands', 'Boats'], correct: 1, boostStat: 'agi', funFact: 'Same animal group, different weapons loadout.' },
+    { q: 'A mantis shrimp lives inside a rocky burrow partly to…', opts: ['Host concerts', 'Ambush prey from a safe doorway', 'Sleep 24/7', 'Paint'], correct: 1, boostStat: 'int', funFact: 'Home base + sudden punch = reef booby trap.' },
+    { q: 'If you poke at a mantis shrimp shell, it might…', opts: ['Ask for a hug', 'Crack aquarium glass with a punch', 'Turn into mist', 'Sing'], correct: 1, boostStat: 'str', funFact: 'Respect the click — speed beats thickness sometimes.' },
   ],
   badger: [
     { q: 'Honey badgers are legends because they…', opts: ['Give up instantly', 'Fight way above their weight class', 'Only nap', 'Fear everything'], correct: 1, boostStat: 'str', funFact: 'Tough skin + fearless attitude = meme-worthy toughness.' },
     { q: 'A honey badger’s attitude is best described as…', opts: ['Shy and quiet always', 'Bold — they do not back down easy', 'Only friendly to aliens', 'Always sleeping'], correct: 1, boostStat: 'int', funFact: 'Their confidence is a survival strategy — predators think twice.' },
+    { q: 'Honey badger skin is oddly…', opts: ['Paper thin', 'Tough and loose — hard to bite through', 'Made of jelly', 'Invisible'], correct: 1, boostStat: 'str', funFact: 'Grip slips, bites fail — chaos armor unlocked.' },
+    { q: 'They raid beehives because…', opts: ['They hate bees', 'Bee larvae and honey are high-calorie snacks', 'Bees are friends', 'They collect wax art'], correct: 1, boostStat: 'agi', funFact: 'Stings happen — snack goals win anyway.' },
+    { q: '“Ratel” is another name for honey badger — it still means…', opts: ['Shy flower', 'Same fearless mustelid menace', 'A fish', 'A cloud'], correct: 1, boostStat: 'int', funFact: 'Different label, same “do not mess with me” energy.' },
   ],
   wolverine: [
     { q: 'For its size, a wolverine is…', opts: ['The weakest animal alive', 'Absurdly strong and stubborn', 'Made of jelly', 'Unable to climb'], correct: 1, boostStat: 'str', funFact: 'Pound-for-pound tank — can steal food from bigger carnivores.' },
     { q: 'Wolverines thrive in…', opts: ['Only hot lava', 'Cold wild places with grit', 'Shopping malls', 'Only underwater cities'], correct: 1, boostStat: 'int', funFact: 'Snow stamina and toughness = northern survivor build.' },
+    { q: 'Wolverines mark territory with…', opts: ['Glitter', 'Scent glands — smell graffiti', 'Balloons', 'Nothing'], correct: 1, boostStat: 'int', funFact: '“This valley is mine” but in stink format.' },
+    { q: 'A wolverine’s teeth can crush…', opts: ['Only air', 'Frozen bones and tough scraps', 'Diamonds always', 'Clouds'], correct: 1, boostStat: 'str', funFact: 'Winter pantry includes leftovers others cannot open.' },
+    { q: 'Wolverines travel huge distances because…', opts: ['They are lost', 'They patrol wide home ranges for food', 'They follow UFOs', 'They hate walking'], correct: 1, boostStat: 'spd', funFact: 'Marathon feet — low food density means long commutes.' },
   ],
   cassowary: [
     { q: 'Why are cassowaries called dangerous birds?', opts: ['They only eat candy', 'A kick with a dagger-like claw can seriously injure', 'They cannot move', 'They are tiny'], correct: 1, boostStat: 'str', funFact: 'Jurassic Park vibes — respect the dinosaur bird.' },
     { q: 'Cassowaries move through forest with…', opts: ['Rocket boots', 'Fast dodging bursts when threatened', 'They never walk', 'Only rolling'], correct: 1, boostStat: 'spd', funFact: 'They can sprint and leap — do not corner one.' },
+    { q: 'The cassowary casque (helmet bump) might help with…', opts: ['Wi-Fi', 'Pushing through brush or showing off', 'Storing soup', 'Flying'], correct: 1, boostStat: 'agi', funFact: 'Scientists still debate — but it looks epic.' },
+    { q: 'Cassowaries spread rainforest trees by…', opts: ['Painting', 'Swallowing fruit and pooping seeds elsewhere', 'Mailing seeds', 'Ignoring fruit'], correct: 1, boostStat: 'int', funFact: 'Gardeners in feathers — forest delivery service.' },
+    { q: 'Bright blue skin on the neck can work as…', opts: ['Camouflage in snow', 'A warning or signal to others', 'A TV', 'Armor plates'], correct: 1, boostStat: 'int', funFact: 'Color screams “notice me” — sometimes that is a threat flex.' },
   ],
   pbear: [
     { q: 'Polar bears are amazing swimmers because…', opts: ['They avoid water', 'They cross long ocean distances hunting seals', 'They only float like corks for fun', 'They cannot swim'], correct: 1, boostStat: 'str', funFact: 'Marathon swims happen — Arctic survival is serious training.' },
     { q: 'Under ice, polar bears find seals using…', opts: ['Loud karaoke', 'Smell and patience at breathing holes', 'Only luck', 'GPS phones'], correct: 1, boostStat: 'int', funFact: 'They sniff out seal breathing spots like tactical hunters.' },
+    { q: 'Polar bear fur looks white because…', opts: ['It is painted', 'Hollow hairs scatter light like snow', 'It is blue metal', 'It is wet only'], correct: 1, boostStat: 'int', funFact: 'Trick-of-the-light camouflage — sneaky science coat.' },
+    { q: 'Polar bears are mostly classified as marine mammals because…', opts: ['They hate land', 'They depend on sea ice and ocean hunting', 'They have gills', 'They only eat plants'], correct: 1, boostStat: 'agi', funFact: 'Ice is their highway — seals are the fuel stations.' },
+    { q: 'Mother polar bears in dens mainly…', opts: ['Throw parties', 'Keep tiny cubs warm through brutal winter', 'Train sharks', 'Grow wings'], correct: 1, boostStat: 'str', funFact: 'Cozy nursery engineering — survival school starts day one.' },
   ],
   saltcroc: [
     { q: 'Saltwater crocs are extra scary because…', opts: ['They only eat salad', 'They can ambush from water and tolerate saltwater travel', 'They are slow always', 'They are toys'], correct: 1, boostStat: 'str', funFact: '“Salty” is not a joke — they cruise between coasts and rivers.' },
     { q: 'The death roll helps a croc…', opts: ['Dance for fun', 'Rip control of prey underwater', 'Sleep', 'Fly'], correct: 1, boostStat: 'agi', funFact: 'Spinning turns a tug-of-war into a win underwater.' },
+    { q: 'A salty’s eyes on top of its head help it…', opts: ['Read books', 'Spy while floating like a log', 'Sing', 'Climb trees'], correct: 1, boostStat: 'int', funFact: 'Mostly submerged surveillance — classic croc trick.' },
+    { q: 'Saltwater crocs can grow…', opts: ['Smaller than a gecko always', 'Huge — some of the biggest reptiles alive', 'Only to shoe size', 'Invisible'], correct: 1, boostStat: 'str', funFact: 'Length records sound like monsters — because they are.' },
+    { q: 'Baby salties chirp from the nest to…', opts: ['Order pizza', 'Signal mom to dig them out', 'Start a band', 'Turn green'], correct: 1, boostStat: 'int', funFact: 'Tiny chirps, giant mom — reptile rescue radio.' },
   ],
   orca: [
     { q: 'Orcas are actually…', opts: ['The biggest dolphins', 'A kind of goldfish', 'Plants', 'Insects'], correct: 0, boostStat: 'int', funFact: 'Killer “whale” is a dolphin cousin plot twist — biggest, smartest dolphin.' },
     { q: 'Orca pods sometimes hunt using…', opts: ['Random chaos only', 'Coached team tactics passed between generations', 'Only solo luck', 'They never hunt'], correct: 1, boostStat: 'int', funFact: 'Different pods have different cultures — real ocean teamwork.' },
+    { q: 'Orcas echolocate clicks mainly to…', opts: ['Paint', 'Map prey and talk underwater', 'Cook', 'Sleep'], correct: 1, boostStat: 'agi', funFact: 'Sound vision — dark water cannot hide everything.' },
+    { q: 'An orca’s black-and-white pattern may help with…', opts: ['Confusing prey when seen from above/below', 'Camouflage in lava', 'Flying', 'Growing plants'], correct: 0, boostStat: 'int', funFact: 'Countershading breaks up the silhouette — sneaky tuxedo.' },
+    { q: 'Some orca pods specialize diets — that shows…', opts: ['They are picky for no reason', 'Learned culture, not just instinct', 'They hate fish', 'They only eat plastic'], correct: 1, boostStat: 'str', funFact: 'Ocean families pass down hunting styles like recipes.' },
   ],
   buffalo: [
     { q: 'When lions attack, buffalo herds may…', opts: ['Always run and abandon calves', 'Circle up and fight back as a wall', 'Fall asleep', 'Turn invisible'], correct: 1, boostStat: 'str', funFact: 'Buffalo can send lions flying — “prey” is not always helpless.' },
     { q: 'Cape buffalo are nicknamed scary because they…', opts: ['Are harmless plushies', 'Can be unpredictable and protective', 'Only eat grass politely', 'Cannot see'], correct: 1, boostStat: 'int', funFact: 'Guides respect them — smart, strong, and grudge-capable.' },
+    { q: 'Buffalo horns curve so fights can…', opts: ['Hook and toss rivals or predators', 'Play violin', 'Store water', 'Glow'], correct: 0, boostStat: 'str', funFact: 'Physics meets attitude — leverage wins shoving matches.' },
+    { q: 'Cape buffalo remember threats — stories show they may…', opts: ['Forget instantly', 'Circle back later to confront a predator', 'Only nap', 'Turn into birds'], correct: 1, boostStat: 'int', funFact: 'Grudge mode is real — savanna payback exists.' },
+    { q: 'A buffalo herd crossing a river is risky because…', opts: ['Water is always safe', 'Crocodiles ambush at the edges', 'Fish help them', 'Rivers are fake'], correct: 1, boostStat: 'agi', funFact: 'Teamwork helps — but jaws still wait in the shallows.' },
   ],
   sibtiger: [
     { q: 'Siberian tigers deal with cold using…', opts: ['Summer shorts only', 'Thick fur and a serious fat layer', 'Hot cocoa only', 'They live in volcanoes'], correct: 1, boostStat: 'str', funFact: 'They are built like furry tanks for -40 style winters.' },
     { q: 'Among big cats, Siberian tigers are often…', opts: ['The smallest ever', 'Some of the largest and heaviest', 'The size of mice', 'Invisible'], correct: 1, boostStat: 'str', funFact: 'Cold climate giants — extra bulk keeps heat inside.' },
+    { q: 'Siberian tigers patrol huge territories because…', opts: ['They are lost', 'Prey is spread thin in cold forests', 'They hate walking', 'They follow trains'], correct: 1, boostStat: 'spd', funFact: 'Big home range = lots of quiet hiking between meals.' },
+    { q: 'Their padded paws work like…', opts: ['Sandals on snow — quieter stalking', 'Drums', 'Wings', 'Speakers'], correct: 0, boostStat: 'agi', funFact: 'Snow sneakers for a predator — stealth stays on.' },
+    { q: 'Siberian tigers are strong swimmers — useful for…', opts: ['Space travel', 'Crossing rivers in their range', 'Flying', 'Digging'], correct: 1, boostStat: 'int', funFact: 'Water is not a wall — just another path.' },
   ],
   trex: [
     { q: 'T. rex bite force is often compared to…', opts: ['A rubber duck', 'A car-crushing hydraulic press level', 'A butterfly', 'A whisper'], correct: 1, boostStat: 'str', funFact: 'Those jaws were bone-breakers — king of crunch.' },
     { q: 'Scientists still argue about T. rex arms because…', opts: ['They were perfect for typing', 'They were tiny but maybe useful for gripping', 'They did not exist', 'They were wings'], correct: 1, boostStat: 'int', funFact: 'Tiny arms, giant mystery — science loves a good debate.' },
+    { q: 'T. rex binocular vision helped it…', opts: ['Read tiny fonts', 'Judge distance while aiming a bite', 'Sleep', 'Fly'], correct: 1, boostStat: 'int', funFact: 'Depth perception turns “somewhere there” into “gotcha.”' },
+    { q: 'T. rex teeth were serrated like…', opts: ['Cotton candy', 'Steak knives for ripping dinosaur steak', 'Spoons', 'Feathers'], correct: 1, boostStat: 'str', funFact: 'Each tooth was a saw-edged tool — floss not included.' },
+    { q: 'A T. rex could crush bone partly because…', opts: ['It ate only air', 'Huge jaw muscles and teeth focused force', 'It was hollow', 'It was tiny'], correct: 1, boostStat: 'str', funFact: 'Bone crunching unlocks hidden calories — waste not.' },
   ],
   raptor: [
     { q: 'Real Velociraptors were closer in size to…', opts: ['A bus like the movies', 'A big turkey', 'A blue whale', 'A skyscraper'], correct: 1, boostStat: 'agi', funFact: 'Hollywood supersized them — real raptors were still clever hunters.' },
     { q: 'Velociraptor relatives had feathers, which means…', opts: ['They were cold metal', 'They connect dinosaurs to modern birds', 'They could not move', 'They hated color'], correct: 1, boostStat: 'int', funFact: 'Birds are living dinosaurs — feathers are the family badge.' },
+    { q: 'The famous sickle claw was likely used to…', opts: ['Pin and slash prey', 'Stir soup', 'Paint', 'Dig tunnels only'], correct: 0, boostStat: 'str', funFact: 'One hooked toe — raptor Swiss Army knife.' },
+    { q: 'Velociraptor lived in deserts with…', opts: ['Only penguins', 'Dunes that could hide ambush hunts', 'Skyscrapers', 'Oceans only'], correct: 1, boostStat: 'agi', funFact: 'Sand-trap horror movie set — real ecosystem.' },
+    { q: 'Pack-hunting is debated for raptor relatives — if true, it means…', opts: ['They never ate', 'Teamwork could overwhelm bigger prey', 'They were plants', 'They feared air'], correct: 1, boostStat: 'int', funFact: 'Brains + buddies = scary math.' },
   ],
   spino: [
     { q: 'Spinosaurus stands out because many think it…', opts: ['Only flew', 'Hunted fish and lived semi-aquatic', 'Ate only clouds', 'Was a plant'], correct: 1, boostStat: 'str', funFact: 'Sail-backed river monster vibes — weird and awesome.' },
     { q: 'Spinosaurus size hype is about…', opts: ['Being smaller than a cat', 'Being one of the longest meat-eaters ever found', 'Being imaginary', 'Being a balloon'], correct: 1, boostStat: 'str', funFact: 'Length records make it a legendary predator silhouette.' },
+    { q: 'Spinosaurus nostrils set far back on the skull helped…', opts: ['Sniff while mostly submerged like a croc', 'Smell space', 'Whistle tunes', 'Hide from birds'], correct: 0, boostStat: 'int', funFact: 'Snorkel-face energy — river hunting hints.' },
+    { q: 'Dense bones in Spinosaurus may have helped it…', opts: ['Float away', 'Sink and maneuver in water easier', 'Fly', 'Glow'], correct: 1, boostStat: 'agi', funFact: 'Heavy bones can be a swim trick — stability beats bobbing.' },
+    { q: 'The giant sail might have helped with…', opts: ['Wi-Fi', 'Temperature control or showing off', 'Storing candy', 'Becoming invisible'], correct: 1, boostStat: 'int', funFact: 'Billboard + radiator + mate flex — multi-tool spine.' },
   ],
   ptero: [
     { q: 'Pterosaurs were not dinosaurs — they were…', opts: ['Flying reptile cousins', 'Early birds exactly', 'Fish only', 'Robots'], correct: 0, boostStat: 'int', funFact: 'Separate branch of awesome — first vertebrates with powered flight.' },
     { q: 'Giant pterosaurs launched into the air using…', opts: ['Only cliffs always', 'A powerful four-limb push-off leap', 'Helicopter blades', 'They never flew'], correct: 1, boostStat: 'spd', funFact: 'Quad-launch let huge flyers take off without a runway.' },
+    { q: 'Pterosaur wing membrane stretched from…', opts: ['Only the legs', 'The body out to an extra-long finger', 'Their nose', 'Their tail only'], correct: 1, boostStat: 'agi', funFact: 'One super finger holds the kite — evolution’s hang glider.' },
+    { q: 'Quetzalcoatlus-level giants could have wingspans like…', opts: ['A house cat', 'A small airplane — insanely wide', 'A coin', 'A shoe'], correct: 1, boostStat: 'str', funFact: 'Shadow on the ground meant “look up now.”' },
+    { q: 'Pterosaurs had hollow bones partly to…', opts: ['Store water', 'Stay lighter for flight', 'Sink faster', 'Play music'], correct: 1, boostStat: 'int', funFact: 'Strength without extra weight — aerospace homework done.' },
   ],
   allo: [
     { q: 'Allosaurus lived mainly in…', opts: ['The Jurassic', 'Your pocket', 'The year 2020 only', 'Outer space'], correct: 0, boostStat: 'spd', funFact: 'Classic Jurassic predator — older story than T-Rex, still a horror movie star.' },
     { q: 'Allosaurus teeth were built to…', opts: ['Crunch rocks', 'Slice meat like steak knives', 'Paint pictures', 'Whistle tunes'], correct: 1, boostStat: 'str', funFact: 'Serrated blades made it a pro at taking bites out of big prey.' },
+    { q: 'Allosaurus had strong arms for a big theropod — handy for…', opts: ['Typing', 'Gripping prey while biting', 'Flying', 'Photosynthesis'], correct: 1, boostStat: 'agi', funFact: 'Arms that actually help — grab-and-bite combo.' },
+    { q: 'Fossil trackways hint some allosaurs might have…', opts: ['Never moved', 'Traveled or hunted with buddies sometimes', 'Lived in phones', 'Only swam'], correct: 1, boostStat: 'int', funFact: 'Pack rumors exist — team tactics make scarier movies.' },
+    { q: 'Allosaurus prey could include…', opts: ['Only ants', 'Big plant-eaters like sauropods and stegosaurs', 'Cotton candy', 'Clouds'], correct: 1, boostStat: 'str', funFact: 'Jurassic menu featured giants — predators needed courage.' },
   ],
   giga: [
     { q: 'Giganotosaurus fossils are especially tied to…', opts: ['The Moon', 'Argentina', 'Only Europe', 'Under your bed'], correct: 1, boostStat: 'int', funFact: 'South America had its own mega-hunters — size contests with T-Rex still make scientists debate.' },
     { q: 'Giganotosaurus is remembered as…', opts: ['A tiny bug eater', 'One of the largest meat-eating dinosaurs', 'A flying squirrel', 'A house cat'], correct: 1, boostStat: 'str', funFact: 'When you are that big, everything on the menu notices you.' },
+    { q: 'Giganotosaurus skull shape suggests bites aimed to…', opts: ['Nibble lettuce', 'Slice huge chunks from big prey', 'Whistle', 'Paint'], correct: 1, boostStat: 'str', funFact: 'Wide jaws = meat cleaver strategy for giant meals.' },
+    { q: 'Living beside other mega-hunters meant…', opts: ['Boring times', 'Real monster-vs-monster ecosystems', 'Only fish', 'No plants'], correct: 1, boostStat: 'int', funFact: 'Cretaceous South America was a heavyweight tournament.' },
+    { q: 'The name basically means…', opts: ['Tiny lizard', 'Giant southern lizard vibes', 'Flying fish', 'Soft bunny'], correct: 1, boostStat: 'int', funFact: 'Names can brag — this one does not whisper.' },
   ],
   stego: [
     { q: 'Stegosaurus is famous for…', opts: ['Being a fish', 'Plates on its back and spiked tail', 'Playing piano', 'Zero spikes'], correct: 1, boostStat: 'str', funFact: 'Tail spikes nicknamed the thagomizer — do not stand behind a grumpy Stegosaurus.' },
     { q: 'Stegosaurus mostly ate…', opts: ['Steel beams', 'Plants', 'Only candy', 'Clouds'], correct: 1, boostStat: 'int', funFact: 'Gentle diet, heavy armor — the tank build of the Jurassic.' },
+    { q: 'Stegosaurus front legs were shorter, so its back sloped…', opts: ['Perfectly flat', 'Head low, tail high — weird but real', 'Upside down', 'Sideways only'], correct: 1, boostStat: 'agi', funFact: 'Goofy posture, serious weapons.' },
+    { q: 'Those back plates may have helped with…', opts: ['Wi-Fi', 'Showing off and shedding extra heat', 'Flying', 'Storing marbles'], correct: 1, boostStat: 'int', funFact: 'Billboard + radiator — Jurassic fashion with function.' },
+    { q: 'A thagomizer swing was a message that…', opts: ['Come closer', 'Stand behind me at your own risk', 'Let’s hug', 'I sell cookies'], correct: 1, boostStat: 'str', funFact: 'Tail club with spikes — unsubscribe from predator plans.' },
   ],
   trike: [
     { q: 'Triceratops is easy to spot because of…', opts: ['One horn', 'Three big horns + a huge frill', 'Wings', 'Gills'], correct: 1, boostStat: 'str', funFact: 'Face armor made it look tough — and it could back that look up.' },
     { q: 'Triceratops used its horns likely for…', opts: ['Only decoration', 'Defense and showing off to rivals', 'Typing essays', 'Swimming only'], correct: 1, boostStat: 'int', funFact: 'Horns and frill were multi-tool survival gear — nature loves accessories with purpose.' },
+    { q: 'Triceratops teeth were best for…', opts: ['Pizza', 'Shearing tough plants', 'Metal cutting', 'Flying'], correct: 1, boostStat: 'int', funFact: 'Rows of scissor teeth — salad shredder at dinosaur scale.' },
+    { q: 'A charging Triceratops told predators…', opts: ['Free hugs', 'My face is a weapon — rethink your plan', 'Follow me', 'I am slow always'], correct: 1, boostStat: 'str', funFact: 'Horns + speed + weight = “nope machine.”' },
+    { q: 'The frill might impress rivals by…', opts: ['Playing music', 'Looking bigger and scarier face-to-face', 'Storing juice', 'Hiding wings'], correct: 1, boostStat: 'agi', funFact: 'Visual volume knob — turn intimidation to eleven.' },
   ],
 };
 
@@ -1170,19 +1441,86 @@ function shuffleQuestionOpts(q) {
   };
 }
 
+function preBattleQuestionSig(q) {
+  return String(q.q || '')
+    .slice(0, 120)
+    .replace(/\s+/g, ' ');
+}
+
+/** Avoid the exact same question twice in a row per animal (sessionStorage). */
+function pickPreBattleQuestionFromBank(animalId, bank) {
+  const fallback = {
+    q: `Which sounds like a real survival trick for a ${ANIMALS[animalId].name}?`,
+    opts: ['Train enemies with jokes', 'Use senses + timing to catch food', 'Only sleep all day', 'Ignore danger'],
+    correct: 1,
+    boostStat: 'int',
+    funFact: `${ANIMALS[animalId].name}s in the wild are tuned for sneak, speed, or power — never underestimate them.`,
+  };
+  if (!bank?.length) return { ...fallback };
+  const key = `hw_pbq_${animalId}`;
+  let lastSig = '';
+  try {
+    lastSig = sessionStorage.getItem(key) || '';
+  } catch (_) {
+    /* private mode */
+  }
+  const candidates = bank.filter(q => preBattleQuestionSig(q) !== lastSig);
+  const pool = candidates.length ? candidates : bank;
+  const pick = pool[Math.floor(Math.random() * pool.length)];
+  try {
+    sessionStorage.setItem(key, preBattleQuestionSig(pick));
+  } catch (_) {
+    /* ignore */
+  }
+  return { ...pick };
+}
+
+/** Unlock quiz: `questions` is the full bank; we draw UNLOCK_QUIZ_SESSION_LEN per attempt. */
+function getUnlockQuizBank(animalId) {
+  const quiz = QUIZZES[animalId];
+  if (!quiz) return null;
+  return quiz.questionPool || quiz.questions;
+}
+
+/**
+ * Pick UNLOCK_QUIZ_SESSION_LEN distinct questions; avoid repeating the same index triple
+ * as the last attempt when the pool is big enough.
+ */
+function pickUnlockSessionQuestions(animalId) {
+  const pool = getUnlockQuizBank(animalId);
+  if (!pool?.length) return [];
+  const n = Math.min(UNLOCK_QUIZ_SESSION_LEN, pool.length);
+  const key = `hw_uq_${animalId}`;
+  let lastKey = '';
+  try {
+    lastKey = sessionStorage.getItem(key) || '';
+  } catch (_) {
+    /* ignore */
+  }
+  for (let attempt = 0; attempt < 14; attempt++) {
+    const idxs = shuffleArray(pool.map((_, i) => i)).slice(0, n);
+    idxs.sort((a, b) => a - b);
+    const sig = idxs.join(',');
+    if (pool.length <= n || sig !== lastKey || attempt > 10) {
+      try {
+        sessionStorage.setItem(key, sig);
+      } catch (_) {
+        /* ignore */
+      }
+      return idxs.map(i => shuffleQuestionOpts({ ...pool[i] }));
+    }
+  }
+  return shuffleArray(pool.map((_, i) => i))
+    .slice(0, n)
+    .sort((a, b) => a - b)
+    .map(i => shuffleQuestionOpts({ ...pool[i] }));
+}
+
 /** One fact question per team animal; +1 boostStat for this battle if correct. */
 function buildPreBattleQuizForAnimals(animalIds) {
   return animalIds.map(animalId => {
     const bank = PRE_BATTLE_QUESTIONS[animalId];
-    const pick = bank?.length
-      ? bank[Math.floor(Math.random() * bank.length)]
-      : {
-          q: `Which sounds like a real survival trick for a ${ANIMALS[animalId].name}?`,
-          opts: ['Train enemies with jokes', 'Use senses + timing to catch food', 'Only sleep all day', 'Ignore danger'],
-          correct: 1,
-          boostStat: 'int',
-          funFact: `${ANIMALS[animalId].name}s in the wild are tuned for sneak, speed, or power — never underestimate them.`,
-        };
+    const pick = pickPreBattleQuestionFromBank(animalId, bank);
     const raw = {
       ...pick,
       animalId,
@@ -1295,6 +1633,10 @@ function showScreen(name, sub) {
     if (name === 'battle') {
       const bb = document.querySelector('#screen-battle .battle-body');
       if (bb) bb.scrollTop = 0;
+    }
+    if (name === 'level-complete' || name === 'defeat' || name === 'game-complete' || name === 'landing' || name === 'auth') {
+      const sec = document.getElementById(`screen-${name}`);
+      if (sec && sec.scrollHeight > sec.clientHeight) sec.scrollTop = 0;
     }
   });
 }
@@ -1729,7 +2071,10 @@ function showBuilder() {
   state.selectedAnimals = state.playerHybrid ? [...state.playerHybrid.animals] : [];
   showScreen('builder');
 }
-function showHub() { showScreen('hub'); }
+function showHub() {
+  console.log('[flow] hub shown');
+  showScreen('hub');
+}
 
 function renderBuilder() {
   const p = state.progress;
@@ -2022,19 +2367,22 @@ function openQuiz(animalId) {
     return;
   }
 
-  quizState = { animalId, currentQ: 0, correctCount: 0, answered: false };
+  quizState = {
+    animalId,
+    currentQ: 0,
+    correctCount: 0,
+    answered: false,
+    sessionQuestions: null,
+  };
   const tierType = quizUiTierType(animalId);
 
   // Topbar badge
   document.getElementById('quiz-tier-badge').innerHTML =
     `<div class="tier-badge-topbar ${tierType}">${tierType === 'dino' ? '🦖 DINOSAUR TIER' : '◈ APEX PREDATOR'}</div>`;
 
-  // Render intro + first question
+  // Render intro (questions drawn when player taps Begin)
   renderQuizIntro(animalId, tierType, quiz.intro);
-
-  // Transition to quiz screen
-  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-  document.getElementById('screen-quiz').classList.add('active');
+  showScreen('quiz');
 }
 
 function renderQuizIntro(animalId, tierType, introText) {
@@ -2051,8 +2399,8 @@ function renderQuizIntro(animalId, tierType, introText) {
     </div>
     <div style="background:var(--surface);border:1px solid var(--border);padding:18px;text-align:center;width:100%">
       <div style="font-family:var(--fm);font-size:.68rem;color:var(--text-dim);letter-spacing:.15em;text-transform:uppercase;margin-bottom:10px">Challenge Rules</div>
-      <p style="font-size:.9rem;color:var(--text);margin-bottom:8px">Answer all <strong style="color:${tierType==='dino'?'var(--dino)':'var(--purple)'}">3 questions</strong> correctly to unlock ${a.name}.</p>
-      <p style="font-size:.82rem;color:var(--text-dim);margin-bottom:16px">Get even one wrong and you'll need to try again later.</p>
+      <p style="font-size:.9rem;color:var(--text);margin-bottom:8px">Answer all <strong style="color:${tierType==='dino'?'var(--dino)':'var(--purple)'}">${UNLOCK_QUIZ_SESSION_LEN} questions</strong> correctly to unlock ${a.name}. Each run picks a fresh mix from a bigger fact deck.</p>
+      <p style="font-size:.82rem;color:var(--text-dim);margin-bottom:16px">Miss any question and you can try again — the deck shuffles each time.</p>
       <div style="display:flex;gap:10px;justify-content:center">
         <button class="btn ${tierType === 'dino' ? 'btn-dino' : 'btn-purple'}" onclick="startQuizQuestions()">Begin Challenge →</button>
         <button class="btn btn-ghost btn-sm" onclick="exitQuiz()">Back</button>
@@ -2061,19 +2409,29 @@ function renderQuizIntro(animalId, tierType, introText) {
 }
 
 function startQuizQuestions() {
+  const id = quizState.animalId;
+  quizState.sessionQuestions = pickUnlockSessionQuestions(id);
+  if (!quizState.sessionQuestions.length) {
+    alert('Could not load quiz questions. Please go back and try again.');
+    return;
+  }
+  quizState.currentQ = 0;
+  quizState.correctCount = 0;
+  quizState.answered = false;
   renderQuizQuestion();
 }
 
 function renderQuizQuestion() {
   const a = ANIMALS[quizState.animalId];
-  const quiz = QUIZZES[quizState.animalId];
-  const q = quiz.questions[quizState.currentQ];
+  const sess = quizState.sessionQuestions;
+  if (!sess?.length) return;
+  const q = sess[quizState.currentQ];
   const tierType = quizUiTierType(quizState.animalId);
   const body = document.getElementById('quiz-body');
   const letters = ['A', 'B', 'C', 'D'];
 
   // Progress pips HTML
-  const pipsHtml = quiz.questions.map((_, i) => {
+  const pipsHtml = sess.map((_, i) => {
     let cls = 'quiz-pip';
     if (i < quizState.currentQ) cls += ' done';
     else if (i === quizState.currentQ) cls += ` current ${tierType}`;
@@ -2097,7 +2455,7 @@ function renderQuizQuestion() {
     </div>
     <div class="quiz-prog" style="width:100%">
       ${pipsHtml}
-      <span class="quiz-pip-lbl">Q${quizState.currentQ+1} of ${quiz.questions.length}</span>
+      <span class="quiz-pip-lbl">Q${quizState.currentQ+1} of ${sess.length}</span>
     </div>
     <div class="quiz-qcard ${tierType}" style="width:100%">
       <div class="quiz-qnum">Question ${quizState.currentQ + 1}</div>
@@ -2112,8 +2470,8 @@ function answerQuestion(optIdx) {
   quizState.answered = true;
 
   const a = ANIMALS[quizState.animalId];
-  const quiz = QUIZZES[quizState.animalId];
-  const q = quiz.questions[quizState.currentQ];
+  const sess = quizState.sessionQuestions;
+  const q = sess[quizState.currentQ];
   const tierType = quizUiTierType(quizState.animalId);
   const isCorrect = optIdx === q.correct;
   const letters = ['A','B','C','D'];
@@ -2135,7 +2493,7 @@ function answerQuestion(optIdx) {
       <div class="qf-verdict ${isCorrect ? 'qpass' : 'qfail'}">${isCorrect ? 'Correct!' : 'Wrong!'}</div>
       <div class="qf-correct-ans">${isCorrect ? 'Great job!' : `Correct answer: <strong>${letters[q.correct]}. ${q.opts[q.correct]}</strong>`}</div>
       <div class="qf-fact"><span class="qf-fact-lbl">💡 Fun Fact</span>${q.fact}</div>
-      <button class="btn ${tierType === 'dino' ? 'btn-dino' : 'btn-purple'}" onclick="nextQuizQuestion()">${quizState.currentQ >= quiz.questions.length - 1 ? 'See Result →' : 'Next Question →'}</button>
+      <button class="btn ${tierType === 'dino' ? 'btn-dino' : 'btn-purple'}" onclick="nextQuizQuestion()">${quizState.currentQ >= sess.length - 1 ? 'See Result →' : 'Next Question →'}</button>
     </div>`;
 
   // Scroll to feedback
@@ -2143,13 +2501,13 @@ function answerQuestion(optIdx) {
 }
 
 function nextQuizQuestion() {
-  const quiz = QUIZZES[quizState.animalId];
+  const sess = quizState.sessionQuestions;
+  const n = sess?.length || 0;
   quizState.currentQ++;
   quizState.answered = false;
 
-  if (quizState.currentQ >= quiz.questions.length) {
-    // All questions done
-    const passed = quizState.correctCount === quiz.questions.length;
+  if (quizState.currentQ >= n) {
+    const passed = quizState.correctCount === n;
     showQuizResult(passed);
   } else {
     renderQuizQuestion();
@@ -2164,7 +2522,8 @@ function showQuizResult(passed) {
   const tierType = quizUiTierType(animalId);
   const p = state.progress;
 
-  recordQuizAnswers(p, 3, quizState.correctCount);
+  const nAsked = quizState.sessionQuestions?.length || UNLOCK_QUIZ_SESSION_LEN;
+  recordQuizAnswers(p, nAsked, quizState.correctCount);
   if (passed) {
     if (!p.quizUnlocked.includes(animalId)) p.quizUnlocked.push(animalId);
   }
@@ -2177,7 +2536,7 @@ function showQuizResult(passed) {
       <div class="quiz-result">
         <span class="qr-icon">🔓</span>
         <div class="qr-title qr-pass">${a.name} Unlocked!</div>
-        <p class="qr-sub">3 / 3 correct — You know your stuff, Commander.</p>
+        <p class="qr-sub">${nAsked} / ${nAsked} correct — You know your stuff, Commander.</p>
         <div class="unlock-showcase ${tierType}-showcase">
           <span class="us-em">${a.emoji}</span>
           <div class="us-nm ${tierType}">${a.name}</div>
@@ -2196,7 +2555,7 @@ function showQuizResult(passed) {
       <div class="quiz-result">
         <span class="qr-icon">😞</span>
         <div class="qr-title qr-fail">Not Quite!</div>
-        <p class="qr-sub">You got ${correctCount} / 3 correct. You need all 3 to unlock ${a.name}.</p>
+        <p class="qr-sub">You got ${correctCount} / ${nAsked} correct. You need every question right to unlock ${a.name}.</p>
         <div style="background:var(--surface);border:1px solid rgba(255,34,68,.3);padding:20px;margin-bottom:18px;text-align:center">
           <div style="font-size:2.5rem;margin-bottom:8px">${a.emoji}</div>
           <div style="font-family:var(--fd);font-size:1rem;color:var(--text-dim);margin-bottom:6px">${a.name} remains locked.</div>
@@ -2216,7 +2575,7 @@ function returnFromQuiz() {
   showScreen('builder');
 }
 function returnFromQuizHub() {
-  showScreen('hub');
+  showHub();
 }
 function exitQuiz() {
   if (state.quizReturnScreen === 'hub') showScreen('hub');
@@ -2232,6 +2591,7 @@ function exitQuiz() {
 
 function startBattle() {
   if (!state.playerHybrid) return;
+  state.battleFlowGen = (state.battleFlowGen || 0) + 1;
   const p = state.progress;
   const levelDef = LEVELS[Math.min(p.level - 1, LEVELS.length - 1)];
   state.enemyHybrid = buildEnemyHybrid(levelDef);
@@ -2761,7 +3121,7 @@ function showBattleResultOverlay(result, opts) {
     if (o.dailyHint) hints.push(o.dailyHint);
     const hint = hints.join(' ');
     nextEl.innerHTML = hint
-      ? `<div class="brt-next-lbl">What is next</div><div class="brt-next-txt">${hint}</div>`
+      ? `<div class="brt-next-lbl">What happens next</div><div class="brt-next-txt">${hint}</div>`
       : '';
   } else if (nextEl) nextEl.innerHTML = '';
   overlay.classList.remove('hidden');
@@ -2954,7 +3314,8 @@ function updateStreakOnLevelComplete(p) {
   touchDailyStreakIfNeeded(p);
 }
 
-function finishBattle(result) {
+async function finishBattle(result) {
+  const flowGen = state.battleFlowGen;
   const box = document.getElementById('clash-box');
   box.classList.add('hidden');
   box.classList.remove('clash-active');
@@ -2964,6 +3325,7 @@ function finishBattle(result) {
   document.getElementById('fighter-enemy')?.classList.remove('f-side-win', 'f-side-lose');
 
   const won = result.winner === 'player';
+  console.log('[battle] resolved', { won, score: `${result.pWins}-${result.eWins}`, flowGen });
   const p = state.progress;
   ensureDailyChallengeRolled(p);
   if (won) touchDailyStreakIfNeeded(p);
@@ -2999,19 +3361,41 @@ function finishBattle(result) {
   const finTxt = won ? `Victory ${result.pWins}–${result.eWins}` : `Defeat ${result.pWins}–${result.eWins}`;
   addLog(`<div class="round-trail-final ${finCls}">${finTxt}</div>`, 0, { scrollTrail: true });
   requestAnimationFrame(() => scrollToBattleTrail());
-  void saveUserProgress(p);
-  setTimeout(() => showBattleResultOverlay(result, { rewardFlash, dailyHint }), 520);
+
+  try {
+    await saveUserProgress(p);
+    if (flowGen !== state.battleFlowGen) return;
+    console.log('[battle] save complete (post-battle outcome)');
+  } catch (e) {
+    console.warn('[battle] save failed after outcome', e);
+  }
+  if (flowGen !== state.battleFlowGen) {
+    console.log('[battle] stale flow after save — skip overlay / transition');
+    return;
+  }
+
+  setTimeout(() => {
+    if (flowGen !== state.battleFlowGen) return;
+    showBattleResultOverlay(result, { rewardFlash, dailyHint });
+    console.log('[battle] result overlay shown', { won });
+  }, 520);
 
   if (won) {
     setTimeout(() => {
+      if (flowGen !== state.battleFlowGen) return;
       hideBattleResultOverlay();
-      showLevelComplete();
+      state.battle = null;
+      console.log('[battle] return to victory / level-complete flow');
+      void showLevelComplete();
     }, 3800);
   } else {
     setTimeout(() => {
+      if (flowGen !== state.battleFlowGen) return;
       hideBattleResultOverlay();
+      state.battle = null;
       document.getElementById('def-sub').textContent =
-        `You lost ${result.pWins}–${result.eWins}. Rebuild your hybrid and try again.`;
+        `You lost ${result.pWins}–${result.eWins}. Tap below to rebuild your hybrid and jump back in.`;
+      console.log('[battle] transition to defeat screen');
       showScreen('defeat');
     }, 3800);
   }
@@ -3021,7 +3405,7 @@ function finishBattle(result) {
 // LEVEL COMPLETE
 // ═══════════════════════════════════════════════════════════════════
 
-function showLevelComplete() {
+async function showLevelComplete() {
   const p = state.progress;
   const currentLevel = p.level;
   const isApexUnlock = currentLevel === 5;
@@ -3038,7 +3422,12 @@ function showLevelComplete() {
     p.level++;
     if (reward && ANIMALS[reward] && !p.unlockedAnimals.includes(reward)) p.unlockedAnimals.push(reward);
   }
-  void saveUserProgress(p);
+  try {
+    await saveUserProgress(p);
+    console.log('[battle] save complete (level advanced)');
+  } catch (e) {
+    console.warn('[battle] save failed after level advance', e);
+  }
 
   document.getElementById('lc-sub').textContent = `LEVEL ${currentLevel} CLEARED`;
   document.getElementById('lc-icon').textContent = isFinalLevel ? '👑' : '🏆';
@@ -3068,7 +3457,7 @@ function showLevelComplete() {
     ab.classList.remove('hidden');
     ab.innerHTML = `
       <div class="apex-bonus-title">◈ Apex Predators Now Available!</div>
-      <p style="font-size:.82rem;color:var(--text-dim);margin-bottom:10px">You've earned the right to challenge apex predators.<br>Each one requires its own 3-question quiz to unlock.</p>
+      <p style="font-size:.82rem;color:var(--text-dim);margin-bottom:10px">You've earned the right to challenge apex predators.<br>Each unlock uses 3 random questions from a larger fact deck.</p>
       <div class="apex-chips">
         ${APEX_IDS.map(id => {
           const a = ANIMALS[id];
@@ -3086,7 +3475,7 @@ function showLevelComplete() {
     db.classList.remove('hidden');
     db.innerHTML = `
       <div class="dino-bonus-title">🦖 Dinosaur Tier Now Available!</div>
-      <p style="font-size:.82rem;color:var(--text-dim);margin-bottom:10px">You've reached the ultimate tier. Dinosaurs have stats far beyond anything you've faced.<br>Each requires its own 3-question quiz to unlock.</p>
+      <p style="font-size:.82rem;color:var(--text-dim);margin-bottom:10px">You've reached the ultimate tier. Dinosaurs have stats far beyond anything you've faced.<br>Each unlock uses 3 random questions from a bigger dinosaur deck.</p>
       <div class="apex-chips" style="gap:14px">
         ${DINO_IDS.map(id => {
           const a = ANIMALS[id];
@@ -3103,11 +3492,13 @@ function showLevelComplete() {
   if (isFinalLevel) {
     acts.innerHTML = `<button class="btn btn-orange btn-lg" onclick="showGameComplete()">👑 Claim Victory</button>`;
   } else {
-    acts.innerHTML = `<button class="btn btn-primary btn-lg" onclick="goNextLevel()">⚗ Forge Next Hybrid</button>
-      <button class="btn btn-ghost btn-sm" onclick="showHub()">Hub</button>`;
+    acts.innerHTML = `<p class="lc-next-hint" style="width:100%;font-family:var(--fm);font-size:.68rem;color:var(--text-dim);margin-bottom:10px;line-height:1.45">Your progress is saved. Forge when you are ready, or head to the Hub for the big picture.</p>
+      <button class="btn btn-primary btn-lg" onclick="goNextLevel()">⚗ Forge next hybrid</button>
+      <button class="btn btn-secondary btn-sm" type="button" onclick="showHub()">Hub — missions &amp; roster</button>`;
   }
 
   showScreen('level-complete');
+  console.log('[flow] level complete screen shown');
 }
 
 function buildMiniStats(a) {
@@ -3119,12 +3510,14 @@ function buildMiniStats(a) {
 }
 
 function goNextLevel() {
+  state.battle = null;
   state.playerHybrid = null;
   state.selectedAnimals = [];
   void persistGameProgress();
   showScreen('builder');
 }
 function retryLevel() {
+  state.battle = null;
   state.playerHybrid = null;
   state.selectedAnimals = [];
   void persistGameProgress();
