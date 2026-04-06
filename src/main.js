@@ -2534,14 +2534,47 @@ function makeQuizLockCard(id, tierType) {
   return card;
 }
 
+function isForgeMobileLayout() {
+  return typeof window.matchMedia === 'function' && window.matchMedia('(max-width:720px)').matches;
+}
+
+function updateForgeMobileStepClass() {
+  const layout = document.querySelector('#screen-builder .builder-layout');
+  if (!layout) return;
+  const n = state.selectedAnimals.length;
+  const forged = !!state.playerHybrid;
+  const step2 = forged || n >= 3;
+  layout.classList.toggle('forge-mobile-step-2', step2);
+  layout.classList.toggle('forge-mobile-step-1', !step2);
+}
+
+function updateForgeMobilePhaseLabel() {
+  const el = document.getElementById('forge-mobile-phase');
+  if (!el) return;
+  const n = state.selectedAnimals.length;
+  const forged = !!state.playerHybrid;
+  if (forged) el.textContent = 'Step 3 · Enter battle when ready';
+  else if (n >= 3) el.textContent = 'Step 2 · Review below — tap Fuse to forge';
+  else el.textContent = 'Step 1 · Tap up to 3 animals in the grid';
+}
+
 function scrollForgeColumnToFusionPanel() {
   const forgeCol = document.getElementById('builder-forge-column');
   const panel = document.getElementById('forge-panel');
+  const anchor = document.getElementById('forge-fusion-anchor');
+  const layout = document.querySelector('#screen-builder .builder-layout');
   if (!forgeCol || !panel) {
     console.warn('[forge] scroll target missing', { forgeCol: !!forgeCol, panel: !!panel });
     return;
   }
   const pad = 16;
+  if (isForgeMobileLayout() && layout && layout.classList.contains('forge-mobile-step-2')) {
+    const targetEl = anchor || panel;
+    const top = targetEl.getBoundingClientRect().top - layout.getBoundingClientRect().top + layout.scrollTop - 8;
+    console.log('[forge] fusion section ready — mobile layout scroll', { top, layoutScrollH: layout.scrollHeight });
+    layout.scrollTo({ top: Math.max(0, top), behavior: 'smooth' });
+    return;
+  }
   const relTop = panel.getBoundingClientRect().top - forgeCol.getBoundingClientRect().top + forgeCol.scrollTop;
   const target = Math.max(0, relTop - pad);
   console.log('[forge] fusion section ready — column scroll', { target, colScrollH: forgeCol.scrollHeight });
@@ -2561,11 +2594,11 @@ function scrollToForgeAndHighlight() {
   requestAnimationFrame(() => {
     requestAnimationFrame(() => {
       setTimeout(runScroll, 50);
-      setTimeout(runScroll, 220);
+      setTimeout(runScroll, 280);
     });
   });
 
-  if (forgeCol) {
+  if (!isForgeMobileLayout() && forgeCol) {
     forgeCol.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'nearest' });
   }
   if (panel) {
@@ -2596,21 +2629,27 @@ function toggleAnimalSelect(id) {
   updateSelectionUI();
   clearHybridPreview();
   void persistGameProgress();
-  if (state.selectedAnimals.length === 3) scrollToForgeAndHighlight();
+  console.log('[forge] animal selected', { id, selectedCount: state.selectedAnimals.length });
+  if (state.selectedAnimals.length === 3) {
+    console.log('[forge] 3 animals selected');
+    scrollToForgeAndHighlight();
+  }
 }
 
 function updateForgeNextHint() {
   const el = document.getElementById('forge-next-hint');
-  if (!el) return;
-  const n = state.selectedAnimals.length;
-  const forged = !!state.playerHybrid;
-  if (!forged) {
-    if (n === 0) el.textContent = 'Next: choose 1–3 animals from the grid.';
-    else if (n < 3) el.textContent = `Next: add up to ${3 - n} more, or tap Fuse with your current picks.`;
-    else el.textContent = 'Next: tap Fuse to roll your hybrid’s stats.';
-  } else {
-    el.textContent = 'Next: Enter Battle — boost quiz, then the fight!';
+  if (el) {
+    const n = state.selectedAnimals.length;
+    const forged = !!state.playerHybrid;
+    if (!forged) {
+      if (n === 0) el.textContent = 'Next: choose 1–3 animals from the grid.';
+      else if (n < 3) el.textContent = `Next: add up to ${3 - n} more, or tap Fuse with your current picks.`;
+      else el.textContent = 'Next: tap Fuse to roll your hybrid’s stats.';
+    } else {
+      el.textContent = 'Next: Enter Battle — boost quiz, then the fight!';
+    }
   }
+  updateForgeMobilePhaseLabel();
 }
 
 function updateSelectionUI() {
@@ -2621,6 +2660,7 @@ function updateSelectionUI() {
   document.getElementById('btn-reroll').disabled = n === 0 || !state.playerHybrid;
   document.getElementById('btn-fight').disabled = !state.playerHybrid;
   updateForgeNextHint();
+  updateForgeMobileStepClass();
 }
 
 function forgeHybrid() {

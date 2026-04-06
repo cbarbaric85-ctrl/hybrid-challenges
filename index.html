@@ -637,6 +637,8 @@ body::before{
 .fighter.f-side-win{border-color:rgba(0,232,122,.55)!important;box-shadow:0 0 22px var(--green-g)}
 .fighter.f-side-lose{border-color:rgba(255,34,68,.4)!important;opacity:.88}
 .forge-step-hint{font-family:var(--fm);font-size:.62rem;color:var(--text-dim);line-height:1.4;margin-bottom:10px;min-height:2.6em;padding:8px 10px;background:rgba(0,0,0,.2);border-radius:4px;border:1px solid var(--border)}
+.forge-mobile-phase{display:none}
+.forge-fusion-anchor{height:0;scroll-margin-top:12px}
 
 /* ─── LEVEL COMPLETE ─── */
 #screen-level-complete{align-items:center;justify-content:flex-start;padding:24px 20px calc(28px + env(safe-area-inset-bottom));text-align:center;overflow-y:auto;min-height:100vh;min-height:100dvh}
@@ -765,10 +767,48 @@ body::before{
 
 /* ─── RESPONSIVE ─── */
 @media(max-width:720px){
-  .builder-layout{grid-template-columns:1fr;grid-template-rows:minmax(0,1fr) minmax(42vh,1fr);max-height:none}
-  .builder-left{min-height:min(48vh,400px)}
-  .builder-right{border-left:none;border-top:1px solid var(--border);max-height:none;min-height:min(46vh,440px);padding-top:16px;padding-bottom:28px}
-  #forge-panel{scroll-margin-top:32px}
+  .forge-mobile-phase{
+    display:block;font-family:var(--fm);font-size:.58rem;letter-spacing:.12em;text-transform:uppercase;
+    color:var(--green);margin:-4px 0 10px;padding:6px 10px;background:rgba(0,232,122,.08);border:1px solid rgba(0,232,122,.22);border-radius:4px;line-height:1.35
+  }
+  .builder-layout{
+    display:flex;flex-direction:column;flex:1;min-height:0;max-height:none;
+    grid-template:none;
+  }
+  .builder-layout.forge-mobile-step-1{overflow:hidden}
+  .builder-layout.forge-mobile-step-1 .builder-left{
+    flex:1 1 auto;min-height:0;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:12px 12px 16px
+  }
+  .builder-layout.forge-mobile-step-1 .builder-right{display:none!important}
+  .builder-layout.forge-mobile-step-2{
+    overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior-y:contain
+  }
+  .builder-layout.forge-mobile-step-2 .builder-left{
+    flex:0 0 auto;max-height:min(38vh,300px);min-height:0;overflow-y:auto;-webkit-overflow-scrolling:touch;
+    padding:12px 12px 10px;border-bottom:1px solid var(--border)
+  }
+  .builder-layout.forge-mobile-step-2 .builder-right{
+    display:flex!important;flex-direction:column;flex:0 0 auto;border-left:none;border-top:none;
+    max-height:none;min-height:0;overflow:visible;padding:14px 12px max(24px,env(safe-area-inset-bottom))
+  }
+  .builder-layout.forge-mobile-step-2 .builder-right > .section-hdr{color:var(--orange);letter-spacing:.18em}
+  #forge-fusion-anchor{scroll-margin-top:10px}
+  #forge-panel{scroll-margin-top:24px}
+  .b-animal-grid{grid-template-columns:repeat(auto-fill,minmax(88px,1fr));gap:6px}
+  .bac{padding:8px 6px}
+  .bac.sel::after{top:3px;right:5px;font-size:.62rem}
+  .bac-em{font-size:1.55rem;margin-bottom:2px}
+  .bac-nm{font-size:.62rem;margin-bottom:2px}
+  .bac-tier-tag{font-size:.48rem;margin-bottom:3px}
+  .bac-stats-mini{gap:1px}
+  .bac-s{font-size:.5rem;padding:0 2px}
+  .tier-section{margin-bottom:12px}
+  .tier-hdr{padding:6px 0 8px;margin-bottom:6px}
+  .sel-counter{margin-bottom:8px;font-size:.65rem}
+  .bac-quizlock{padding:8px 6px}
+  .bql-em{font-size:1.45rem;margin-bottom:2px}
+  .bql-nm{font-size:.65rem}
+  .bql-lbl{font-size:.5rem;margin-bottom:5px}
   .battle-stage{grid-template-columns:1fr;gap:10px}
   .vs-col{flex-direction:row;justify-content:center;padding:5px 0}
   .hub-grid{grid-template-columns:1fr}
@@ -962,6 +1002,7 @@ body::before{
   <div class="builder-layout">
     <div class="builder-left">
       <div class="section-hdr">Select Animals</div>
+      <div id="forge-mobile-phase" class="forge-mobile-phase" aria-hidden="true"></div>
       <div class="sel-counter">
         <div class="sel-pip" id="sp1"></div>
         <div class="sel-pip" id="sp2"></div>
@@ -971,6 +1012,7 @@ body::before{
       <div id="builder-tiers"></div>
     </div>
     <div class="builder-right" id="builder-forge-column">
+      <div id="forge-fusion-anchor" class="forge-fusion-anchor" aria-hidden="true"></div>
       <div class="section-hdr">Your Hybrid</div>
       <div id="forge-next-hint" class="forge-step-hint" aria-live="polite"></div>
       <div id="forge-ready-msg" class="forge-ready-msg" aria-live="polite"></div>
