@@ -1267,6 +1267,41 @@ async function ensureMyPublicLeaderboardDocLoaded() {
   return finalize();
 }
 
+/**
+ * Backfill: read leaderboardEntries/{uid}; if missing, bootstrap + sync.
+ * Safe to call repeatedly (merge writes are idempotent).
+ * @returns {Promise<boolean>} true if a doc exists (or was just created)
+ */
+async function backfillLeaderboardIfMissing() {
+  const uid = state.profile?.uid;
+  const progress = state.progress;
+  if (!uid || !progress) {
+    console.log('[lb-backfill] skip — no uid or progress');
+    return false;
+  }
+  try {
+    const ref = leaderboardDocRef(uid);
+    const snap = await getDoc(ref);
+    const exists = docSnapshotExists(snap);
+    console.log('[lb-backfill] check', { uid, path: `leaderboardEntries/${uid}`, exists });
+    if (exists) return true;
+
+    console.log('[lb-backfill] public row MISSING — creating now', { uid });
+    const bOk = await writeLeaderboardBootstrapDoc(uid, state.profile.username);
+    console.log('[lb-backfill] bootstrap result', { bOk });
+    const sOk = await syncLeaderboardEntry(progress);
+    console.log('[lb-backfill] sync result', { sOk });
+
+    const verify = await getDoc(ref);
+    const created = docSnapshotExists(verify);
+    console.log('[lb-backfill] verify after create', { uid, created });
+    return created;
+  } catch (e) {
+    console.error('[lb-backfill] error', { uid, code: e?.code, message: e?.message });
+    return false;
+  }
+}
+
 async function saveUserProgress(progress) {
   const uid = state.profile?.uid;
   if (!uid || !progress) return;
@@ -2104,7 +2139,23 @@ async function handleAuth() {
         { merge: true }
       );
       console.log('[auth] signup profile write OK', cred.user.uid);
-      await writeLeaderboardBootstrapDoc(cred.user.uid, username);
+      const signupLbOk = await writeLeaderboardBootstrapDoc(cred.user.uid, username);
+      console.log('[auth] signup leaderboard bootstrap', { uid: cred.user.uid, ok: signupLbOk });
+      if (signupLbOk) {
+        try {
+          const lbVerify = await getDoc(leaderboardDocRef(cred.user.uid));
+          const lbExists = docSnapshotExists(lbVerify);
+          console.log('[auth] signup leaderboard verify', { uid: cred.user.uid, exists: lbExists });
+          if (!lbExists) {
+            console.warn('[auth] signup: bootstrap reported success but doc missing — retrying');
+            await writeLeaderboardBootstrapDoc(cred.user.uid, username);
+          }
+        } catch (ve) {
+          console.error('[auth] signup leaderboard verify read failed', { code: ve?.code, message: ve?.message });
+        }
+      } else {
+        console.warn('[auth] signup: bootstrap failed — onAuthStateChanged will retry');
+      }
     } else {
       await signInWithEmailAndPassword(auth, email, password);
     }
@@ -2189,6 +2240,7 @@ function renderHubDailyChallenge() {
 function renderHub() {
   const p = state.progress;
   if (touchDailyStreakIfNeeded(p)) void persistGameProgress();
+  void backfillLeaderboardIfMissing();
   const levelIdx = Math.min(p.level - 1, LEVELS.length - 1);
   const level = LEVELS[levelIdx];
 
@@ -4069,9 +4121,11 @@ onAuthStateChanged(auth, async user => {
     showScreen('landing');
     return;
   }
+  console.log('[auth] onAuthStateChanged — user detected', { uid: user.uid, email: user.email });
   const ref = userDocRef(user.uid);
   let snap = await getDoc(ref);
   let data = snap.data();
+  console.log('[auth] user doc read', { uid: user.uid, hasData: !!data });
   if (!data) {
     const email = user.email || '';
     const derivedName = email.split('@')[0] || 'Commander';
@@ -4109,7 +4163,8 @@ onAuthStateChanged(auth, async user => {
       },
       { merge: true }
     );
-    await writeLeaderboardBootstrapDoc(user.uid, derivedName);
+    const firstLoginLbOk = await writeLeaderboardBootstrapDoc(user.uid, derivedName);
+    console.log('[auth] first-login leaderboard bootstrap', { uid: user.uid, derivedName, ok: firstLoginLbOk });
     snap = await getDoc(ref);
     data = snap.data();
   }
@@ -4117,15 +4172,40 @@ onAuthStateChanged(auth, async user => {
     uid: user.uid,
     email: user.email || data.email || '',
     username: data.username || 'Commander',
-    // Default true for legacy accounts without the field; future Settings can set false.
     leaderboardOptIn: data.leaderboardOptIn !== false,
   };
   state.progress = firestoreDataToProgress(data);
   state.selectedAnimals = [...(data.selectedHybridAnimals || [])];
   state.playerHybrid = hybridFromSaved(data.hybridStats);
-  const lbAuthOk = await syncLeaderboardEntry(state.progress);
-  if (!lbAuthOk) console.warn('[lb] post-auth public row publish failed', user.uid);
-  console.log('[auth] session ready — leaderboard sync attempted', user.uid);
+  console.log('[auth] profile loaded', { uid: user.uid, username: state.profile.username, optIn: state.profile.leaderboardOptIn });
+
+  let lbAuthOk = await syncLeaderboardEntry(state.progress);
+  console.log('[lb] post-auth sync result', { uid: user.uid, ok: lbAuthOk });
+
+  if (!lbAuthOk) {
+    console.warn('[lb] post-auth sync failed — falling back to bootstrap + retry', user.uid);
+    const bOk = await writeLeaderboardBootstrapDoc(user.uid, state.profile.username);
+    console.log('[lb] post-auth fallback bootstrap', { uid: user.uid, bOk });
+    lbAuthOk = await syncLeaderboardEntry(state.progress);
+    console.log('[lb] post-auth retry sync', { uid: user.uid, ok: lbAuthOk });
+  }
+
+  if (lbAuthOk) {
+    const verifyRef = leaderboardDocRef(user.uid);
+    try {
+      const verifySnap = await getDoc(verifyRef);
+      const exists = docSnapshotExists(verifySnap);
+      console.log('[lb] post-auth verify read-back', { uid: user.uid, path: `leaderboardEntries/${user.uid}`, exists });
+      if (!exists) {
+        console.warn('[lb] post-auth verify: write reported success but doc missing — forcing bootstrap');
+        await writeLeaderboardBootstrapDoc(user.uid, state.profile.username);
+      }
+    } catch (ve) {
+      console.error('[lb] post-auth verify read failed', { uid: user.uid, code: ve?.code, message: ve?.message });
+    }
+  }
+
+  console.log('[auth] session ready', user.uid);
   showScreen('hub');
 });
 
