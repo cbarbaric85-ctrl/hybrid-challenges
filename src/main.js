@@ -2579,10 +2579,10 @@ function makeQuizLockCard(id, tierType) {
     ${gateHtml ? `<div class="unlock-gate-list" style="margin-top:4px">${gateHtml}</div>` : ''}`;
   if (eligible) {
     const btn = document.createElement('button');
-    btn.className = `btn btn-sm ${tierType === 'dino' ? 'btn-dino' : 'btn-purple'}`;
+    btn.className = `btn btn-sm bac-quiz-btn ${tierType === 'dino' ? 'btn-dino' : 'btn-purple'}`;
     btn.textContent = '📝 Take Quiz';
     btn.style.width = '100%';
-    btn.style.marginTop = '5px';
+    btn.style.marginTop = '4px';
     btn.onclick = () => {
       state.quizReturnScreen = 'builder';
       openQuiz(id);
