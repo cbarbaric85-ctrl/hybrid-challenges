@@ -551,11 +551,19 @@ const XP_PER_BATTLE_WIN = 28;
 const COMMANDER_XP_SEGMENT = 50;
 
 let levelCompleteAutoNavTimer = null;
+let defeatReturnToHubTimer = null;
 
 function clearLevelCompleteAutoNav() {
   if (levelCompleteAutoNavTimer) {
     clearTimeout(levelCompleteAutoNavTimer);
     levelCompleteAutoNavTimer = null;
+  }
+}
+
+function clearDefeatAutoReturn() {
+  if (defeatReturnToHubTimer) {
+    clearTimeout(defeatReturnToHubTimer);
+    defeatReturnToHubTimer = null;
   }
 }
 
@@ -1088,46 +1096,83 @@ function hybridPowerForLeaderboard() {
   return state.playerHybrid?.power ?? 0;
 }
 
-async function syncLeaderboardEntry(progress) {
-  const uid = state.profile?.uid;
-  if (!uid || !progress) return;
-  const ref = leaderboardDocRef(uid);
-  if (!isLeaderboardOptIn()) {
+/** First-time public row so new accounts appear in queries without waiting for a battle save. */
+async function writeLeaderboardBootstrapDoc(uid, username) {
+  if (!uid) return;
+  try {
     await setDoc(
-      ref,
+      leaderboardDocRef(uid),
       {
         uid,
-        leaderboardOptIn: false,
+        username: String(username || 'Commander').slice(0, 40),
+        hybridName: '',
+        highestLevelReached: 0,
+        currentCampaignLevel: 1,
+        totalWins: 0,
+        hybridPowerScore: 0,
+        commanderXp: 0,
+        totalQuizQuestions: 0,
+        totalQuizCorrect: 0,
+        quizAccuracy: null,
+        leaderboardOptIn: true,
         updatedAt: serverTimestamp(),
       },
       { merge: true }
     );
+    console.log('[lb] bootstrap leaderboard doc OK', { uid });
+  } catch (e) {
+    console.error('[lb] bootstrap leaderboard doc failed', { uid, err: e });
+  }
+}
+
+/** Deterministic public doc at leaderboardEntries/{uid} — never stores email. */
+async function syncLeaderboardEntry(progress) {
+  const uid = state.profile?.uid;
+  if (!uid || !progress) {
+    console.log('[lb] sync skip — no uid or progress');
     return;
   }
-  const acc = computeQuizAccuracy(progress);
-  const pubName = sanitizeHybridName(
-    state.playerHybrid?.name,
-    state.playerHybrid ? hybridName(state.playerHybrid.animals) : ''
-  );
-  await setDoc(
-    ref,
-    {
+  const ref = leaderboardDocRef(uid);
+  try {
+    if (!isLeaderboardOptIn()) {
+      console.log('[lb] sync start (opt-out stub)', { uid });
+      const payload = {
+        uid,
+        leaderboardOptIn: false,
+        updatedAt: serverTimestamp(),
+      };
+      await setDoc(ref, payload, { merge: true });
+      console.log('[lb] sync success (opt-out)', { uid });
+      return;
+    }
+    const acc = computeQuizAccuracy(progress);
+    const pubName = sanitizeHybridName(
+      state.playerHybrid?.name,
+      state.playerHybrid ? hybridName(state.playerHybrid.animals) : ''
+    );
+    const hl = Math.max(0, Math.floor(Number(progress.highestLevelReached) || 0));
+    const payload = {
       uid,
-      username: state.profile.username || 'Commander',
+      username: String(state.profile.username || 'Commander').slice(0, 40),
       hybridName: pubName || '',
-      highestLevelReached: progress.highestLevelReached ?? 0,
-      currentCampaignLevel: progress.level ?? 1,
-      totalWins: progress.totalWins ?? 0,
-      hybridPowerScore: hybridPowerForLeaderboard(),
-      commanderXp: progress.commanderXp ?? 0,
-      totalQuizQuestions: progress.totalQuizQuestions ?? 0,
-      totalQuizCorrect: progress.totalQuizCorrect ?? 0,
+      highestLevelReached: hl,
+      currentCampaignLevel: Math.max(1, Math.floor(Number(progress.level) || 1)),
+      totalWins: Math.max(0, Math.floor(Number(progress.totalWins) || 0)),
+      hybridPowerScore: Math.max(0, Math.floor(Number(hybridPowerForLeaderboard()) || 0)),
+      commanderXp: Math.max(0, Math.floor(Number(progress.commanderXp) || 0)),
+      totalQuizQuestions: Math.max(0, Math.floor(Number(progress.totalQuizQuestions) || 0)),
+      totalQuizCorrect: Math.max(0, Math.floor(Number(progress.totalQuizCorrect) || 0)),
       quizAccuracy: acc != null ? acc : null,
       leaderboardOptIn: true,
       updatedAt: serverTimestamp(),
-    },
-    { merge: true }
-  );
+    };
+    console.log('[lb] sync start (opt-in)', { uid });
+    console.log('[lb] payload', payload);
+    await setDoc(ref, payload, { merge: true });
+    console.log('[lb] sync success (opt-in)', { uid });
+  } catch (e) {
+    console.error('[lb] sync failed', { uid, err: e });
+  }
 }
 
 async function saveUserProgress(progress) {
@@ -1204,6 +1249,7 @@ async function fetchLeaderboardWithRank() {
   );
   const snap = await getDocs(q);
   const rows = sortLeaderboardRows(snap.docs.map(d => ({ ...d.data(), _id: d.id })));
+  console.log('[lb] query result', { docs: snap.docs.length, sorted: rows.length });
   const myUid = state.profile?.uid;
   let myRank = null;
   if (myUid) {
@@ -1748,23 +1794,62 @@ async function renderLeaderboard() {
   if (!body) return;
   body.innerHTML = '<p class="lb-loading">Loading rankings…</p>';
   try {
-    const { rows, myRank, scanned } = await fetchLeaderboardWithRank();
-    if (!rows.length) {
-      body.innerHTML =
-        '<p class="lb-empty">No commanders on the leaderboard yet. Opt in and play to appear here!</p>';
-      return;
-    }
     const myUid = state.profile?.uid;
     const optedIn = isLeaderboardOptIn();
+    let myPublic = null;
+    if (myUid) {
+      const mine = await getDoc(leaderboardDocRef(myUid));
+      myPublic = mine.exists() ? mine.data() : null;
+      console.log('[lb] render my leaderboard doc', {
+        uid: myUid,
+        exists: mine.exists(),
+        leaderboardOptIn: myPublic?.leaderboardOptIn,
+      });
+    }
+
+    const { rows, myRank, scanned } = await fetchLeaderboardWithRank();
+    console.log('[lb] render query snapshot', { tableRows: rows.length, myRank, scanned });
+
     let rankBanner = '';
     if (!optedIn) {
       rankBanner =
         '<p class="lb-rank-banner lb-rank-muted">You are browsing as opted out — your row stays private. Opt in from your profile when that toggle ships to earn a rank here.</p>';
+    } else if (myPublic && myPublic.leaderboardOptIn === false) {
+      rankBanner =
+        '<p class="lb-rank-banner lb-rank-muted">Your account is set to stay off the public board.</p>';
     } else if (myRank != null) {
-      rankBanner = `<p class="lb-rank-banner lb-rank-you">You are ranked <strong>#${myRank}</strong> among the top ${scanned} commanders we loaded.</p>`;
+      rankBanner = `<p class="lb-rank-banner lb-rank-you">You are ranked <strong>#${myRank}</strong> among the top ${scanned} commanders we loaded (then we show the top 25).</p>`;
+    } else if (myPublic && myPublic.leaderboardOptIn !== false) {
+      rankBanner = `<p class="lb-rank-banner lb-rank-muted">You are not in the <strong>top 25</strong> on screen — we load the top <strong>100</strong> by best level first, then sort. Your live stats are always shown in <strong>Your entry</strong> below.</p>`;
     } else {
-      rankBanner = `<p class="lb-rank-banner lb-rank-muted">You are not in the top ${scanned} yet — keep winning levels and forging stronger hybrids!</p>`;
+      rankBanner = `<p class="lb-rank-banner lb-rank-muted">We could not load your public row yet. Open the Hub or finish a mission — your next save publishes your stats to the board.</p>`;
     }
+
+    let yourCard = '';
+    if (optedIn && myPublic && myPublic.leaderboardOptIn !== false) {
+      const hn = (myPublic.hybridName && String(myPublic.hybridName).trim()) || '';
+      const hybridLine = hn ? `<div class="lb-ye-hybrid">🐾 ${escapeHtml(hn)}</div>` : '';
+      const tq = myPublic.totalQuizQuestions ?? 0;
+      const tc = Math.min(myPublic.totalQuizCorrect ?? 0, tq);
+      const accPct =
+        tq > 0
+          ? myPublic.quizAccuracy != null
+            ? myPublic.quizAccuracy
+            : Math.round((100 * tc) / tq)
+          : null;
+      const brain = accPct != null ? `${accPct}%` : '—';
+      yourCard = `<div class="lb-your-entry">
+        <div class="lb-ye-title">Your entry <span class="lb-ye-tag">synced</span></div>
+        <div class="lb-ye-grid">
+          <div><em>Commander</em><strong>${escapeHtml(myPublic.username || 'Commander')}</strong>${hybridLine}</div>
+          <div><em>Best level</em><strong>${myPublic.highestLevelReached ?? 0}</strong></div>
+          <div><em>Power</em><strong>${myPublic.hybridPowerScore ?? 0}</strong></div>
+          <div><em>Wins</em><strong>${myPublic.totalWins ?? 0}</strong></div>
+          <div><em>Brain</em><strong>${brain}</strong></div>
+        </div>
+      </div>`;
+    }
+
     const tableRows = rows
       .map((r, i) => {
         const rank = i + 1;
@@ -1792,19 +1877,27 @@ async function renderLeaderboard() {
         </tr>`;
       })
       .join('');
-    body.innerHTML = `
-      ${rankBanner}
-      <p class="lb-note">Top 25 · Sorted by best level, then power, then wins. <strong>Brain</strong> = your quiz hit rate (the more you play, the cooler it gets).</p>
-      <div class="lb-table-wrap">
+
+    const tableBlock =
+      rows.length > 0
+        ? `<div class="lb-table-wrap">
         <table class="lb-table">
           <thead><tr>
             <th>#</th><th>Commander</th><th>Best Lv</th><th>Power</th><th>Wins</th><th>Brain</th>
           </tr></thead>
           <tbody>${tableRows}</tbody>
         </table>
-      </div>`;
+      </div>`
+        : '<p class="lb-empty">No other commanders matched the live query yet — new players start at level 0 and climb into the top 100 as they play.</p>';
+
+    body.innerHTML = `
+      ${rankBanner}
+      ${yourCard}
+      <p class="lb-note">Top 25 · Sorted by best level, then power, then wins. <strong>Brain</strong> = your quiz hit rate (the more you play, the cooler it gets).</p>
+      ${tableBlock}`;
+    console.log('[lb] render complete');
   } catch (e) {
-    console.error(e);
+    console.error('[lb] render failed', e);
     body.innerHTML =
       '<p class="lb-err">Could not load the leaderboard. Check your connection or Firestore index (leaderboardOptIn + highestLevelReached).</p>';
   }
@@ -1876,6 +1969,7 @@ async function handleAuth() {
   try {
     if (authMode === 'signup') {
       const cred = await createUserWithEmailAndPassword(auth, email, password);
+      console.log('[auth] signup profile write start', cred.user.uid);
       await setDoc(
         userDocRef(cred.user.uid),
         {
@@ -1898,17 +1992,19 @@ async function handleAuth() {
           stageAccess: { base: true, apex: true, dinosaur: true },
           coins: 0,
           unlockTokens: 0,
-      dailyChallengeDayKey: null,
-      dailyWinsToday: 0,
-      dailyChallengeRewardClaimed: false,
-      totalQuizQuestions: 0,
-      totalQuizCorrect: 0,
-      commanderXp: 0,
-      createdAt: serverTimestamp(),
-      updatedAt: serverTimestamp(),
-    },
+          dailyChallengeDayKey: null,
+          dailyWinsToday: 0,
+          dailyChallengeRewardClaimed: false,
+          totalQuizQuestions: 0,
+          totalQuizCorrect: 0,
+          commanderXp: 0,
+          createdAt: serverTimestamp(),
+          updatedAt: serverTimestamp(),
+        },
         { merge: true }
       );
+      console.log('[auth] signup profile write OK', cred.user.uid);
+      await writeLeaderboardBootstrapDoc(cred.user.uid, username);
     } else {
       await signInWithEmailAndPassword(auth, email, password);
     }
@@ -1918,6 +2014,8 @@ async function handleAuth() {
 }
 
 async function logout() {
+  clearDefeatAutoReturn();
+  clearLevelCompleteAutoNav();
   try {
     await signOut(auth);
   } catch (e) {
@@ -2187,11 +2285,13 @@ function renderHubAnimalGrid() {
 // ═══════════════════════════════════════════════════════════════════
 
 function showBuilder() {
+  clearDefeatAutoReturn();
   state.selectedAnimals = state.playerHybrid ? [...state.playerHybrid.animals] : [];
   showScreen('builder');
 }
 function showHub() {
   clearLevelCompleteAutoNav();
+  clearDefeatAutoReturn();
   console.log('[flow] hub shown');
   showScreen('hub');
 }
@@ -2334,11 +2434,40 @@ function makeQuizLockCard(id, tierType) {
   return card;
 }
 
+function scrollForgeColumnToFusionPanel() {
+  const forgeCol = document.getElementById('builder-forge-column');
+  const panel = document.getElementById('forge-panel');
+  if (!forgeCol || !panel) {
+    console.warn('[forge] scroll target missing', { forgeCol: !!forgeCol, panel: !!panel });
+    return;
+  }
+  const pad = 16;
+  const relTop = panel.getBoundingClientRect().top - forgeCol.getBoundingClientRect().top + forgeCol.scrollTop;
+  const target = Math.max(0, relTop - pad);
+  console.log('[forge] fusion section ready — column scroll', { target, colScrollH: forgeCol.scrollHeight });
+  forgeCol.scrollTo({ top: target, behavior: 'smooth' });
+}
+
 function scrollToForgeAndHighlight() {
   const forgeCol = document.getElementById('builder-forge-column');
   const panel = document.getElementById('forge-panel');
   const msg = document.getElementById('forge-ready-msg');
-  if (forgeCol) forgeCol.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  console.log('[forge] 3 animals selected — scheduling fusion scroll');
+
+  const runScroll = () => {
+    scrollForgeColumnToFusionPanel();
+    console.log('[forge] forge scroll triggered');
+  };
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      setTimeout(runScroll, 50);
+      setTimeout(runScroll, 220);
+    });
+  });
+
+  if (forgeCol) {
+    forgeCol.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'nearest' });
+  }
   if (panel) {
     panel.classList.remove('forge-highlight');
     void panel.offsetWidth;
@@ -2711,6 +2840,7 @@ function exitQuiz() {
 
 function startBattle() {
   if (!state.playerHybrid) return;
+  clearDefeatAutoReturn();
   state.battleFlowGen = (state.battleFlowGen || 0) + 1;
   const p = state.progress;
   const levelDef = LEVELS[Math.min(p.level - 1, LEVELS.length - 1)];
@@ -3468,6 +3598,15 @@ function updateStreakOnLevelComplete(p) {
   touchDailyStreakIfNeeded(p);
 }
 
+function scrollDefeatIntoView() {
+  const root = document.getElementById('screen-defeat');
+  const box = root?.querySelector('.def-box');
+  console.log('[flow] defeat scroll triggered', { hasScreen: !!root, hasBox: !!box });
+  if (!root || !box) return;
+  root.scrollTop = 0;
+  box.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'nearest' });
+}
+
 async function finishBattle(result) {
   const flowGen = state.battleFlowGen;
   const box = document.getElementById('clash-box');
@@ -3553,12 +3692,32 @@ async function finishBattle(result) {
   } else {
     setTimeout(() => {
       if (flowGen !== state.battleFlowGen) return;
+      clearDefeatAutoReturn();
       hideBattleResultOverlay();
       state.battle = null;
       document.getElementById('def-sub').textContent =
-        `You lost ${result.pWins}–${result.eWins}. Tap below to rebuild your hybrid and jump back in.`;
-      console.log('[battle] transition to defeat screen');
+        `You lost ${result.pWins}–${result.eWins}. Rebuild in the Forge and jump back in.`;
+      const defHint = document.getElementById('def-auto-hint');
+      if (defHint) {
+        defHint.textContent =
+          'You will return to your Hub automatically in a few seconds — or tap a button when you are ready.';
+      }
+      console.log('[battle] defeat resolved — defeat screen next');
       showScreen('defeat');
+      console.log('[flow] defeat screen shown');
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          scrollDefeatIntoView();
+        });
+      });
+      defeatReturnToHubTimer = setTimeout(() => {
+        defeatReturnToHubTimer = null;
+        const d = document.getElementById('screen-defeat');
+        if (d && d.classList.contains('active')) {
+          console.log('[flow] defeat return to hub');
+          showHub();
+        }
+      }, 9000);
     }, 3800);
   }
 }
@@ -3690,6 +3849,7 @@ function buildMiniStats(a) {
 
 function goNextLevel() {
   clearLevelCompleteAutoNav();
+  clearDefeatAutoReturn();
   state.battle = null;
   state.playerHybrid = null;
   state.selectedAnimals = [];
@@ -3698,6 +3858,7 @@ function goNextLevel() {
 }
 function retryLevel() {
   clearLevelCompleteAutoNav();
+  clearDefeatAutoReturn();
   state.battle = null;
   state.playerHybrid = null;
   state.selectedAnimals = [];
@@ -3711,6 +3872,7 @@ function retryLevel() {
 
 function showGameComplete() {
   clearLevelCompleteAutoNav();
+  clearDefeatAutoReturn();
   const p = state.progress;
   p.level = 11;
   void saveUserProgress(p);
@@ -3733,6 +3895,7 @@ function showGameComplete() {
 
 function newGame() {
   clearLevelCompleteAutoNav();
+  clearDefeatAutoReturn();
   const fresh = defaultProgress();
   state.progress = fresh;
   void saveUserProgress(fresh);
@@ -3757,6 +3920,8 @@ document.addEventListener('keydown', e => {
 
 onAuthStateChanged(auth, async user => {
   if (!user) {
+    clearDefeatAutoReturn();
+    clearLevelCompleteAutoNav();
     state.profile = null;
     state.progress = null;
     state.playerHybrid = null;
@@ -3769,11 +3934,13 @@ onAuthStateChanged(auth, async user => {
   let data = snap.data();
   if (!data) {
     const email = user.email || '';
+    const derivedName = email.split('@')[0] || 'Commander';
+    console.log('[auth] first-login profile creation', user.uid);
     await setDoc(
       ref,
       {
         uid: user.uid,
-        username: email.split('@')[0] || 'Commander',
+        username: derivedName,
         email,
         currentLevel: 1,
         highestLevelReached: 0,
@@ -3802,6 +3969,7 @@ onAuthStateChanged(auth, async user => {
       },
       { merge: true }
     );
+    await writeLeaderboardBootstrapDoc(user.uid, derivedName);
     snap = await getDoc(ref);
     data = snap.data();
   }
@@ -3815,6 +3983,8 @@ onAuthStateChanged(auth, async user => {
   state.progress = firestoreDataToProgress(data);
   state.selectedAnimals = [...(data.selectedHybridAnimals || [])];
   state.playerHybrid = hybridFromSaved(data.hybridStats);
+  await syncLeaderboardEntry(state.progress);
+  console.log('[auth] session ready — leaderboard sync attempted', user.uid);
   showScreen('hub');
 });
 
