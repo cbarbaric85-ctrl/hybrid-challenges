@@ -1,0 +1,94 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(uid) {
+      return signedIn() && request.auth.uid == uid;
+    }
+
+    function validLeaderboardDoc(uid) {
+      return request.resource.data.keys().hasOnly([
+          'uid',
+          'username',
+          'hybridName',
+          'highestLevelReached',
+          'currentCampaignLevel',
+          'totalWins',
+          'hybridPowerScore',
+          'commanderXp',
+          'totalQuizQuestions',
+          'totalQuizCorrect',
+          'quizAccuracy',
+          'leaderboardOptIn',
+          'updatedAt'
+        ])
+        && request.resource.data.keys().hasAll([
+          'uid',
+          'leaderboardOptIn',
+          'updatedAt'
+        ])
+        && request.resource.data.uid == uid
+        && request.resource.data.leaderboardOptIn is bool
+        && request.resource.data.updatedAt is timestamp
+        && (
+          !request.resource.data.keys().hasAny(['username']) ||
+          (
+            request.resource.data.username is string &&
+            request.resource.data.username.size() <= 40
+          )
+        )
+        && (
+          !request.resource.data.keys().hasAny(['hybridName']) ||
+          request.resource.data.hybridName is string
+        )
+        && (
+          !request.resource.data.keys().hasAny(['highestLevelReached']) ||
+          request.resource.data.highestLevelReached is int
+        )
+        && (
+          !request.resource.data.keys().hasAny(['currentCampaignLevel']) ||
+          request.resource.data.currentCampaignLevel is int
+        )
+        && (
+          !request.resource.data.keys().hasAny(['totalWins']) ||
+          request.resource.data.totalWins is int
+        )
+        && (
+          !request.resource.data.keys().hasAny(['hybridPowerScore']) ||
+          request.resource.data.hybridPowerScore is int
+        )
+        && (
+          !request.resource.data.keys().hasAny(['commanderXp']) ||
+          request.resource.data.commanderXp is int
+        )
+        && (
+          !request.resource.data.keys().hasAny(['totalQuizQuestions']) ||
+          request.resource.data.totalQuizQuestions is int
+        )
+        && (
+          !request.resource.data.keys().hasAny(['totalQuizCorrect']) ||
+          request.resource.data.totalQuizCorrect is int
+        )
+        && (
+          !request.resource.data.keys().hasAny(['quizAccuracy']) ||
+          request.resource.data.quizAccuracy == null ||
+          request.resource.data.quizAccuracy is number
+        );
+    }
+
+    match /users/{uid} {
+      allow read, create, update: if isOwner(uid);
+      allow delete: if false;
+    }
+
+    match /leaderboardEntries/{uid} {
+      allow read: if true;
+      allow create, update: if isOwner(uid) && validLeaderboardDoc(uid);
+      allow delete: if false;
+    }
+  }
+}
