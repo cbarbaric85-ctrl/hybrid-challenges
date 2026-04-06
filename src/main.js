@@ -2449,6 +2449,12 @@ function showHub() {
 }
 
 function renderBuilder() {
+  updateForgeMobileStepClass();
+  console.log('[forge] renderBuilder — step class pre-applied', {
+    selected: state.selectedAnimals.length,
+    hasHybrid: !!state.playerHybrid,
+    isMobile: isForgeMobileLayout(),
+  });
   const p = state.progress;
   const available = getAvailableAnimals(p);
   const container = document.getElementById('builder-tiers');
@@ -2596,8 +2602,12 @@ function updateForgeMobileStepClass() {
   const n = state.selectedAnimals.length;
   const forged = !!state.playerHybrid;
   const step2 = forged || n >= 3;
+  const was2 = layout.classList.contains('forge-mobile-step-2');
   layout.classList.toggle('forge-mobile-step-2', step2);
   layout.classList.toggle('forge-mobile-step-1', !step2);
+  if (was2 !== step2) {
+    console.log('[forge] mobile step transition', { from: was2 ? 'step-2' : 'step-1', to: step2 ? 'step-2' : 'step-1', n, forged });
+  }
 }
 
 function updateForgeMobilePhaseLabel() {
@@ -2639,14 +2649,17 @@ function scrollToForgeAndHighlight() {
   const msg = document.getElementById('forge-ready-msg');
   console.log('[forge] 3 animals selected — scheduling fusion scroll');
 
-  const runScroll = () => {
+  updateForgeMobileStepClass();
+
+  const runScroll = (label) => {
+    console.log('[forge] forge scroll triggered', { pass: label });
     scrollForgeColumnToFusionPanel();
-    console.log('[forge] forge scroll triggered');
   };
   requestAnimationFrame(() => {
     requestAnimationFrame(() => {
-      setTimeout(runScroll, 50);
-      setTimeout(runScroll, 280);
+      setTimeout(() => runScroll('early'), 80);
+      setTimeout(() => runScroll('settle'), 350);
+      setTimeout(() => runScroll('final'), 600);
     });
   });
 
@@ -2681,10 +2694,12 @@ function toggleAnimalSelect(id) {
   updateSelectionUI();
   clearHybridPreview();
   void persistGameProgress();
-  console.log('[forge] animal selected', { id, selectedCount: state.selectedAnimals.length });
+  console.log('[forge] animal selected', { id, selectedCount: state.selectedAnimals.length, isMobile: isForgeMobileLayout() });
   if (state.selectedAnimals.length === 3) {
-    console.log('[forge] 3 animals selected');
+    console.log('[forge] 3 animals selected — transitioning to fusion');
     scrollToForgeAndHighlight();
+  } else if (state.selectedAnimals.length < 3) {
+    console.log('[forge] selection count below 3 — ensuring step-1');
   }
 }
 
