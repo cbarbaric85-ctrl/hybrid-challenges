@@ -1096,54 +1096,70 @@ function hybridPowerForLeaderboard() {
   return state.playerHybrid?.power ?? 0;
 }
 
+function docSnapshotExists(snap) {
+  if (!snap) return false;
+  return typeof snap.exists === 'function' ? snap.exists() : !!snap.exists;
+}
+
+/** True if public doc should be shown as on the board (legacy rows may omit the field). */
+function publicDocShowsAsOptedIn(d) {
+  if (!d || d.leaderboardOptIn === false) return false;
+  return true;
+}
+
 /** First-time public row so new accounts appear in queries without waiting for a battle save. */
 async function writeLeaderboardBootstrapDoc(uid, username) {
-  if (!uid) return;
+  if (!uid) return false;
   try {
-    await setDoc(
-      leaderboardDocRef(uid),
-      {
-        uid,
-        username: String(username || 'Commander').slice(0, 40),
-        hybridName: '',
-        highestLevelReached: 0,
-        currentCampaignLevel: 1,
-        totalWins: 0,
-        hybridPowerScore: 0,
-        commanderXp: 0,
-        totalQuizQuestions: 0,
-        totalQuizCorrect: 0,
-        quizAccuracy: null,
-        leaderboardOptIn: true,
-        updatedAt: serverTimestamp(),
-      },
-      { merge: true }
-    );
-    console.log('[lb] bootstrap leaderboard doc OK', { uid });
+    const payload = {
+      uid,
+      username: String(username || 'Commander').slice(0, 40),
+      hybridName: '',
+      highestLevelReached: 0,
+      currentCampaignLevel: 1,
+      totalWins: 0,
+      hybridPowerScore: 0,
+      commanderXp: 0,
+      totalQuizQuestions: 0,
+      totalQuizCorrect: 0,
+      quizAccuracy: null,
+      leaderboardOptIn: true,
+      updatedAt: serverTimestamp(),
+    };
+    console.log('[lb] bootstrap public row payload', { uid, keys: Object.keys(payload) });
+    await setDoc(leaderboardDocRef(uid), payload, { merge: true });
+    console.log('[lb] bootstrap public row write success', { uid });
+    return true;
   } catch (e) {
-    console.error('[lb] bootstrap leaderboard doc failed', { uid, err: e });
+    console.error('[lb] bootstrap public row write failed', {
+      uid,
+      code: e?.code,
+      message: e?.message,
+      err: e,
+    });
+    return false;
   }
 }
 
-/** Deterministic public doc at leaderboardEntries/{uid} — never stores email. */
+/** Deterministic public doc at leaderboardEntries/{uid} — never stores email. @returns {Promise<boolean>} */
 async function syncLeaderboardEntry(progress) {
   const uid = state.profile?.uid;
   if (!uid || !progress) {
-    console.log('[lb] sync skip — no uid or progress');
-    return;
+    console.log('[lb] public row sync skip — no uid or progress');
+    return false;
   }
   const ref = leaderboardDocRef(uid);
   try {
     if (!isLeaderboardOptIn()) {
-      console.log('[lb] sync start (opt-out stub)', { uid });
+      console.log('[lb] public row sync start (opt-out stub)', { uid });
       const payload = {
         uid,
         leaderboardOptIn: false,
         updatedAt: serverTimestamp(),
       };
       await setDoc(ref, payload, { merge: true });
-      console.log('[lb] sync success (opt-out)', { uid });
-      return;
+      console.log('[lb] public row write success (opt-out stub)', { uid });
+      return true;
     }
     const acc = computeQuizAccuracy(progress);
     const pubName = sanitizeHybridName(
@@ -1166,13 +1182,89 @@ async function syncLeaderboardEntry(progress) {
       leaderboardOptIn: true,
       updatedAt: serverTimestamp(),
     };
-    console.log('[lb] sync start (opt-in)', { uid });
-    console.log('[lb] payload', payload);
+    console.log('[lb] public row sync start (opt-in)', { uid });
+    console.log('[lb] public row payload (timestamps omitted in logs)', {
+      ...payload,
+      updatedAt: '[serverTimestamp]',
+    });
     await setDoc(ref, payload, { merge: true });
-    console.log('[lb] sync success (opt-in)', { uid });
+    console.log('[lb] public row write success (opt-in)', { uid });
+    return true;
   } catch (e) {
-    console.error('[lb] sync failed', { uid, err: e });
+    console.error('[lb] public row write failed', {
+      uid,
+      code: e?.code,
+      message: e?.message,
+      err: e,
+    });
+    return false;
   }
+}
+
+/**
+ * Publish then read leaderboardEntries/{uid}. Retries if the row is missing (failed write, cold start, rules delay).
+ * @returns {{ snap: object|null, myPublic: object|null }}
+ */
+async function ensureMyPublicLeaderboardDocLoaded() {
+  const uid = state.profile?.uid;
+  const progress = state.progress;
+  if (!uid || !progress) {
+    console.log('[lb] ensure public row skip — no uid or progress');
+    return { snap: null, myPublic: null };
+  }
+  const ref = leaderboardDocRef(uid);
+  const readOnce = async label => {
+    const snap = await getDoc(ref);
+    const ex = docSnapshotExists(snap);
+    console.log('[lb] public row fetch', { label, uid, path: `leaderboardEntries/${uid}`, exists: ex });
+    return snap;
+  };
+
+  let snap = await readOnce('before-ensure');
+
+  const finalize = () => {
+    if (!docSnapshotExists(snap)) return { snap, myPublic: null };
+    const raw = snap.data();
+    const myPublic = raw && typeof raw === 'object' ? { ...raw } : null;
+    if (myPublic && myPublic.leaderboardOptIn !== true && myPublic.leaderboardOptIn !== false) {
+      myPublic.leaderboardOptIn = true;
+    }
+    if (myPublic && (myPublic.highestLevelReached == null || myPublic.highestLevelReached === '')) {
+      myPublic.highestLevelReached = 0;
+    }
+    if (myPublic && (myPublic.hybridPowerScore == null || myPublic.hybridPowerScore === '')) {
+      myPublic.hybridPowerScore = 0;
+    }
+    if (myPublic && (myPublic.totalWins == null || myPublic.totalWins === '')) {
+      myPublic.totalWins = 0;
+    }
+    return { snap, myPublic };
+  };
+
+  if (docSnapshotExists(snap)) return finalize();
+
+  if (!isLeaderboardOptIn()) {
+    await syncLeaderboardEntry(progress);
+    snap = await readOnce('after opt-out publish');
+    return finalize();
+  }
+
+  console.log('[lb] ensure public row — missing doc, publishing pipeline', { uid });
+  let ok = await syncLeaderboardEntry(progress);
+  console.log('[lb] ensure publish pass 1', { ok });
+  snap = await readOnce('after publish 1');
+  if (docSnapshotExists(snap)) return finalize();
+
+  ok = await writeLeaderboardBootstrapDoc(uid, state.profile.username);
+  console.log('[lb] ensure bootstrap', { ok });
+  ok = await syncLeaderboardEntry(progress);
+  console.log('[lb] ensure publish pass 2', { ok });
+  snap = await readOnce('after publish 2');
+  if (docSnapshotExists(snap)) return finalize();
+
+  await new Promise(r => setTimeout(r, 500));
+  snap = await readOnce('after cooldown');
+  return finalize();
 }
 
 async function saveUserProgress(progress) {
@@ -1214,7 +1306,19 @@ async function saveUserProgress(progress) {
     },
     { merge: true }
   );
-  await syncLeaderboardEntry(p);
+  const lbOk = await syncLeaderboardEntry(p);
+  if (!lbOk) console.warn('[lb] saveUserProgress: public row publish failed', { uid });
+}
+
+function normalizeLeaderboardQueryRow(d) {
+  const x = d.data();
+  return {
+    ...x,
+    _id: d.id,
+    highestLevelReached: Math.max(0, Math.floor(Number(x.highestLevelReached) || 0)),
+    hybridPowerScore: Math.max(0, Math.floor(Number(x.hybridPowerScore) || 0)),
+    totalWins: Math.max(0, Math.floor(Number(x.totalWins) || 0)),
+  };
 }
 
 function sortLeaderboardRows(rows) {
@@ -1236,8 +1340,8 @@ async function fetchLeaderboardTop25() {
     limit(100)
   );
   const snap = await getDocs(q);
-  const rows = snap.docs.map(d => ({ ...d.data(), _id: d.id }));
-  return sortLeaderboardRows(rows).slice(0, 25);
+  const rows = sortLeaderboardRows(snap.docs.map(normalizeLeaderboardQueryRow));
+  return rows.slice(0, 25);
 }
 
 async function fetchLeaderboardWithRank() {
@@ -1248,8 +1352,8 @@ async function fetchLeaderboardWithRank() {
     limit(100)
   );
   const snap = await getDocs(q);
-  const rows = sortLeaderboardRows(snap.docs.map(d => ({ ...d.data(), _id: d.id })));
-  console.log('[lb] query result', { docs: snap.docs.length, sorted: rows.length });
+  const rows = sortLeaderboardRows(snap.docs.map(normalizeLeaderboardQueryRow));
+  console.log('[lb] leaderboard query results', { rawDocs: snap.docs.length, sorted: rows.length });
   const myUid = state.profile?.uid;
   let myRank = null;
   if (myUid) {
@@ -1796,19 +1900,15 @@ async function renderLeaderboard() {
   try {
     const myUid = state.profile?.uid;
     const optedIn = isLeaderboardOptIn();
-    let myPublic = null;
-    if (myUid) {
-      const mine = await getDoc(leaderboardDocRef(myUid));
-      myPublic = mine.exists() ? mine.data() : null;
-      console.log('[lb] render my leaderboard doc', {
-        uid: myUid,
-        exists: mine.exists(),
-        leaderboardOptIn: myPublic?.leaderboardOptIn,
-      });
-    }
+    const { myPublic } = await ensureMyPublicLeaderboardDocLoaded();
+    console.log('[lb] render after ensure', {
+      uid: myUid,
+      hasPublicRow: !!myPublic,
+      publicOptIn: myPublic?.leaderboardOptIn,
+    });
 
     const { rows, myRank, scanned } = await fetchLeaderboardWithRank();
-    console.log('[lb] render query snapshot', { tableRows: rows.length, myRank, scanned });
+    console.log('[lb] render table snapshot', { tableRows: rows.length, myRank, scanned });
 
     let rankBanner = '';
     if (!optedIn) {
@@ -1819,14 +1919,14 @@ async function renderLeaderboard() {
         '<p class="lb-rank-banner lb-rank-muted">Your account is set to stay off the public board.</p>';
     } else if (myRank != null) {
       rankBanner = `<p class="lb-rank-banner lb-rank-you">You are ranked <strong>#${myRank}</strong> among the top ${scanned} commanders we loaded (then we show the top 25).</p>`;
-    } else if (myPublic && myPublic.leaderboardOptIn !== false) {
+    } else if (publicDocShowsAsOptedIn(myPublic)) {
       rankBanner = `<p class="lb-rank-banner lb-rank-muted">You are not in the <strong>top 25</strong> on screen — we load the top <strong>100</strong> by best level first, then sort. Your live stats are always shown in <strong>Your entry</strong> below.</p>`;
     } else {
-      rankBanner = `<p class="lb-rank-banner lb-rank-muted">We could not load your public row yet. Open the Hub or finish a mission — your next save publishes your stats to the board.</p>`;
+      rankBanner = `<p class="lb-rank-banner lb-rank-muted">We could not load your public row after publishing. Check the browser console for logs starting with <strong>[lb]</strong> — often a Firestore security rules issue on the <strong>leaderboardEntries</strong> collection — or try again in a moment.</p>`;
     }
 
     let yourCard = '';
-    if (optedIn && myPublic && myPublic.leaderboardOptIn !== false) {
+    if (optedIn && publicDocShowsAsOptedIn(myPublic)) {
       const hn = (myPublic.hybridName && String(myPublic.hybridName).trim()) || '';
       const hybridLine = hn ? `<div class="lb-ye-hybrid">🐾 ${escapeHtml(hn)}</div>` : '';
       const tq = myPublic.totalQuizQuestions ?? 0;
@@ -3983,7 +4083,8 @@ onAuthStateChanged(auth, async user => {
   state.progress = firestoreDataToProgress(data);
   state.selectedAnimals = [...(data.selectedHybridAnimals || [])];
   state.playerHybrid = hybridFromSaved(data.hybridStats);
-  await syncLeaderboardEntry(state.progress);
+  const lbAuthOk = await syncLeaderboardEntry(state.progress);
+  if (!lbAuthOk) console.warn('[lb] post-auth public row publish failed', user.uid);
   console.log('[auth] session ready — leaderboard sync attempted', user.uid);
   showScreen('hub');
 });
