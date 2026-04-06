@@ -543,6 +543,97 @@ let state = {
 /** How many questions each Apex/Dino unlock run uses (picked randomly from a larger pool). */
 const UNLOCK_QUIZ_SESSION_LEN = 3;
 
+/** Lightweight economy — Hub actions (kid-friendly copy in UI). */
+const COIN_TUNING_COST = 12;
+const TOKEN_RECRUIT_COST = 5;
+const XP_PER_BATTLE_WIN = 28;
+/** Commander XP fills this many points per “star” segment on the Hub bar. */
+const COMMANDER_XP_SEGMENT = 50;
+
+let levelCompleteAutoNavTimer = null;
+
+function clearLevelCompleteAutoNav() {
+  if (levelCompleteAutoNavTimer) {
+    clearTimeout(levelCompleteAutoNavTimer);
+    levelCompleteAutoNavTimer = null;
+  }
+}
+
+function getCommanderXpSegment(xp) {
+  const x = Math.max(0, xp | 0);
+  const seg = COMMANDER_XP_SEGMENT;
+  const inSeg = x % seg;
+  const tier = Math.floor(x / seg) + 1;
+  return { tier, inSeg, seg, pct: Math.min(100, (inSeg / seg) * 100) };
+}
+
+function findNextTokenRecruitTarget(p) {
+  const baseNext = getNextBaseAnimalId(p);
+  if (baseNext) return { id: baseNext, mode: 'base' };
+  const na = getNextApexAnimalId(p);
+  if (na) return { id: na, mode: 'quiz' };
+  const nd = getNextDinoAnimalId(p);
+  if (nd) return { id: nd, mode: 'quiz' };
+  return null;
+}
+
+let hubRewardMsgTimer = null;
+function flashHubRewardMsg(msg) {
+  const el = document.getElementById('hub-reward-msg');
+  if (!el) return;
+  el.textContent = msg;
+  el.classList.remove('hidden');
+  if (hubRewardMsgTimer) clearTimeout(hubRewardMsgTimer);
+  hubRewardMsgTimer = setTimeout(() => {
+    el.classList.add('hidden');
+    hubRewardMsgTimer = null;
+  }, 3200);
+}
+
+function hubSpendCoinTune() {
+  const p = state.progress;
+  if (!p || (p.coins || 0) < COIN_TUNING_COST) {
+    flashHubRewardMsg('You need more Fusion Coins — win battles!');
+    return;
+  }
+  if (!state.playerHybrid) {
+    flashHubRewardMsg('Forge a hybrid in the Forge, then tune stats here.');
+    return;
+  }
+  p.coins -= COIN_TUNING_COST;
+  const h = state.playerHybrid;
+  const keys = ['spd', 'agi', 'int', 'str'];
+  const stat = keys[Math.floor(Math.random() * keys.length)];
+  h.stats[stat] = Math.min(STAT_MAX, (h.stats[stat] || 0) + 1);
+  h.power = powerScore(h.stats);
+  void saveUserProgress(p);
+  flashHubRewardMsg(`+1 ${STAT_LABELS_SIMPLE[stat]} — your hybrid grows stronger!`);
+  renderHub();
+}
+
+function hubSpendTokenRecruit() {
+  const p = state.progress;
+  if (!p || (p.unlockTokens || 0) < TOKEN_RECRUIT_COST) {
+    flashHubRewardMsg('You need more Unlock Tokens — clear levels and daily goals.');
+    return;
+  }
+  const t = findNextTokenRecruitTarget(p);
+  if (!t) {
+    flashHubRewardMsg('Every animal is unlocked. Use tokens in future updates!');
+    return;
+  }
+  p.unlockTokens -= TOKEN_RECRUIT_COST;
+  if (t.mode === 'base') {
+    if (!p.unlockedAnimals.includes(t.id)) p.unlockedAnimals.push(t.id);
+    flashHubRewardMsg(`${ANIMALS[t.id].name} joined your roster!`);
+  } else {
+    if (!p.quizUnlocked.includes(t.id)) p.quizUnlocked.push(t.id);
+    flashHubRewardMsg(`${ANIMALS[t.id].name} is unlocked — find them in the Forge!`);
+  }
+  void saveUserProgress(p);
+  renderHub();
+}
+
 // Quiz sub-state
 let quizState = {
   animalId: null,
@@ -572,6 +663,8 @@ function defaultProgress() {
     dailyChallengeRewardClaimed: false,
     totalQuizQuestions: 0,
     totalQuizCorrect: 0,
+    /** Meta XP — wins only; drives Hub progress bar (not campaign level). */
+    commanderXp: 0,
   };
 }
 
@@ -888,6 +981,7 @@ function normalizeProgress(p) {
   if (p.dailyChallengeRewardClaimed == null) p.dailyChallengeRewardClaimed = false;
   if (p.totalQuizQuestions == null) p.totalQuizQuestions = 0;
   if (p.totalQuizCorrect == null) p.totalQuizCorrect = 0;
+  if (p.commanderXp == null) p.commanderXp = 0;
   return p;
 }
 
@@ -959,6 +1053,7 @@ function firestoreDataToProgress(data) {
     dailyChallengeRewardClaimed: data.dailyChallengeRewardClaimed === true,
     totalQuizQuestions: data.totalQuizQuestions ?? 0,
     totalQuizCorrect: data.totalQuizCorrect ?? 0,
+    commanderXp: data.commanderXp ?? 0,
     stageAccess: {
       base: data.stageAccess?.base !== false,
       apex: data.stageAccess?.apex !== false,
@@ -1021,8 +1116,10 @@ async function syncLeaderboardEntry(progress) {
       username: state.profile.username || 'Commander',
       hybridName: pubName || '',
       highestLevelReached: progress.highestLevelReached ?? 0,
+      currentCampaignLevel: progress.level ?? 1,
       totalWins: progress.totalWins ?? 0,
       hybridPowerScore: hybridPowerForLeaderboard(),
+      commanderXp: progress.commanderXp ?? 0,
       totalQuizQuestions: progress.totalQuizQuestions ?? 0,
       totalQuizCorrect: progress.totalQuizCorrect ?? 0,
       quizAccuracy: acc != null ? acc : null,
@@ -1066,6 +1163,7 @@ async function saveUserProgress(progress) {
       dailyChallengeRewardClaimed: p.dailyChallengeRewardClaimed === true,
       totalQuizQuestions: p.totalQuizQuestions ?? 0,
       totalQuizCorrect: p.totalQuizCorrect ?? 0,
+      commanderXp: p.commanderXp ?? 0,
       stageAccess: { ...(p.stageAccess || { base: true, apex: true, dinosaur: true }) },
       updatedAt: serverTimestamp(),
     },
@@ -1805,6 +1903,7 @@ async function handleAuth() {
       dailyChallengeRewardClaimed: false,
       totalQuizQuestions: 0,
       totalQuizCorrect: 0,
+      commanderXp: 0,
       createdAt: serverTimestamp(),
       updatedAt: serverTimestamp(),
     },
@@ -1901,7 +2000,7 @@ function renderHub() {
   const streakEl = document.getElementById('hub-streak');
   if (streakEl) {
     const n = p.streakCount || 0;
-    streakEl.textContent = `🔥 Daily Streak: ${n} day${n === 1 ? '' : 's'}`;
+    streakEl.textContent = `🔥 ${n} day streak`;
   }
   const coinsEl = document.getElementById('hsb-coins');
   if (coinsEl) coinsEl.textContent = String(p.coins ?? 0);
@@ -1930,6 +2029,26 @@ function renderHub() {
     document.getElementById('hsb-hybrid').textContent = '—';
     document.getElementById('hsb-power').textContent = '—';
   }
+
+  const xpUi = getCommanderXpSegment(p.commanderXp || 0);
+  const xpFill = document.getElementById('hub-xp-bar-fill');
+  const xpMeta = document.getElementById('hub-xp-meta');
+  const xpSegLbl = document.getElementById('hub-xp-seg-lbl');
+  const xpTrack = document.getElementById('hub-xp-bar-track');
+  if (xpFill) xpFill.style.width = `${xpUi.pct}%`;
+  if (xpSegLbl) xpSegLbl.textContent = `Spark ${xpUi.tier}`;
+  if (xpTrack) xpTrack.setAttribute('aria-valuenow', String(Math.round(xpUi.pct)));
+  if (xpMeta) {
+    xpMeta.textContent = `Commander XP · ${xpUi.inSeg} / ${xpUi.seg} points in this spark (wins fill the bar)`;
+  }
+
+  const coinBtn = document.getElementById('hub-btn-coin-tune');
+  const tokBtn = document.getElementById('hub-btn-token-recruit');
+  const coinCan = (p.coins || 0) >= COIN_TUNING_COST && !!state.playerHybrid;
+  const tokTgt = findNextTokenRecruitTarget(p);
+  const tokCan = (p.unlockTokens || 0) >= TOKEN_RECRUIT_COST && !!tokTgt;
+  if (coinBtn) coinBtn.disabled = !coinCan;
+  if (tokBtn) tokBtn.disabled = !tokCan;
 
   // Level banner
   document.getElementById('hub-level-num').textContent = p.level > 10 ? '✓' : p.level;
@@ -2072,6 +2191,7 @@ function showBuilder() {
   showScreen('builder');
 }
 function showHub() {
+  clearLevelCompleteAutoNav();
   console.log('[flow] hub shown');
   showScreen('hub');
 }
@@ -2818,6 +2938,11 @@ function renderBattleScreen() {
   document.getElementById('battle-countdown-overlay')?.classList.add('hidden');
   hideBattleResultOverlay();
 
+  const fp = document.getElementById('fighter-player');
+  const fe = document.getElementById('fighter-enemy');
+  if (fp) fp.classList.toggle('fighter-champion', !!h);
+  if (fe) fe.classList.remove('fighter-champion');
+
   const phase = state.battle.phase;
   if (phase === 'pre_quiz') {
     if (pre) pre.classList.remove('hidden');
@@ -3103,10 +3228,33 @@ function showBattleResultOverlay(result, opts) {
   const overlay = document.getElementById('battle-result-overlay');
   const card = document.getElementById('battle-result-card');
   const emojiEl = document.getElementById('battle-result-emoji');
+  const lootEl = document.getElementById('battle-result-loot');
   card.className = `battle-result-card ${v.brClass} br-moment`;
   if (emojiEl) emojiEl.textContent = '';
   document.getElementById('battle-result-title').textContent = v.title;
   document.getElementById('battle-result-score').textContent = `Final score · ${result.pWins} – ${result.eWins}`;
+  if (lootEl) {
+    lootEl.classList.remove('br-loot-pop');
+    const xg = o.xpGained | 0;
+    const cg = o.coinsGained | 0;
+    const tg = o.tokensGained | 0;
+    if (won && (xg || cg || tg)) {
+      lootEl.classList.remove('hidden');
+      lootEl.innerHTML = `
+        <div class="br-loot-title">You earned</div>
+        <div class="br-loot-pills">
+          ${xg ? `<span class="br-pill br-pill-xp">+${xg} Commander XP</span>` : ''}
+          ${cg ? `<span class="br-pill br-pill-coin">+${cg} Fusion Coins</span>` : ''}
+          ${tg ? `<span class="br-pill br-pill-token">+${tg} Unlock Token</span>` : ''}
+        </div>`;
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => lootEl.classList.add('br-loot-pop'));
+      });
+    } else {
+      lootEl.classList.add('hidden');
+      lootEl.innerHTML = '';
+    }
+  }
   const hy = state.playerHybrid;
   const nameLine =
     hy && hy.name
@@ -3129,6 +3277,12 @@ function showBattleResultOverlay(result, opts) {
 
 function hideBattleResultOverlay() {
   document.getElementById('battle-result-overlay').classList.add('hidden');
+  const loot = document.getElementById('battle-result-loot');
+  if (loot) {
+    loot.classList.add('hidden');
+    loot.classList.remove('br-loot-pop');
+    loot.innerHTML = '';
+  }
 }
 
 function beginBattle() {
@@ -3332,15 +3486,23 @@ async function finishBattle(result) {
 
   let rewardFlash = '';
   let dailyHint = '';
+  let xpGained = 0;
+  let coinsGained = 0;
+  let tokensGained = 0;
   if (won) {
+    xpGained = XP_PER_BATTLE_WIN;
+    p.commanderXp = (p.commanderXp || 0) + xpGained;
     p.totalWins++;
     p.dailyWinsToday = (p.dailyWinsToday || 0) + 1;
+    coinsGained = 5;
     p.coins = (p.coins || 0) + 5;
     const ch = pickDailyChallenge(localDateString());
     if (!p.dailyChallengeRewardClaimed && dailyChallengeMet(ch, p, state.playerHybrid, true)) {
       p.dailyChallengeRewardClaimed = true;
       p.coins += 8;
       p.unlockTokens = (p.unlockTokens || 0) + 1;
+      coinsGained += 8;
+      tokensGained += 1;
       rewardFlash =
         '🎯 Daily challenge complete! +8 Fusion Coins · +1 <strong>Unlock token</strong> (save for future rewards).';
     } else if (!p.dailyChallengeRewardClaimed && ch.id === 'double' && (p.dailyWinsToday || 0) < 2) {
@@ -3376,7 +3538,7 @@ async function finishBattle(result) {
 
   setTimeout(() => {
     if (flowGen !== state.battleFlowGen) return;
-    showBattleResultOverlay(result, { rewardFlash, dailyHint });
+    showBattleResultOverlay(result, { rewardFlash, dailyHint, xpGained, coinsGained, tokensGained });
     console.log('[battle] result overlay shown', { won });
   }, 520);
 
@@ -3497,6 +3659,23 @@ async function showLevelComplete() {
       <button class="btn btn-secondary btn-sm" type="button" onclick="showHub()">Hub — missions &amp; roster</button>`;
   }
 
+  const autoHint = document.getElementById('lc-auto-hint');
+  if (isFinalLevel) {
+    if (autoHint) autoHint.textContent = '';
+    clearLevelCompleteAutoNav();
+  } else {
+    if (autoHint) {
+      autoHint.textContent =
+        'You will return to the Hub automatically in a few seconds — or tap a button when you are ready.';
+    }
+    clearLevelCompleteAutoNav();
+    levelCompleteAutoNavTimer = setTimeout(() => {
+      levelCompleteAutoNavTimer = null;
+      const lc = document.getElementById('screen-level-complete');
+      if (lc && lc.classList.contains('active')) showHub();
+    }, 9000);
+  }
+
   showScreen('level-complete');
   console.log('[flow] level complete screen shown');
 }
@@ -3510,6 +3689,7 @@ function buildMiniStats(a) {
 }
 
 function goNextLevel() {
+  clearLevelCompleteAutoNav();
   state.battle = null;
   state.playerHybrid = null;
   state.selectedAnimals = [];
@@ -3517,6 +3697,7 @@ function goNextLevel() {
   showScreen('builder');
 }
 function retryLevel() {
+  clearLevelCompleteAutoNav();
   state.battle = null;
   state.playerHybrid = null;
   state.selectedAnimals = [];
@@ -3529,6 +3710,7 @@ function retryLevel() {
 // ═══════════════════════════════════════════════════════════════════
 
 function showGameComplete() {
+  clearLevelCompleteAutoNav();
   const p = state.progress;
   p.level = 11;
   void saveUserProgress(p);
@@ -3550,6 +3732,7 @@ function showGameComplete() {
 }
 
 function newGame() {
+  clearLevelCompleteAutoNav();
   const fresh = defaultProgress();
   state.progress = fresh;
   void saveUserProgress(fresh);
@@ -3613,6 +3796,7 @@ onAuthStateChanged(auth, async user => {
         dailyChallengeRewardClaimed: false,
         totalQuizQuestions: 0,
         totalQuizCorrect: 0,
+        commanderXp: 0,
         createdAt: serverTimestamp(),
         updatedAt: serverTimestamp(),
       },
@@ -3660,4 +3844,6 @@ Object.assign(window, {
   advancePreBattleQuiz,
   confirmPreBattleAndStartFight,
   applyHybridDisplayName,
+  hubSpendCoinTune,
+  hubSpendTokenRecruit,
 });
