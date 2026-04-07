@@ -1,16 +1,18 @@
 import {
-  STAGE_BASE, STAGE_APEX, STAGE_DINO,
-  ANIMALS, BASE_IDS, APEX_IDS, DINO_IDS, STARTER_BASE_IDS,
+  STAGE_BASE, STAGE_APEX, STAGE_DINO, STAGE_LEGENDARY, STAGE_MYTHICAL,
+  ANIMALS, BASE_IDS, APEX_IDS, DINO_IDS, LEGENDARY_IDS, MYTHICAL_IDS, STARTER_BASE_IDS,
 } from '../data/animals.js';
 import { LEVEL_REWARDS } from '../data/levels.js';
 import { state, MONETIZE_PLACEHOLDER } from './state.js';
 import { localDateString, localYesterdayString, EMPTY_STAT_BOOST } from './utils.js';
 
 function canAccessStage(progress, stage) {
-  const a = progress.stageAccess || { base: true, apex: true, dinosaur: true };
+  const a = progress.stageAccess || { base: true, apex: true, dinosaur: true, legendary: true, mythical: true };
   if (stage === STAGE_BASE) return a.base !== false && MONETIZE_PLACEHOLDER.fullBaseStageOwned;
   if (stage === STAGE_APEX) return a.apex !== false && MONETIZE_PLACEHOLDER.apexStageOwned;
   if (stage === STAGE_DINO) return a.dinosaur !== false && MONETIZE_PLACEHOLDER.dinosaurStageOwned;
+  if (stage === STAGE_LEGENDARY) return a.legendary !== false && MONETIZE_PLACEHOLDER.legendaryStageOwned;
+  if (stage === STAGE_MYTHICAL) return a.mythical !== false && MONETIZE_PLACEHOLDER.mythicalStageOwned;
   return true;
 }
 
@@ -35,6 +37,14 @@ function countDinoUnlocked(progress) {
   return DINO_IDS.filter(id => progress.quizUnlocked.includes(id)).length;
 }
 
+function countLegendaryUnlocked(progress) {
+  return LEGENDARY_IDS.filter(id => progress.quizUnlocked.includes(id)).length;
+}
+
+function countMythicalUnlocked(progress) {
+  return MYTHICAL_IDS.filter(id => progress.quizUnlocked.includes(id)).length;
+}
+
 /** Beat level 5 (campaign level 6+) → apex quizzes open. */
 function apexLevelGateMet(progress) {
   return progress.level >= 6;
@@ -45,11 +55,24 @@ function dinoLevelGateMet(progress) {
   return progress.level >= 9;
 }
 
+/** Beat level 12 (campaign level 13+) → legendary quizzes open. */
+function legendaryLevelGateMet(progress) {
+  return progress.level >= 13;
+}
+
+/** Beat level 16 (campaign level 17+) → mythical quizzes open. */
+function mythicalLevelGateMet(progress) {
+  return progress.level >= 17;
+}
+
 function getPlayerStageLabel(progress) {
+  if (mythicalLevelGateMet(progress) && countMythicalUnlocked(progress) > 0) return 'Mythical Gods';
+  if (legendaryLevelGateMet(progress) && countLegendaryUnlocked(progress) > 0) return 'Legendary Beasts';
   const b = countBaseUnlocked(progress);
   if (b < BASE_IDS.length || !apexLevelGateMet(progress)) return 'Base Animals';
   if (!dinoLevelGateMet(progress)) return 'Apex Predators';
-  return 'Dinosaurs';
+  if (!legendaryLevelGateMet(progress)) return 'Dinosaurs';
+  return 'Legendary Beasts';
 }
 
 /** Cleared level number that awards each base recruit (inverse of LEVEL_REWARDS). */
@@ -73,16 +96,28 @@ function getNextDinoAnimalId(progress) {
   return DINO_IDS.find(id => !progress.quizUnlocked.includes(id)) || null;
 }
 
+function getNextLegendaryAnimalId(progress) {
+  if (!legendaryLevelGateMet(progress)) return null;
+  return LEGENDARY_IDS.find(id => !progress.quizUnlocked.includes(id)) || null;
+}
+
+function getNextMythicalAnimalId(progress) {
+  if (!mythicalLevelGateMet(progress)) return null;
+  return MYTHICAL_IDS.find(id => !progress.quizUnlocked.includes(id)) || null;
+}
+
+const MAX_LEVEL = 20;
+
 /** One-line hints for hub / battle overlay (short, kid-friendly). */
 function getProgressionNextLines(progress) {
   const lines = [];
   const p = progress;
-  const curLv = Math.min(p.level, 10);
+  const curLv = Math.min(p.level, MAX_LEVEL);
   const bNext = getNextBaseAnimalId(p);
   if (bNext) {
     const needLv = BASE_UNLOCK_LEVEL[bNext];
     const nm = ANIMALS[bNext].name;
-    if (needLv != null && needLv === curLv && p.level <= 10) {
+    if (needLv != null && needLv === curLv && p.level <= MAX_LEVEL) {
       lines.push(`<strong>Next goal:</strong> Win this mission to recruit ${nm}.`);
     } else if (needLv != null) {
       lines.push(`<strong>Next unlock:</strong> ${nm} — beat Level ${needLv}.`);
@@ -97,6 +132,16 @@ function getProgressionNextLines(progress) {
   } else if (getNextDinoAnimalId(p)) {
     const id = getNextDinoAnimalId(p);
     lines.push(`<strong>Next goal:</strong> Pass the <strong>${ANIMALS[id].name}</strong> Dino quiz in the Forge.`);
+  } else if (!legendaryLevelGateMet(p)) {
+    lines.push(`<strong>Next goal:</strong> Beat Level 12 to open <strong>Legendary Beasts</strong>, then quiz in the Forge.`);
+  } else if (getNextLegendaryAnimalId(p)) {
+    const id = getNextLegendaryAnimalId(p);
+    lines.push(`<strong>Next goal:</strong> Pass the <strong>${ANIMALS[id].name}</strong> Legendary quiz in the Forge.`);
+  } else if (!mythicalLevelGateMet(p)) {
+    lines.push(`<strong>Next goal:</strong> Beat Level 16 to open <strong>Mythical Gods</strong>, then quiz in the Forge.`);
+  } else if (getNextMythicalAnimalId(p)) {
+    const id = getNextMythicalAnimalId(p);
+    lines.push(`<strong>Next goal:</strong> Pass the <strong>${ANIMALS[id].name}</strong> Mythical quiz in the Forge.`);
   } else {
     lines.push(`<strong>You cleared the roster!</strong> Push levels, coins, and leaderboard rank.`);
   }
@@ -110,18 +155,16 @@ function getAvailableAnimals(progress) {
       return canAccessStage(progress, STAGE_BASE) && isBaseAnimalUnlocked(id, progress);
     }
     if (a.stage === STAGE_APEX) {
-      return (
-        canAccessStage(progress, STAGE_APEX) &&
-        apexLevelGateMet(progress) &&
-        progress.quizUnlocked.includes(id)
-      );
+      return canAccessStage(progress, STAGE_APEX) && apexLevelGateMet(progress) && progress.quizUnlocked.includes(id);
     }
     if (a.stage === STAGE_DINO) {
-      return (
-        canAccessStage(progress, STAGE_DINO) &&
-        dinoLevelGateMet(progress) &&
-        progress.quizUnlocked.includes(id)
-      );
+      return canAccessStage(progress, STAGE_DINO) && dinoLevelGateMet(progress) && progress.quizUnlocked.includes(id);
+    }
+    if (a.stage === STAGE_LEGENDARY) {
+      return canAccessStage(progress, STAGE_LEGENDARY) && legendaryLevelGateMet(progress) && progress.quizUnlocked.includes(id);
+    }
+    if (a.stage === STAGE_MYTHICAL) {
+      return canAccessStage(progress, STAGE_MYTHICAL) && mythicalLevelGateMet(progress) && progress.quizUnlocked.includes(id);
     }
     return false;
   });
@@ -131,12 +174,10 @@ function isQuizEligible(id, progress) {
   const a = ANIMALS[id];
   if (!a || a.stage === STAGE_BASE) return false;
   if (progress.quizUnlocked.includes(id)) return false;
-  if (a.stage === STAGE_APEX) {
-    return canAccessStage(progress, STAGE_APEX) && apexLevelGateMet(progress);
-  }
-  if (a.stage === STAGE_DINO) {
-    return canAccessStage(progress, STAGE_DINO) && dinoLevelGateMet(progress);
-  }
+  if (a.stage === STAGE_APEX) return canAccessStage(progress, STAGE_APEX) && apexLevelGateMet(progress);
+  if (a.stage === STAGE_DINO) return canAccessStage(progress, STAGE_DINO) && dinoLevelGateMet(progress);
+  if (a.stage === STAGE_LEGENDARY) return canAccessStage(progress, STAGE_LEGENDARY) && legendaryLevelGateMet(progress);
+  if (a.stage === STAGE_MYTHICAL) return canAccessStage(progress, STAGE_MYTHICAL) && mythicalLevelGateMet(progress);
   return false;
 }
 
@@ -144,10 +185,11 @@ function isLevelLocked(id, progress) {
   const a = ANIMALS[id];
   if (a.stage === STAGE_APEX) return progress.level < 6;
   if (a.stage === STAGE_DINO) return progress.level < 9;
+  if (a.stage === STAGE_LEGENDARY) return progress.level < 13;
+  if (a.stage === STAGE_MYTHICAL) return progress.level < 17;
   return false;
 }
 
-/** Checklist for hub / roster (base level gates + apex & dinosaurs). */
 function unlockGateLinesForAnimal(id, progress) {
   const a = ANIMALS[id];
   if (a.stage === STAGE_BASE && !isBaseAnimalUnlocked(id, progress)) {
@@ -156,26 +198,38 @@ function unlockGateLinesForAnimal(id, progress) {
     return [{ ok: progress.level > needLv, text: `Beat Level ${needLv}` }];
   }
   if (a.stage === STAGE_APEX) {
-    const levelOk = apexLevelGateMet(progress);
-    const quizOk = progress.quizUnlocked.includes(id);
     return [
-      { ok: levelOk, text: 'Beat Level 5' },
-      { ok: quizOk, text: 'Pass Apex quiz' },
+      { ok: apexLevelGateMet(progress), text: 'Beat Level 5' },
+      { ok: progress.quizUnlocked.includes(id), text: 'Pass Apex quiz' },
     ];
   }
   if (a.stage === STAGE_DINO) {
-    const levelOk = dinoLevelGateMet(progress);
-    const quizOk = progress.quizUnlocked.includes(id);
     return [
-      { ok: levelOk, text: 'Beat Level 8' },
-      { ok: quizOk, text: 'Pass Dino quiz' },
+      { ok: dinoLevelGateMet(progress), text: 'Beat Level 8' },
+      { ok: progress.quizUnlocked.includes(id), text: 'Pass Dino quiz' },
+    ];
+  }
+  if (a.stage === STAGE_LEGENDARY) {
+    return [
+      { ok: legendaryLevelGateMet(progress), text: 'Beat Level 12' },
+      { ok: progress.quizUnlocked.includes(id), text: 'Pass Legendary quiz' },
+    ];
+  }
+  if (a.stage === STAGE_MYTHICAL) {
+    return [
+      { ok: mythicalLevelGateMet(progress), text: 'Beat Level 16' },
+      { ok: progress.quizUnlocked.includes(id), text: 'Pass Mythical quiz' },
     ];
   }
   return null;
 }
 
 function quizUiTierType(animalId) {
-  return ANIMALS[animalId]?.stage === STAGE_DINO ? 'dino' : 'apex';
+  const stage = ANIMALS[animalId]?.stage;
+  if (stage === STAGE_MYTHICAL) return 'mythical';
+  if (stage === STAGE_LEGENDARY) return 'legendary';
+  if (stage === STAGE_DINO) return 'dino';
+  return 'apex';
 }
 
 function mergeStatBoosts(a, b) {
@@ -279,6 +333,12 @@ function getSoftMonetisationHintLines(progress) {
   if (!MONETIZE_PLACEHOLDER.dinosaurStageOwned && dinoLevelGateMet(progress) && countDinoUnlocked(progress) < DINO_IDS.length) {
     lines.push('<span class="soft-gate-pill">Unlock Dinosaurs</span> Or earn each beast with <strong>Dino quizzes</strong>.');
   }
+  if (!MONETIZE_PLACEHOLDER.legendaryStageOwned && legendaryLevelGateMet(progress) && countLegendaryUnlocked(progress) < LEGENDARY_IDS.length) {
+    lines.push('<span class="soft-gate-pill">Unlock Legendary</span> Or earn each beast with <strong>Legendary quizzes</strong>.');
+  }
+  if (!MONETIZE_PLACEHOLDER.mythicalStageOwned && mythicalLevelGateMet(progress) && countMythicalUnlocked(progress) < MYTHICAL_IDS.length) {
+    lines.push('<span class="soft-gate-pill">Unlock Mythical</span> Or earn each god with <strong>Mythical quizzes</strong>.');
+  }
   return lines;
 }
 
@@ -292,13 +352,20 @@ export {
   countBaseUnlocked,
   countApexUnlocked,
   countDinoUnlocked,
+  countLegendaryUnlocked,
+  countMythicalUnlocked,
   apexLevelGateMet,
   dinoLevelGateMet,
+  legendaryLevelGateMet,
+  mythicalLevelGateMet,
   getPlayerStageLabel,
   BASE_UNLOCK_LEVEL,
+  MAX_LEVEL,
   getNextBaseAnimalId,
   getNextApexAnimalId,
   getNextDinoAnimalId,
+  getNextLegendaryAnimalId,
+  getNextMythicalAnimalId,
   getProgressionNextLines,
   getAvailableAnimals,
   isQuizEligible,

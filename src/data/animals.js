@@ -1,10 +1,12 @@
-export const STAT_MAX = 18;
+export const STAT_MAX = 25;
 
 export const STAGE_BASE = 'base';
 export const STAGE_APEX = 'apex';
 export const STAGE_DINO = 'dinosaur';
+export const STAGE_LEGENDARY = 'legendary';
+export const STAGE_MYTHICAL = 'mythical';
 
-export const STAGE_RANK = { [STAGE_BASE]: 1, [STAGE_APEX]: 2, [STAGE_DINO]: 3 };
+export const STAGE_RANK = { [STAGE_BASE]: 1, [STAGE_APEX]: 2, [STAGE_DINO]: 3, [STAGE_LEGENDARY]: 4, [STAGE_MYTHICAL]: 5 };
 
 /**
  * Tier-grouped animal registry. Add new animals inside the correct tier block.
@@ -59,6 +61,40 @@ export const TIER_REGISTRY = {
       trike:    {id:'trike',    name:'Triceratops',    icon:'🦏', emoji:'🦏', spd:5,  agi:4,  int:5,  str:15, stage:STAGE_DINO, bio:'Three horns, one shield — charge first, ask later.'},
     },
   },
+  legendary: {
+    label: 'Legendary Beast',
+    stage: STAGE_LEGENDARY,
+    intro: 'Ancient creatures of myth, forged in fire, magic, and legend.',
+    animals: {
+      dragon:   {id:'dragon',   name:'Dragon',    icon:'🐲', emoji:'🐲', spd:14, agi:12, int:16, str:20, stage:STAGE_LEGENDARY, bio:'Fire-breathing sovereign of the skies.'},
+      phoenix:  {id:'phoenix',  name:'Phoenix',   icon:'🔥', emoji:'🔥', spd:18, agi:16, int:18, str:10, stage:STAGE_LEGENDARY, bio:'Reborn from ashes. Eternal flame given form.'},
+      griffin:  {id:'griffin',   name:'Griffin',    icon:'🦅', emoji:'🦅', spd:16, agi:18, int:14, str:15, stage:STAGE_LEGENDARY, bio:'Lion body, eagle wings. Royalty of myth.'},
+      hydra:    {id:'hydra',    name:'Hydra',      icon:'🐍', emoji:'🐍', spd:8,  agi:10, int:14, str:22, stage:STAGE_LEGENDARY, bio:'Cut one head — two grow back.'},
+      minotaur: {id:'minotaur', name:'Minotaur',   icon:'🐂', emoji:'🐂', spd:10, agi:8,  int:8,  str:22, stage:STAGE_LEGENDARY, bio:'Labyrinth guardian. Unstoppable brute.'},
+      kraken:   {id:'kraken',   name:'Kraken',     icon:'🦑', emoji:'🦑', spd:12, agi:14, int:16, str:20, stage:STAGE_LEGENDARY, bio:'Pulls ships beneath the waves.'},
+      cerberus: {id:'cerberus', name:'Cerberus',   icon:'🐕', emoji:'🐕', spd:14, agi:12, int:12, str:18, stage:STAGE_LEGENDARY, bio:'Three heads. One purpose: guard the gates.'},
+      pegasus:  {id:'pegasus',  name:'Pegasus',    icon:'🐴', emoji:'🐴', spd:22, agi:20, int:14, str:8,  stage:STAGE_LEGENDARY, bio:'Winged stallion. Faster than thought.'},
+      basilisk: {id:'basilisk', name:'Basilisk',   icon:'🐍', emoji:'🐍', spd:10, agi:12, int:20, str:16, stage:STAGE_LEGENDARY, bio:'Its gaze turns flesh to stone.'},
+      chimera:  {id:'chimera',  name:'Chimera',    icon:'🦁', emoji:'🦁', spd:14, agi:14, int:14, str:18, stage:STAGE_LEGENDARY, bio:'Lion, goat, serpent — three beasts in one.'},
+    },
+  },
+  mythical: {
+    label: 'Mythical God',
+    stage: STAGE_MYTHICAL,
+    intro: 'Beyond beasts — these are rulers of realms, masters of power itself.',
+    animals: {
+      zeus:     {id:'zeus',     name:'Zeus',      icon:'⚡', emoji:'⚡', spd:20, agi:18, int:22, str:25, stage:STAGE_MYTHICAL, bio:'King of gods. Lord of thunder.'},
+      poseidon: {id:'poseidon', name:'Poseidon',  icon:'🔱', emoji:'🔱', spd:18, agi:16, int:20, str:24, stage:STAGE_MYTHICAL, bio:'Ruler of oceans. Shaker of worlds.'},
+      hades:    {id:'hades',    name:'Hades',     icon:'💀', emoji:'💀', spd:14, agi:14, int:25, str:22, stage:STAGE_MYTHICAL, bio:'Lord of the underworld. Judge of souls.'},
+      athena:   {id:'athena',   name:'Athena',    icon:'🦉', emoji:'🦉', spd:16, agi:20, int:25, str:16, stage:STAGE_MYTHICAL, bio:'Goddess of wisdom and war strategy.'},
+      ares:     {id:'ares',     name:'Ares',      icon:'⚔️', emoji:'⚔️', spd:18, agi:16, int:14, str:25, stage:STAGE_MYTHICAL, bio:'God of war. Destruction incarnate.'},
+      apollo:   {id:'apollo',   name:'Apollo',    icon:'☀️', emoji:'☀️', spd:22, agi:20, int:22, str:14, stage:STAGE_MYTHICAL, bio:'God of light, music, and prophecy.'},
+      artemis:  {id:'artemis',  name:'Artemis',   icon:'🏹', emoji:'🏹', spd:24, agi:25, int:18, str:14, stage:STAGE_MYTHICAL, bio:'Goddess of the hunt. Never misses.'},
+      thor:     {id:'thor',     name:'Thor',      icon:'🔨', emoji:'🔨', spd:16, agi:14, int:16, str:25, stage:STAGE_MYTHICAL, bio:'Thunder god. Mjolnir\'s chosen wielder.'},
+      loki:     {id:'loki',     name:'Loki',      icon:'🎭', emoji:'🎭', spd:22, agi:22, int:25, str:12, stage:STAGE_MYTHICAL, bio:'Trickster god. Master of chaos.'},
+      anubis:   {id:'anubis',   name:'Anubis',    icon:'⚖️', emoji:'⚖️', spd:18, agi:18, int:22, str:20, stage:STAGE_MYTHICAL, bio:'Guardian of the dead. Weigher of hearts.'},
+    },
+  },
 };
 
 /** Flat animal lookup derived from TIER_REGISTRY — backward-compatible. */
@@ -84,11 +120,17 @@ export const SYLLABLES = {
   wolverine:'Wolv', cassowary:'Kass', pbear:'Pol', saltcroc:'Sal',
   orca:'Ork', buffalo:'Buph', sibtiger:'Sib', trex:'Rex', raptor:'Rapt',
   spino:'Spin', ptero:'Pter', allo:'Allo', giga:'Giga', stego:'Steg', trike:'Trik',
+  dragon:'Drak', phoenix:'Phyx', griffin:'Gryph', hydra:'Hyd', minotaur:'Mino',
+  kraken:'Krak', cerberus:'Cerb', pegasus:'Pegs', basilisk:'Bazl', chimera:'Kymr',
+  zeus:'Zeu', poseidon:'Psdn', hades:'Had', athena:'Athn', ares:'Ars',
+  apollo:'Apol', artemis:'Artm', thor:'Thor', loki:'Lok', anubis:'Anb',
   cat:'Kat', dog:'Dog', elephant:'Elph', hippo:'Hip', hyena:'Hyen', panther:'Pan',
 };
 
 export const BASE_IDS = Object.keys(TIER_REGISTRY.base.animals);
 export const APEX_IDS = Object.keys(TIER_REGISTRY.apex.animals);
 export const DINO_IDS = Object.keys(TIER_REGISTRY.dino.animals);
+export const LEGENDARY_IDS = Object.keys(TIER_REGISTRY.legendary.animals);
+export const MYTHICAL_IDS = Object.keys(TIER_REGISTRY.mythical.animals);
 
 export const STARTER_BASE_IDS = ['wolf', 'bear', 'eagle'];

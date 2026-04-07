@@ -397,6 +397,208 @@ export const QUIZZES = {
       {q:'Cassowaries can move through jungle by…',opts:['Teleporting','Sprinting and jumping like forest parkour','Only rolling','Sleeping only'],correct:1,fact:'When they decide to go, they’re fast — “slow bird” is a myth.'},
     ]
   },
+
+  // ── LEGENDARY BEASTS ──
+  dragon: {
+    intro:'The Dragon — fire, flight, and fear. Prove you understand the king of legends!',
+    questions:[
+      {q:'Dragons appear in myths from almost every continent — true or false?',opts:['Only Europe had dragons','True — China, Europe, Americas and more','Dragons are modern inventions','Only in video games'],correct:1,fact:'From Chinese long to European wyrms, dragons are universal symbols of power.'},
+      {q:'In Chinese culture, dragons symbolize…',opts:['Bad luck','Wisdom, power, and good fortune','Weakness','Sadness'],correct:1,fact:'Emperors used the dragon as their personal emblem of supreme authority.'},
+      {q:'Dragon scales in legend were said to be…',opts:['Soft as silk','Harder than any known armor','Invisible','Edible'],correct:1,fact:'Knights needed enchanted weapons because normal swords bounced off dragon hide.'},
+      {q:'What makes dragons stand out from most mythical creatures?',opts:['They can fly AND breathe fire','They only swim','They are very small','They are plants'],correct:0,fact:'Flight plus elemental breath makes dragons the apex predator of legends.'},
+      {q:'Dragon hoards in Western myths were typically filled with…',opts:['Books','Gold, gems, and treasure','Food','Water'],correct:1,fact:'Greed and power — a dragon sitting on gold is one of mythology\'s most iconic images.'},
+    ]
+  },
+  phoenix: {
+    intro:'The Phoenix — eternal flame, eternal rebirth. Can you unlock this legend?',
+    questions:[
+      {q:'When a phoenix dies, what happens?',opts:['It stays dead','It is reborn from its own ashes','It turns to water','It floats away'],correct:1,fact:'The cycle of death and rebirth makes the phoenix a symbol of immortality.'},
+      {q:'In Greek myth, a phoenix lived about how many years?',opts:['10','500','Forever','1 day'],correct:1,fact:'Five centuries of life, then flame, then renewal — the ultimate comeback.'},
+      {q:'Phoenix tears in legend could…',opts:['Cause floods','Heal wounds','Start fires','Turn things to gold'],correct:1,fact:'A single phoenix tear was said to cure any injury.'},
+      {q:'The phoenix is linked to which element?',opts:['Water','Earth','Fire','Ice'],correct:2,fact:'Living flame — the phoenix embodies fire as both destruction and creation.'},
+      {q:'A phoenix feather was said to glow with…',opts:['Darkness','Golden and crimson light','Blue ice','Nothing'],correct:1,fact:'One feather could light an entire room — nature\'s eternal torch.'},
+    ]
+  },
+  griffin: {
+    intro:'The Griffin — eagle and lion fused. Show your knowledge of this royal beast!',
+    questions:[
+      {q:'A griffin combines which two animals?',opts:['Snake and fish','Eagle and lion','Horse and dog','Bear and whale'],correct:1,fact:'King of beasts meets king of birds — double royalty in one creature.'},
+      {q:'Griffins in myth were famous guardians of…',opts:['Libraries','Gold and treasure','Rivers','Vegetables'],correct:1,fact:'Griffins built nests of gold and fiercely protected their hoard.'},
+      {q:'On medieval shields, the griffin symbolized…',opts:['Weakness','Valor, vigilance, and strength','Cooking','Bad luck'],correct:1,fact:'Knights used the griffin to show noble courage.'},
+      {q:'Griffin wings gave them the power to…',opts:['Only glide','Carry heavy loads while flying at great speed','Only hover','Nothing'],correct:1,fact:'Griffins were the cargo planes of the mythical world.'},
+      {q:'The griffin\'s eagle half provided incredible…',opts:['Swimming','Vision from great heights','Cooking ability','Nothing useful'],correct:1,fact:'See everything, fear nothing — the ultimate predator advantage.'},
+    ]
+  },
+  hydra: {
+    intro:'The Hydra — cut one head, two grow back. Can you outwit this beast?',
+    questions:[
+      {q:'What happened when you cut off a hydra head?',opts:['It died','Two more grew back','Nothing','It turned to stone'],correct:1,fact:'The hydra was nearly impossible to kill — every wound made it stronger.'},
+      {q:'Which hero defeated the Hydra?',opts:['Achilles','Heracles (Hercules)','Odysseus','Perseus'],correct:1,fact:'Heracles burned neck stumps to stop the regeneration.'},
+      {q:'Hydra blood was said to be…',opts:['Harmless','Extremely poisonous','Good medicine','Made of water'],correct:1,fact:'Heracles dipped arrows in hydra venom — making them permanently lethal.'},
+      {q:'"Hydra" comes from the Greek word for…',opts:['Fire','Water','Wind','Earth'],correct:1,fact:'Hydra means "water serpent" — it lived in the swamps of Lerna.'},
+      {q:'The Hydra guarded the entrance to…',opts:['A shop','The Underworld','A school','The beach'],correct:1,fact:'Literally death\'s doorkeeper — no small gig.'},
+    ]
+  },
+  minotaur: {
+    intro:'The Minotaur — half man, half bull, all danger. Enter the labyrinth of knowledge!',
+    questions:[
+      {q:'The Minotaur lived inside a famous…',opts:['Castle','Labyrinth','Forest','Cave'],correct:1,fact:'The Labyrinth of Crete was so complex no one could find their way out.'},
+      {q:'The Minotaur had the head of a…',opts:['Lion','Eagle','Bull','Snake'],correct:2,fact:'Half-human, half-bull — a fusion of civilization and raw animal fury.'},
+      {q:'Who defeated the Minotaur?',opts:['Heracles','Theseus','Perseus','Achilles'],correct:1,fact:'Theseus used a ball of thread to navigate the labyrinth back out.'},
+      {q:'The Labyrinth was designed by genius inventor…',opts:['Zeus','Daedalus','The Minotaur','Nobody'],correct:1,fact:'Daedalus was so clever that even he nearly got lost in his own creation.'},
+      {q:'Athens had to send young people into the maze as…',opts:['Tourists','Sacrifice to feed the Minotaur','Athletes','Guests'],correct:1,fact:'Seven boys and seven girls every nine years — a terrifying tribute.'},
+    ]
+  },
+  kraken: {
+    intro:'The Kraken — deep sea terror. Prove you can survive its mysteries!',
+    questions:[
+      {q:'Sailors feared the Kraken because it could…',opts:['Sing','Drag entire ships underwater','Fly','Talk'],correct:1,fact:'So massive that sailors mistook it for an island — until it moved.'},
+      {q:'The Kraken is usually shown as a giant…',opts:['Whale','Squid or octopus','Shark','Crab'],correct:1,fact:'Giant squid sightings probably inspired the legend — reality is still scary.'},
+      {q:'Kraken legends came from…',opts:['Australia','Scandinavia — Norse sailors','Ancient Egypt','Modern cinema'],correct:1,fact:'Norwegian and Icelandic fishermen told the first Kraken stories.'},
+      {q:'Kraken tentacles were supposedly long enough to…',opts:['Tickle fish','Wrap around an entire ship','Reach the moon','Knit'],correct:1,fact:'Some legends claim over 100 feet — longer than three school buses.'},
+      {q:'When the Kraken rose from the deep, the sea would…',opts:['Freeze','Form massive whirlpools','Turn pink','Vanish'],correct:1,fact:'The sheer size created suction that could swallow boats whole.'},
+    ]
+  },
+  cerberus: {
+    intro:'Cerberus — three heads, zero chance of escape. Prove your underworld knowledge!',
+    questions:[
+      {q:'Cerberus guards the entrance to the Greek…',opts:['Beach','Underworld','Mountain top','Library'],correct:1,fact:'No soul was meant to leave — Cerberus made sure of that.'},
+      {q:'How many heads does Cerberus have?',opts:['One','Two','Three','Fifty'],correct:2,fact:'Three heads = three times the alertness.'},
+      {q:'Orpheus got past Cerberus by…',opts:['Fighting','Playing beautiful music','Running','Bribery'],correct:1,fact:'Art over might — music charmed even a monster.'},
+      {q:'Which hero captured Cerberus alive?',opts:['Perseus','Theseus','Heracles','Odysseus'],correct:2,fact:'The twelfth labour of Heracles — the only mortal strong enough.'},
+      {q:'Cerberus had a serpent for a…',opts:['Hat','Tail','Ear','Collar'],correct:1,fact:'Attacked from both ends — nowhere was safe.'},
+    ]
+  },
+  pegasus: {
+    intro:'Pegasus — winged stallion of the gods. Soar through this quiz!',
+    questions:[
+      {q:'Pegasus was born from the blood of…',opts:['A volcano','Medusa','A rainbow','Zeus'],correct:1,fact:'When Perseus cut Medusa\'s head, Pegasus sprang from the blood.'},
+      {q:'What makes Pegasus unique?',opts:['Horns','Wings and flight','Tiny size','Lives underwater'],correct:1,fact:'The only winged horse in Greek myth — freedom and speed combined.'},
+      {q:'Pegasus was placed among the…',opts:['Mountains','Stars as a constellation','Oceans','Trees'],correct:1,fact:'Zeus honoured Pegasus in the night sky — you can still see it.'},
+      {q:'Bellerophon rode Pegasus to defeat the…',opts:['Hydra','Chimera','Minotaur','Kraken'],correct:1,fact:'Aerial combat before planes — Pegasus was the original fighter jet.'},
+      {q:'Pegasus could create springs by striking the ground with…',opts:['Wings','Hooves','Teeth','Nothing'],correct:1,fact:'One hoof-strike created the Hippocrene spring — sacred to poets.'},
+    ]
+  },
+  basilisk: {
+    intro:'The Basilisk — king of serpents. One look could be your last!',
+    questions:[
+      {q:'A basilisk could kill with its…',opts:['Voice','Gaze alone','Touch','Smell'],correct:1,fact:'So dangerous that even its stare was a lethal weapon.'},
+      {q:'The basilisk was born from a…',opts:['Normal egg','Rooster egg hatched by a serpent','Stone','Raindrop'],correct:1,fact:'Bizarre origin for a bizarre creature — myths love weird recipes.'},
+      {q:'A mirror could defeat a basilisk because…',opts:['It loved reflections','Its own gaze reflected back killed it','Mirrors are magic','It feared glass'],correct:1,fact:'Turn the weapon against the wielder — reflection as defense.'},
+      {q:'One creature immune to the basilisk was a…',opts:['Cat','Weasel','Parrot','Goldfish'],correct:1,fact:'The humble weasel was immune to the gaze — nature loves an underdog.'},
+      {q:'The basilisk\'s breath could…',opts:['Smell nice','Wither plants and crack stone','Create rainbows','Freeze water'],correct:1,fact:'Walking biological warfare — turned fertile land into desert.'},
+    ]
+  },
+  chimera: {
+    intro:'The Chimera — lion, goat, serpent in one body. Three beasts, one quiz!',
+    questions:[
+      {q:'The Chimera fuses which three animals?',opts:['Eagle, snake, horse','Lion, goat, and serpent','Wolf, bear, fish','Dog, cat, bird'],correct:1,fact:'Three dangerous animals in one — the original hybrid nightmare.'},
+      {q:'The Chimera could breathe…',opts:['Ice','Fire','Water','Music'],correct:1,fact:'Fire-breathing goat head — a flamethrower on four legs.'},
+      {q:'Who defeated the Chimera?',opts:['Heracles','Perseus','Bellerophon on Pegasus','Theseus'],correct:2,fact:'Aerial superiority — attacked from above where Chimera couldn\'t reach.'},
+      {q:'Today "chimera" means…',opts:['Simple thing','Mixed parts or an impossible dream','A tool','A food'],correct:1,fact:'Scientists use "chimera" for organisms with mixed DNA — myth meets science.'},
+      {q:'The serpent tail could…',opts:['Wag happily','Strike with venom','Only swim','Nothing'],correct:1,fact:'Attacked front and back — no safe approach angle.'},
+    ]
+  },
+  zeus: {
+    intro:'Zeus — king of the Olympian gods. Prove you are worthy of thunder!',
+    questions:[
+      {q:'Zeus is king of which gods?',opts:['Roman gods','The Greek Olympians','Egyptian gods','Norse gods'],correct:1,fact:'Zeus ruled from Mount Olympus as the most powerful Greek god.'},
+      {q:'Zeus\'s weapon is the…',opts:['Sword','Trident','Thunderbolt','Shield'],correct:2,fact:'Forged by the Cyclopes — one thunderbolt could shatter mountains.'},
+      {q:'Zeus overthrew which group?',opts:['Humans','The Titans','Giants','Animals'],correct:1,fact:'The Titanomachy was a ten-year war — Zeus led his siblings to victory.'},
+      {q:'Zeus could transform into…',opts:['Only a lion','Many forms — animals, people, weather','A rock','Nothing'],correct:1,fact:'Shape-shifting made Zeus unpredictable — eagles, bulls, even rain.'},
+      {q:'Mount Olympus was believed to be…',opts:['Underground','Where earth meets sky','Underwater','On the moon'],correct:1,fact:'The real Mount Olympus in Greece is 9,570 feet tall.'},
+    ]
+  },
+  poseidon: {
+    intro:'Poseidon — lord of the sea. Navigate this quiz to unlock the ocean god!',
+    questions:[
+      {q:'Poseidon rules the…',opts:['Sky','Underworld','Sea and oceans','Forests'],correct:2,fact:'Every wave, every storm at sea — all Poseidon\'s domain.'},
+      {q:'Poseidon\'s weapon is the…',opts:['Thunderbolt','Trident','Hammer','Bow'],correct:1,fact:'One trident strike could cause earthquakes and tidal waves.'},
+      {q:'Poseidon was called "Earth-Shaker" because…',opts:['He danced','He caused earthquakes','He was loud','He was heavy'],correct:1,fact:'Greeks believed earthquakes came from Poseidon striking the ground.'},
+      {q:'Poseidon created which animal?',opts:['Dogs','Cats','Horses','Birds'],correct:2,fact:'He struck a rock and the first horse leapt out.'},
+      {q:'Poseidon is brother to…',opts:['Only Ares','Zeus and Hades','Thor','Apollo'],correct:1,fact:'Three brothers divided the cosmos — sky, sea, and underworld.'},
+    ]
+  },
+  hades: {
+    intro:'Hades — lord of the underworld. Face death\'s questions to unlock him!',
+    questions:[
+      {q:'Hades rules the…',opts:['Sky','Ocean','Underworld — realm of the dead','Forest'],correct:2,fact:'Hades isn\'t evil — he\'s a strict ruler keeping order among souls.'},
+      {q:'Hades\' helmet makes him…',opts:['Fly','Invisible','Stronger','Immortal'],correct:1,fact:'The Helm of Darkness — even gods couldn\'t see him.'},
+      {q:'Souls cross which river to enter Hades\' realm?',opts:['The Nile','The Styx','The Thames','The Amazon'],correct:1,fact:'Charon the boatman ferried souls — you needed a coin to pay.'},
+      {q:'Despite ruling the dead, Hades was one of the…',opts:['Weakest','Richest gods — all underground wealth was his','Youngest','Smallest'],correct:1,fact:'Every gem and mineral underground belonged to Hades.'},
+      {q:'Persephone became…',opts:['A warrior','Queen of the Underworld','A bird','Lost'],correct:1,fact:'She spent half the year below — explaining winter in Greek myth.'},
+    ]
+  },
+  athena: {
+    intro:'Athena — goddess of wisdom and war. Answer wisely to unlock her!',
+    questions:[
+      {q:'Athena is goddess of…',opts:['Love','Wisdom and strategic warfare','The sea','Music'],correct:1,fact:'Athena won wars through strategy, not chaos.'},
+      {q:'Athena was born from Zeus\'s…',opts:['Hand','Heart','Head — fully armored','Foot'],correct:2,fact:'Born from thought itself — literally the brainchild of the king of gods.'},
+      {q:'Athena\'s sacred animal is the…',opts:['Eagle','Owl','Snake','Lion'],correct:1,fact:'"Wise as an owl" comes from Athena\'s sacred companion.'},
+      {q:'Athens was named after Athena because she gifted…',opts:['Gold','An olive tree','A weapon','A palace'],correct:1,fact:'The olive tree provided food, oil, and wood — sustaining civilization.'},
+      {q:'Athena\'s shield was called the…',opts:['Excalibur','Aegis','Mjolnir','Trident'],correct:1,fact:'The Aegis bore Medusa\'s head — anyone who looked turned to stone.'},
+    ]
+  },
+  ares: {
+    intro:'Ares — god of war. Prove you understand raw battle power!',
+    questions:[
+      {q:'Ares is the god of…',opts:['Wisdom','War and violence','The sea','Music'],correct:1,fact:'Ares embodied the raw brutality of combat.'},
+      {q:'Other gods felt about Ares…',opts:['Love','Fear and dislike','Indifference','Worship'],correct:1,fact:'Even Zeus called Ares the most hated of his children.'},
+      {q:'Ares\' sacred animals were…',opts:['Owls','Vultures and venomous snakes','Butterflies','Rabbits'],correct:1,fact:'Creatures of death — fitting companions for the war god.'},
+      {q:'In Roman myth, Ares is called…',opts:['Jupiter','Mars','Neptune','Pluto'],correct:1,fact:'The planet Mars is named after the Roman war god.'},
+      {q:'Ares\' war cry could…',opts:['Heal people','Make entire armies tremble','Put them to sleep','Nothing'],correct:1,fact:'His voice alone was a weapon of psychological warfare.'},
+    ]
+  },
+  apollo: {
+    intro:'Apollo — god of light, music, and prophecy. Shine bright in this quiz!',
+    questions:[
+      {q:'Apollo is the god of…',opts:['Darkness','Light, music, and prophecy','The underworld','Farming'],correct:1,fact:'The most versatile god — arts, truth, healing, and the sun itself.'},
+      {q:'Apollo drove a golden chariot carrying the…',opts:['Moon','Sun across the sky','Stars','Clouds'],correct:1,fact:'Every sunrise was Apollo beginning his ride.'},
+      {q:'Apollo\'s instrument was the…',opts:['Drums','Lyre','Trumpet','Piano'],correct:1,fact:'His music was so beautiful that gods on Olympus stopped to listen.'},
+      {q:'The Oracle at Delphi served which god?',opts:['Poseidon','Apollo','Ares','Hades'],correct:1,fact:'Kings traveled to Delphi to hear Apollo\'s prophecies.'},
+      {q:'Apollo\'s twin sister is…',opts:['Athena','Aphrodite','Artemis','Hera'],correct:2,fact:'Apollo ruled the day, Artemis ruled the night and the hunt.'},
+    ]
+  },
+  artemis: {
+    intro:'Artemis — goddess of the hunt and the moon. Track down the right answers!',
+    questions:[
+      {q:'Artemis is goddess of…',opts:['Love','The hunt, wilderness, and the moon','The sea','Fire'],correct:1,fact:'Artemis roamed wild forests with her bow — the ultimate adventurer.'},
+      {q:'Artemis never missed because she was…',opts:['Lucky','The greatest archer among all gods','Using magic','Close range'],correct:1,fact:'Perfect aim was her divine gift.'},
+      {q:'Artemis was protective of…',opts:['Cities','Wild animals and young creatures','Gold','Ships'],correct:1,fact:'Despite being a hunter, she guarded wildlife — balance in nature.'},
+      {q:'Artemis\'s sacred animal was the…',opts:['Owl','Deer','Eagle','Snake'],correct:1,fact:'She could run alongside deer through any forest.'},
+      {q:'Artemis chose to be…',opts:['In the ocean','Independent and free in the wild','In a palace','Underground'],correct:1,fact:'The first goddess to choose independence over comfort.'},
+    ]
+  },
+  thor: {
+    intro:'Thor — Norse god of thunder. Hammer through this quiz!',
+    questions:[
+      {q:'Thor is the Norse god of…',opts:['Wisdom','Thunder, lightning, and strength','The sea','Trickery'],correct:1,fact:'Thunder was believed to be Thor swinging his mighty hammer.'},
+      {q:'Thor\'s hammer is called…',opts:['Excalibur','Mjolnir','Gungnir','Aegis'],correct:1,fact:'Mjolnir could level mountains and always returned to Thor\'s hand.'},
+      {q:'Thor protected…',opts:['Only kings','All of Midgard (Earth) and its people','Only gods','Only warriors'],correct:1,fact:'Unlike many gods, Thor genuinely cared about humans.'},
+      {q:'Thursday comes from…',opts:['Saturn','The Moon','Thor\'s Day','The Sun'],correct:2,fact:'We say Thor\'s name every single week.'},
+      {q:'Thor\'s chariot was pulled by magical…',opts:['Horses','Wolves','Goats','Eagles'],correct:2,fact:'The goats could be eaten and come back to life — infinite road snacks.'},
+    ]
+  },
+  loki: {
+    intro:'Loki — trickster god. Can you see through the chaos?',
+    questions:[
+      {q:'Loki is the Norse god of…',opts:['Wisdom','Mischief and chaos','The sea','Healing'],correct:1,fact:'Loki could talk his way into — and sometimes out of — anything.'},
+      {q:'Loki\'s special power was…',opts:['Flight','Shape-shifting into any form','Fire breath','Invisibility'],correct:1,fact:'Horse, fish, fly, old woman — master of disguise.'},
+      {q:'Loki\'s relationship with other gods was…',opts:['Always friendly','Complicated — ally and enemy','They never met','He was king'],correct:1,fact:'Helped the gods but also caused Baldur\'s death — chaos incarnate.'},
+      {q:'One of Loki\'s children was the wolf…',opts:['Cerberus','Fenrir','Sif','Sleipnir'],correct:1,fact:'Fenrir was destined to swallow Odin — like father, like son.'},
+      {q:'Loki was punished by being bound with…',opts:['Gold chains','Venom dripping from a serpent above','Rope','Nothing'],correct:1,fact:'His writhing caused earthquakes — even punishment couldn\'t contain him.'},
+    ]
+  },
+  anubis: {
+    intro:'Anubis — Egyptian guardian of the dead. Weigh your knowledge carefully!',
+    questions:[
+      {q:'Anubis is the Egyptian god of…',opts:['The sun','Mummification and the afterlife','The sea','War'],correct:1,fact:'Anubis guided souls and prepared the dead for their journey.'},
+      {q:'Anubis has the head of a…',opts:['Cat','Eagle','Jackal','Crocodile'],correct:2,fact:'Jackals near cemeteries connected them to death and protection.'},
+      {q:'Anubis weighed hearts against a…',opts:['Stone','Feather of truth','Gold coin','Sword'],correct:1,fact:'Heavier than the feather meant a monster devoured your soul.'},
+      {q:'The colour linked to Anubis is…',opts:['Gold','Black — fertile soil and rebirth','Red','White'],correct:1,fact:'Black meant renewal — the Nile\'s soil brought life to Egypt.'},
+      {q:'Anubis is one of the oldest gods in…',opts:['Greek myth','Norse myth','Egyptian mythology','Roman myth'],correct:2,fact:'Anubis dates back over 5,000 years.'},
+    ]
+  },
 };
 
 /** Surprising fact MCQs — one pool per roster animal; boostStat tags which stat gets +1 when correct. */
@@ -610,5 +812,149 @@ export const PRE_BATTLE_QUESTIONS = {
     { q: 'Triceratops teeth were best for…', opts: ['Pizza', 'Shearing tough plants', 'Metal cutting', 'Flying'], correct: 1, boostStat: 'int', funFact: 'Rows of scissor teeth — salad shredder at dinosaur scale.' },
     { q: 'A charging Triceratops told predators…', opts: ['Free hugs', 'My face is a weapon — rethink your plan', 'Follow me', 'I am slow always'], correct: 1, boostStat: 'str', funFact: 'Horns + speed + weight = “nope machine.”' },
     { q: 'The frill might impress rivals by…', opts: ['Playing music', 'Looking bigger and scarier face-to-face', 'Storing juice', 'Hiding wings'], correct: 1, boostStat: 'agi', funFact: 'Visual volume knob — turn intimidation to eleven.' },
+  ],
+
+  // ── LEGENDARY BEASTS ──
+  dragon: [
+    { q: 'Dragons appear in myths from almost every…', opts: ['Continent on Earth', 'Only Europe', 'Only Asia', 'Only video games'], correct: 0, boostStat: 'int', funFact: 'From Chinese long to European wyrms — dragons are universal symbols of power.' },
+    { q: 'Many legends say dragon fire could…', opts: ['Cook breakfast only', 'Melt stone and metal', 'Freeze oceans', 'Make flowers grow'], correct: 1, boostStat: 'str', funFact: 'Dragon breath was feared above all weapons in medieval tales.' },
+    { q: 'In Chinese mythology, dragons represent…', opts: ['Bad luck', 'Wisdom, power, and good fortune', 'Sadness', 'Small creatures'], correct: 1, boostStat: 'int', funFact: 'Chinese emperors used the dragon as their personal symbol of supreme authority.' },
+    { q: 'Dragon scales are legendary because they were said to be…', opts: ['Soft as cotton', 'Harder than any known armor', 'Invisible', 'Edible'], correct: 1, boostStat: 'str', funFact: 'Knights needed enchanted weapons because normal swords bounced off dragon hide.' },
+    { q: 'What makes dragons different from most mythical creatures?', opts: ['They can fly AND breathe fire', 'They only swim', 'They are tiny', 'They are plants'], correct: 0, boostStat: 'agi', funFact: 'Flight plus elemental breath makes dragons the apex predator of legends worldwide.' },
+  ],
+  phoenix: [
+    { q: 'When a phoenix dies, what happens next?', opts: ['Nothing', 'It is reborn from its own ashes', 'It turns into water', 'It becomes a tree'], correct: 1, boostStat: 'int', funFact: 'The cycle of death and rebirth makes the phoenix a symbol of immortality and hope.' },
+    { q: 'In Greek myth, how long did a phoenix live before rebirth?', opts: ['1 year', 'About 500 years', 'Forever — it never died', '1 day'], correct: 1, boostStat: 'int', funFact: 'Five centuries of life, then flame, then renewal — the ultimate comeback story.' },
+    { q: 'Phoenix tears were believed to have the power to…', opts: ['Cause floods', 'Heal wounds', 'Start fires', 'Make gold'], correct: 1, boostStat: 'str', funFact: 'Legend says a single phoenix tear could cure any injury — magic medicine.' },
+    { q: 'The phoenix is most often linked to which element?', opts: ['Water', 'Earth', 'Fire', 'Ice'], correct: 2, boostStat: 'spd', funFact: 'Living flame — the phoenix embodies fire as both destruction and creation.' },
+    { q: 'A phoenix feather was said to glow with…', opts: ['Darkness', 'Golden and crimson light', 'Blue ice', 'Nothing special'], correct: 1, boostStat: 'agi', funFact: 'One feather could light an entire room — nature\'s eternal torch.' },
+  ],
+  griffin: [
+    { q: 'A griffin is a combination of which two animals?', opts: ['Snake and fish', 'Eagle and lion', 'Horse and dog', 'Bear and whale'], correct: 1, boostStat: 'str', funFact: 'The king of beasts meets the king of birds — double royalty in one creature.' },
+    { q: 'In ancient myths, griffins were known as guardians of…', opts: ['Libraries', 'Gold and treasure', 'Rivers', 'Vegetables'], correct: 1, boostStat: 'int', funFact: 'Griffins were said to build nests of gold and fiercely protect their hoard.' },
+    { q: 'A griffin combines eagle vision with lion…', opts: ['Laziness', 'Strength and courage', 'Swimming ability', 'Silence'], correct: 1, boostStat: 'agi', funFact: 'See everything, fear nothing — the perfect predator blueprint.' },
+    { q: 'Griffins in heraldry symbolize…', opts: ['Weakness', 'Valor, vigilance, and strength', 'Cooking skill', 'Bad weather'], correct: 1, boostStat: 'str', funFact: 'Medieval knights used the griffin on their shields to show noble courage.' },
+    { q: 'Some legends say only a griffin could…', opts: ['Talk to fish', 'Fly while carrying heavy cargo like horses', 'Cook dinner', 'Turn invisible'], correct: 1, boostStat: 'spd', funFact: 'Immense wingpower — griffins were the cargo planes of the mythical world.' },
+  ],
+  hydra: [
+    { q: 'In Greek myth, what happened when you cut off one hydra head?', opts: ['It died', 'Two more heads grew back', 'Nothing', 'It turned to stone'], correct: 1, boostStat: 'str', funFact: 'The hydra was nearly impossible to kill — every wound made it stronger.' },
+    { q: 'Which Greek hero was famous for defeating the Hydra?', opts: ['Achilles', 'Heracles (Hercules)', 'Odysseus', 'Perseus'], correct: 1, boostStat: 'int', funFact: 'Heracles burned the neck stumps to stop heads regrowing — clever wins over brute force.' },
+    { q: 'The Hydra lived near the entrance to…', opts: ['A supermarket', 'The Underworld', 'A school', 'The moon'], correct: 1, boostStat: 'int', funFact: 'Guarding the gates to Hades — the hydra was literally death\'s doorkeeper.' },
+    { q: 'Hydra blood was said to be…', opts: ['Refreshing to drink', 'Extremely poisonous', 'Good medicine', 'Made of water'], correct: 1, boostStat: 'str', funFact: 'Heracles dipped his arrows in hydra venom — making them lethal forever.' },
+    { q: 'The word "hydra" comes from the Greek word for…', opts: ['Fire', 'Water', 'Wind', 'Earth'], correct: 1, boostStat: 'agi', funFact: 'Hydra means "water serpent" — it lived in the swampy waters of Lerna.' },
+  ],
+  minotaur: [
+    { q: 'The Minotaur lived inside a famous…', opts: ['Castle', 'Labyrinth', 'Forest', 'Cave'], correct: 1, boostStat: 'int', funFact: 'The Labyrinth of Crete was designed so complex that no one could find their way out.' },
+    { q: 'The Minotaur had the body of a man and the head of a…', opts: ['Lion', 'Eagle', 'Bull', 'Snake'], correct: 2, boostStat: 'str', funFact: 'Half-human, half-bull — a monstrous fusion of civilization and raw animal fury.' },
+    { q: 'Who defeated the Minotaur in Greek mythology?', opts: ['Heracles', 'Theseus', 'Perseus', 'Achilles'], correct: 1, boostStat: 'int', funFact: 'Theseus used a ball of thread to navigate the labyrinth and find his way back out.' },
+    { q: 'The Minotaur was said to eat…', opts: ['Vegetables', 'Sacrificed humans sent into the maze', 'Fish', 'Only bread'], correct: 1, boostStat: 'str', funFact: 'Athens had to send seven boys and seven girls every nine years — a terrifying tribute.' },
+    { q: 'The Labyrinth was designed by…', opts: ['Zeus', 'The inventor Daedalus', 'The Minotaur itself', 'Nobody'], correct: 1, boostStat: 'agi', funFact: 'Daedalus was such a genius that even he nearly got lost in his own creation.' },
+  ],
+  kraken: [
+    { q: 'Sailors in Norse legends feared the Kraken because it could…', opts: ['Sing loudly', 'Drag entire ships underwater', 'Fly above them', 'Talk to them'], correct: 1, boostStat: 'str', funFact: 'A creature so massive that sailors mistook it for an island — until it moved.' },
+    { q: 'The Kraken is usually depicted as a giant…', opts: ['Whale', 'Squid or octopus', 'Shark', 'Crab'], correct: 1, boostStat: 'int', funFact: 'Giant squid sightings probably inspired the Kraken legend — reality is still terrifying.' },
+    { q: 'In which ocean did legends place the Kraken?', opts: ['Pacific', 'Indian', 'North Atlantic near Scandinavia', 'Mediterranean'], correct: 2, boostStat: 'int', funFact: 'Norwegian and Icelandic fishermen told the first Kraken stories centuries ago.' },
+    { q: 'A Kraken\'s tentacles were said to be long enough to…', opts: ['Tickle fish', 'Wrap around an entire ship', 'Reach the moon', 'Knit sweaters'], correct: 1, boostStat: 'str', funFact: 'Some legends claim tentacles over 100 feet long — longer than three school buses.' },
+    { q: 'When the Kraken surfaced, the water above it would…', opts: ['Freeze solid', 'Create massive whirlpools', 'Turn pink', 'Disappear'], correct: 1, boostStat: 'agi', funFact: 'The kraken\'s movements created suction that could swallow boats whole.' },
+  ],
+  cerberus: [
+    { q: 'Cerberus is the three-headed dog that guards…', opts: ['A pet shop', 'The entrance to the Greek Underworld', 'A mountain', 'A treasure chest'], correct: 1, boostStat: 'str', funFact: 'No soul that entered the Underworld was meant to leave — Cerberus made sure of that.' },
+    { q: 'How many heads does Cerberus have?', opts: ['One', 'Two', 'Three', 'Fifty'], correct: 2, boostStat: 'int', funFact: 'Three heads means three times the alertness — nothing gets past this guard dog.' },
+    { q: 'Orpheus got past Cerberus by…', opts: ['Fighting it', 'Playing beautiful music', 'Running fast', 'Bribing it with gold'], correct: 1, boostStat: 'int', funFact: 'Music so beautiful it could charm even a monster — the power of art over might.' },
+    { q: 'Cerberus had a snake for a…', opts: ['Hat', 'Tail', 'Ear', 'Collar'], correct: 1, boostStat: 'agi', funFact: 'A serpent tail added extra danger — this dog attacked from both ends.' },
+    { q: 'Which hero captured Cerberus alive as a labour?', opts: ['Perseus', 'Theseus', 'Heracles', 'Odysseus'], correct: 2, boostStat: 'str', funFact: 'The twelfth labour of Heracles — the only mortal strong enough to wrestle a three-headed beast.' },
+  ],
+  pegasus: [
+    { q: 'Pegasus was born from the blood of…', opts: ['A volcano', 'Medusa when Perseus cut her head off', 'A rainbow', 'An earthquake'], correct: 1, boostStat: 'int', funFact: 'Even death can create beauty — Pegasus sprang from monster blood into magnificent life.' },
+    { q: 'What makes Pegasus unique among horses?', opts: ['It has horns', 'It has wings and can fly', 'It is tiny', 'It lives underwater'], correct: 1, boostStat: 'spd', funFact: 'The only winged horse in Greek myth — freedom and speed combined in one creature.' },
+    { q: 'Pegasus was eventually placed among the…', opts: ['Mountains', 'Stars as a constellation', 'Oceans', 'Trees'], correct: 1, boostStat: 'int', funFact: 'Zeus honoured Pegasus by placing it in the night sky — you can still see it there.' },
+    { q: 'Bellerophon rode Pegasus to defeat the…', opts: ['Hydra', 'Chimera', 'Minotaur', 'Kraken'], correct: 1, boostStat: 'agi', funFact: 'Aerial combat thousands of years before planes — Pegasus was the original fighter jet.' },
+    { q: 'Pegasus could create springs by…', opts: ['Digging', 'Striking the ground with its hooves', 'Crying', 'Blowing wind'], correct: 1, boostStat: 'str', funFact: 'One hoof strike created the Hippocrene spring — sacred water for poets and artists.' },
+  ],
+  basilisk: [
+    { q: 'In legend, a basilisk could kill with just its…', opts: ['Voice', 'Gaze — looking at you was deadly', 'Touch', 'Smell'], correct: 1, boostStat: 'int', funFact: 'The "king of serpents" — so dangerous that even its stare was a weapon.' },
+    { q: 'The basilisk was said to be born from a…', opts: ['Normal egg', 'Rooster egg hatched by a serpent', 'Stone', 'Raindrop'], correct: 1, boostStat: 'int', funFact: 'A bizarre origin for a bizarre creature — myths love weird recipes.' },
+    { q: 'One creature that could defeat a basilisk was a…', opts: ['Cat', 'Weasel', 'Parrot', 'Goldfish'], correct: 1, boostStat: 'agi', funFact: 'The humble weasel was immune to the basilisk\'s gaze — nature loves an underdog.' },
+    { q: 'The basilisk\'s breath was said to…', opts: ['Smell nice', 'Wither plants and crack stone', 'Create rainbows', 'Freeze water'], correct: 1, boostStat: 'str', funFact: 'So toxic that it turned fertile land into desert — walking biological warfare.' },
+    { q: 'A mirror could defeat a basilisk because…', opts: ['It loved its reflection', 'Its own gaze reflected back would kill it', 'Mirrors are magic', 'It feared glass'], correct: 1, boostStat: 'int', funFact: 'Turn the weapon against the wielder — sometimes the best defense is reflection.' },
+  ],
+  chimera: [
+    { q: 'The Chimera is a fusion of which three animals?', opts: ['Eagle, snake, horse', 'Lion, goat, and serpent', 'Wolf, bear, fish', 'Dog, cat, bird'], correct: 1, boostStat: 'str', funFact: 'Three dangerous animals in one body — the original hybrid nightmare.' },
+    { q: 'The Chimera could breathe…', opts: ['Ice', 'Fire', 'Water', 'Music'], correct: 1, boostStat: 'str', funFact: 'Fire from the goat head made the Chimera a flying flamethrower on four legs.' },
+    { q: 'Which hero defeated the Chimera?', opts: ['Heracles', 'Perseus', 'Bellerophon riding Pegasus', 'Theseus'], correct: 2, boostStat: 'int', funFact: 'Aerial superiority — Bellerophon attacked from above where the Chimera couldn\'t reach.' },
+    { q: 'Today, the word "chimera" means…', opts: ['Something simple', 'Something made of mixed parts or an impossible dream', 'A type of food', 'A tool'], correct: 1, boostStat: 'int', funFact: 'Scientists use "chimera" to describe organisms with mixed DNA — myth meets science.' },
+    { q: 'The serpent tail of the Chimera could…', opts: ['Wag happily', 'Strike and bite with venom', 'Swim only', 'Do nothing'], correct: 1, boostStat: 'agi', funFact: 'Attacked from front and back simultaneously — no safe approach angle.' },
+  ],
+
+  // ── MYTHICAL GODS ──
+  zeus: [
+    { q: 'Zeus is the king of which group of gods?', opts: ['Roman gods', 'The Greek Olympian gods', 'Egyptian gods', 'Norse gods'], correct: 1, boostStat: 'int', funFact: 'Zeus ruled from Mount Olympus and was the most powerful of all Greek gods.' },
+    { q: 'Zeus\'s signature weapon is the…', opts: ['Sword', 'Trident', 'Thunderbolt', 'Shield'], correct: 2, boostStat: 'str', funFact: 'Forged by the Cyclopes — one thunderbolt could shatter mountains.' },
+    { q: 'Zeus overthrew which group to become king?', opts: ['The Humans', 'The Titans', 'The Giants', 'The Animals'], correct: 1, boostStat: 'str', funFact: 'The Titanomachy was a ten-year war — Zeus led his siblings to ultimate victory.' },
+    { q: 'Zeus could transform into…', opts: ['Only a lion', 'Many different forms — animals, people, even weather', 'A rock only', 'Nothing'], correct: 1, boostStat: 'agi', funFact: 'Shape-shifting made Zeus unpredictable — he appeared as eagles, bulls, and even rain.' },
+    { q: 'Mount Olympus, Zeus\'s home, was believed to be…', opts: ['Underground', 'The highest point where earth meets the sky', 'Underwater', 'On the moon'], correct: 1, boostStat: 'int', funFact: 'The real Mount Olympus in Greece is 9,570 feet tall — the gods had a great view.' },
+  ],
+  poseidon: [
+    { q: 'Poseidon rules over the…', opts: ['Sky', 'Underworld', 'Sea and all oceans', 'Forests'], correct: 2, boostStat: 'str', funFact: 'Every wave, every storm at sea — all under Poseidon\'s domain.' },
+    { q: 'Poseidon\'s signature weapon is the…', opts: ['Thunderbolt', 'Trident', 'Hammer', 'Bow'], correct: 1, boostStat: 'str', funFact: 'One strike of the trident could cause earthquakes and summon tidal waves.' },
+    { q: 'Poseidon was also called the "Earth-Shaker" because he could cause…', opts: ['Rain', 'Earthquakes', 'Snowstorms', 'Sunshine'], correct: 1, boostStat: 'int', funFact: 'Ancient Greeks believed earthquakes happened when Poseidon struck the ground in anger.' },
+    { q: 'Poseidon created which animal as a gift?', opts: ['Dogs', 'Cats', 'Horses', 'Birds'], correct: 2, boostStat: 'agi', funFact: 'In the contest for Athens, Poseidon struck a rock and the first horse leapt out.' },
+    { q: 'Poseidon was the brother of…', opts: ['Only Ares', 'Zeus and Hades', 'Thor', 'Apollo only'], correct: 1, boostStat: 'int', funFact: 'The three brothers divided the cosmos — sky, sea, and underworld.' },
+  ],
+  hades: [
+    { q: 'Hades rules over the…', opts: ['Sky', 'Ocean', 'Underworld — realm of the dead', 'Forest'], correct: 2, boostStat: 'int', funFact: 'Hades isn\'t evil — he\'s a strict ruler keeping order among the souls.' },
+    { q: 'Hades owns a special helmet that makes him…', opts: ['Fly', 'Invisible', 'Stronger', 'Immortal'], correct: 1, boostStat: 'agi', funFact: 'The Helm of Darkness — even other gods couldn\'t see Hades when he wore it.' },
+    { q: 'The river that souls cross to enter Hades\'s realm is called…', opts: ['The Nile', 'The Styx', 'The Thames', 'The Amazon'], correct: 1, boostStat: 'int', funFact: 'Charon the boatman ferried souls across — you needed a coin to pay the fare.' },
+    { q: 'Hades captured Persephone, who then became…', opts: ['A warrior', 'Queen of the Underworld', 'A bird', 'Lost forever'], correct: 1, boostStat: 'str', funFact: 'Persephone spent half the year below — which the Greeks used to explain winter.' },
+    { q: 'Despite ruling the dead, Hades was one of the…', opts: ['Weakest gods', 'Richest gods — all underground wealth was his', 'Youngest gods', 'Smallest gods'], correct: 1, boostStat: 'str', funFact: 'Every gem, metal, and mineral underground belonged to Hades — wealth beyond measure.' },
+  ],
+  athena: [
+    { q: 'Athena is the Greek goddess of…', opts: ['Love', 'Wisdom and strategic warfare', 'The sea', 'Music'], correct: 1, boostStat: 'int', funFact: 'Unlike Ares who loved chaos, Athena won wars through strategy and intelligence.' },
+    { q: 'Athena was born in an unusual way — she sprang from Zeus\'s…', opts: ['Hand', 'Heart', 'Head — fully armored', 'Foot'], correct: 2, boostStat: 'int', funFact: 'Born from thought itself — literally the brainchild of the king of gods.' },
+    { q: 'Athena\'s sacred animal is the…', opts: ['Eagle', 'Owl', 'Snake', 'Lion'], correct: 1, boostStat: 'agi', funFact: 'The owl symbolizes wisdom — "wise as an owl" comes from Athena\'s association.' },
+    { q: 'The city of Athens was named after Athena because she gifted the city…', opts: ['Gold', 'An olive tree', 'A weapon', 'A palace'], correct: 1, boostStat: 'str', funFact: 'The olive tree provided food, oil, and wood — a gift that sustained civilization.' },
+    { q: 'Athena carried a special shield called the…', opts: ['Excalibur', 'Aegis', 'Mjolnir', 'Trident'], correct: 1, boostStat: 'str', funFact: 'The Aegis bore Medusa\'s head — anyone who looked at it turned to stone.' },
+  ],
+  ares: [
+    { q: 'Ares is the Greek god of…', opts: ['Wisdom', 'War and violence', 'The sea', 'Music'], correct: 1, boostStat: 'str', funFact: 'Where Athena was strategic, Ares embodied the raw brutality of combat.' },
+    { q: 'Unlike most Greek gods, Ares was often…', opts: ['Loved by everyone', 'Feared and disliked, even by other gods', 'Very quiet', 'A pacifist'], correct: 1, boostStat: 'str', funFact: 'Even Zeus said Ares was the most hated of all his children — too violent for Olympus.' },
+    { q: 'Ares\'s sacred animals included…', opts: ['Owls and dolphins', 'Vultures and venomous snakes', 'Butterflies', 'Rabbits'], correct: 1, boostStat: 'agi', funFact: 'Creatures of death and destruction — fitting companions for the god of war.' },
+    { q: 'In Roman mythology, Ares is known as…', opts: ['Jupiter', 'Mars', 'Neptune', 'Pluto'], correct: 1, boostStat: 'int', funFact: 'The Romans respected Mars more — the planet Mars is named after him too.' },
+    { q: 'Ares charged into battle wearing…', opts: ['Pajamas', 'Full bronze armor with a blood-red war helmet', 'A toga', 'Nothing'], correct: 1, boostStat: 'spd', funFact: 'His war cry alone was said to make entire armies tremble before the fight began.' },
+  ],
+  apollo: [
+    { q: 'Apollo is the Greek god of many things, including…', opts: ['Darkness and shadows', 'Light, music, and prophecy', 'The underworld', 'Farming only'], correct: 1, boostStat: 'int', funFact: 'Apollo was the most versatile god — arts, truth, healing, and the sun itself.' },
+    { q: 'Apollo drove a golden chariot that carried the…', opts: ['Moon', 'Sun across the sky each day', 'Stars', 'Clouds'], correct: 1, boostStat: 'spd', funFact: 'Every sunrise was Apollo beginning his daily ride — the ultimate road trip.' },
+    { q: 'Apollo\'s musical instrument was the…', opts: ['Drums', 'Lyre — a stringed instrument', 'Trumpet', 'Piano'], correct: 1, boostStat: 'agi', funFact: 'His music was so beautiful that even the gods on Olympus stopped to listen.' },
+    { q: 'The Oracle at Delphi delivered prophecies from…', opts: ['Poseidon', 'Apollo', 'Ares', 'Hades'], correct: 1, boostStat: 'int', funFact: 'Kings and heroes traveled to Delphi to hear Apollo\'s predictions about the future.' },
+    { q: 'Apollo\'s twin sister is…', opts: ['Athena', 'Aphrodite', 'Artemis', 'Hera'], correct: 2, boostStat: 'spd', funFact: 'The divine twins — Apollo ruled the day, Artemis ruled the night and the hunt.' },
+  ],
+  artemis: [
+    { q: 'Artemis is the goddess of…', opts: ['Love', 'The hunt, wilderness, and the moon', 'The sea', 'Fire'], correct: 1, boostStat: 'agi', funFact: 'Artemis roamed wild forests with her bow — the ultimate outdoor adventurer.' },
+    { q: 'Artemis never missed a shot because she was…', opts: ['Lucky', 'The greatest archer among all gods', 'Using magic arrows', 'Standing close'], correct: 1, boostStat: 'spd', funFact: 'Perfect aim was her divine gift — no creature could outrun or dodge her arrows.' },
+    { q: 'Artemis was fiercely protective of…', opts: ['Cities', 'Wild animals and young creatures', 'Gold', 'Ships'], correct: 1, boostStat: 'int', funFact: 'Despite being a hunter, Artemis was also the guardian of wildlife — balance in nature.' },
+    { q: 'Artemis\'s sacred animal was the…', opts: ['Owl', 'Deer', 'Eagle', 'Snake'], correct: 1, boostStat: 'agi', funFact: 'She could run alongside deer through any forest — speed and grace personified.' },
+    { q: 'Artemis chose to remain…', opts: ['In the ocean', 'Independent and free in the wild forever', 'In a palace', 'Underground'], correct: 1, boostStat: 'str', funFact: 'She asked Zeus to let her roam free — the first goddess to choose independence.' },
+  ],
+  thor: [
+    { q: 'Thor is the Norse god of…', opts: ['Wisdom', 'Thunder, lightning, and strength', 'The sea', 'Trickery'], correct: 1, boostStat: 'str', funFact: 'When you hear thunder, the Norse believed Thor was swinging his mighty hammer.' },
+    { q: 'Thor\'s hammer is called…', opts: ['Excalibur', 'Mjolnir', 'Gungnir', 'Stormbreaker'], correct: 1, boostStat: 'str', funFact: 'Mjolnir could level mountains and always returned to Thor\'s hand after being thrown.' },
+    { q: 'Thor was the protector of…', opts: ['Only kings', 'Ordinary people and all of Midgard (Earth)', 'Only gods', 'Only warriors'], correct: 1, boostStat: 'int', funFact: 'Unlike many gods, Thor genuinely cared about mortal humans and defended them.' },
+    { q: 'Thursday gets its name from…', opts: ['Saturn', 'The Moon', 'Thor\'s Day', 'The Sun'], correct: 2, boostStat: 'int', funFact: 'Thor\'s Day became Thursday — we say his name every single week.' },
+    { q: 'Thor traveled in a chariot pulled by two magical…', opts: ['Horses', 'Wolves', 'Goats', 'Eagles'], correct: 2, boostStat: 'spd', funFact: 'The goats could be eaten and then come back to life the next day — infinite road snacks.' },
+  ],
+  loki: [
+    { q: 'Loki is known as the Norse god of…', opts: ['Wisdom', 'Mischief, trickery, and chaos', 'The sea', 'Healing'], correct: 1, boostStat: 'int', funFact: 'Loki could talk his way into — and sometimes out of — anything.' },
+    { q: 'Loki\'s special ability was to…', opts: ['Fly', 'Shape-shift into any form', 'Breathe fire', 'Turn invisible'], correct: 1, boostStat: 'agi', funFact: 'Loki became a horse, a fish, a fly, and even an old woman — master of disguise.' },
+    { q: 'Loki\'s relationship with the other Norse gods was…', opts: ['Always friendly', 'Complicated — sometimes ally, sometimes enemy', 'They never met', 'He was their king'], correct: 1, boostStat: 'int', funFact: 'Loki helped the gods many times but also caused the death of Baldur — chaos incarnate.' },
+    { q: 'One of Loki\'s children was the giant wolf…', opts: ['Cerberus', 'Fenrir', 'Sif', 'Sleipnir'], correct: 1, boostStat: 'str', funFact: 'Fenrir was destined to swallow Odin during Ragnarok — like father, like son.' },
+    { q: 'Loki\'s punishment was being bound with…', opts: ['Chains of gold', 'Venom dripping on his face from a serpent', 'Rope', 'Nothing — he escaped'], correct: 1, boostStat: 'spd', funFact: 'His writhing in pain caused earthquakes — even punishment couldn\'t fully contain Loki.' },
+  ],
+  anubis: [
+    { q: 'Anubis is the Egyptian god of…', opts: ['The sun', 'Mummification and the afterlife', 'The sea', 'War'], correct: 1, boostStat: 'int', funFact: 'Anubis guided souls to the afterlife and prepared the dead for their final journey.' },
+    { q: 'Anubis has the head of a…', opts: ['Cat', 'Eagle', 'Jackal', 'Crocodile'], correct: 2, boostStat: 'int', funFact: 'Jackals were seen near cemeteries — the Egyptians connected them to death and protection.' },
+    { q: 'Anubis weighed each person\'s heart against a…', opts: ['Stone', 'Feather of truth (Ma\'at)', 'Gold coin', 'Sword'], correct: 1, boostStat: 'str', funFact: 'If your heart was heavier than the feather, a monster devoured your soul — high stakes.' },
+    { q: 'The colour most associated with Anubis is…', opts: ['Gold', 'Black — representing the fertile soil and rebirth', 'Red', 'White'], correct: 1, boostStat: 'agi', funFact: 'Black meant renewal, not death — the Nile\'s black soil brought life to Egypt.' },
+    { q: 'Anubis was one of the oldest gods in…', opts: ['Greek mythology', 'Norse mythology', 'Egyptian mythology', 'Roman mythology'], correct: 2, boostStat: 'int', funFact: 'Anubis dates back over 5,000 years — one of humanity\'s oldest divine figures.' },
   ],
 };

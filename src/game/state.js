@@ -66,7 +66,7 @@ function defaultProgress() {
     streakCount: 0,
     lastPlayedDate: null,
     progressSchemaVersion: 1,
-    stageAccess: { base: true, apex: true, dinosaur: true },
+    stageAccess: { base: true, apex: true, dinosaur: true, legendary: true, mythical: true },
     coins: 0,
     unlockTokens: 0,
     dailyChallengeDayKey: null,
@@ -83,6 +83,8 @@ const MONETIZE_PLACEHOLDER = {
   fullBaseStageOwned: true,
   apexStageOwned: true,
   dinosaurStageOwned: true,
+  legendaryStageOwned: true,
+  mythicalStageOwned: true,
 };
 
 export {

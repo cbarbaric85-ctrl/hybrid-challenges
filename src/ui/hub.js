@@ -1,6 +1,6 @@
 import {
-  STAT_MAX, STAGE_BASE, STAGE_APEX, STAGE_DINO,
-  ANIMALS, ALL_ANIMALS, BASE_IDS, APEX_IDS, DINO_IDS,
+  STAT_MAX, STAGE_BASE, STAGE_APEX, STAGE_DINO, STAGE_LEGENDARY, STAGE_MYTHICAL,
+  ANIMALS, ALL_ANIMALS, BASE_IDS, APEX_IDS, DINO_IDS, LEGENDARY_IDS, MYTHICAL_IDS,
 } from '../data/animals.js';
 import { LEVELS } from '../data/levels.js';
 import {
@@ -9,7 +9,9 @@ import {
 } from '../game/state.js';
 import {
   countBaseUnlocked, countApexUnlocked, countDinoUnlocked,
+  countLegendaryUnlocked, countMythicalUnlocked,
   apexLevelGateMet, dinoLevelGateMet,
+  legendaryLevelGateMet, mythicalLevelGateMet,
   getPlayerStageLabel, getProgressionNextLines,
   isLevelLocked, isQuizEligible,
   ensureDailyChallengeRolled, dailyChallengeMet,
@@ -17,12 +19,14 @@ import {
   RETENTION_SOFT_MONETISE_COPY, getSoftMonetisationHintLines,
   getRetentionShopTeasers,
   getNextBaseAnimalId, getNextApexAnimalId, getNextDinoAnimalId,
+  getNextLegendaryAnimalId, getNextMythicalAnimalId,
   formatMiniStatPreview,
   getStreakBattleBoost, sumBoostPoints,
   unlockGateLinesForAnimal,
   touchDailyStreakIfNeeded,
   pickDailyChallenge,
   getAvailableAnimals,
+  MAX_LEVEL,
 } from '../game/progression.js';
 import { powerScore } from '../game/hybrid.js';
 import { STAT_LABELS_SIMPLE } from '../game/battle.js';
@@ -114,26 +118,36 @@ function renderHubProgressionPanel() {
   const bU = countBaseUnlocked(p);
   const aU = countApexUnlocked(p);
   const dU = countDinoUnlocked(p);
+  const lU = countLegendaryUnlocked(p);
+  const mU = countMythicalUnlocked(p);
   const stage = getPlayerStageLabel(p);
   const apexOpen = apexLevelGateMet(p);
   const dinoOpen = dinoLevelGateMet(p);
+  const legendOpen = legendaryLevelGateMet(p);
+  const mythOpen = mythicalLevelGateMet(p);
   const apexLine = apexOpen ? `${aU} / ${APEX_IDS.length} unlocked` : 'Locked — beat Level 5 first';
   const dinoLine = dinoOpen ? `${dU} / ${DINO_IDS.length} unlocked` : 'Locked — beat Level 8 first';
+  const legendLine = legendOpen ? `${lU} / ${LEGENDARY_IDS.length} unlocked` : 'Locked — beat Level 12 first';
+  const mythLine = mythOpen ? `${mU} / ${MYTHICAL_IDS.length} unlocked` : 'Locked — beat Level 16 first';
   const nextLines = getProgressionNextLines(p);
   el.innerHTML = `
     <div class="hub-progress-hdr">Progression</div>
     <div class="hub-progress-meta">
-      <span><em>Level</em> <strong>${p.level > 10 ? '✓' : p.level}</strong></span>
+      <span><em>Level</em> <strong>${p.level > MAX_LEVEL ? '✓' : p.level}</strong></span>
       <span><em>Stage</em> <strong>${stage}</strong></span>
     </div>
     <ul class="hub-progress-stages">
       <li><span class="hps-emoji">◇</span> <span class="hps-name">Base Animals</span> <span class="hps-count">${bU} / ${BASE_IDS.length}</span></li>
       <li><span class="hps-emoji">◈</span> <span class="hps-name">Apex Predators</span> <span class="hps-count">${apexLine}</span></li>
       <li><span class="hps-emoji">🦖</span> <span class="hps-name">Dinosaurs</span> <span class="hps-count">${dinoLine}</span></li>
+      <li><span class="hps-emoji">🐲</span> <span class="hps-name">Legendary Beasts</span> <span class="hps-count">${legendLine}</span></li>
+      <li><span class="hps-emoji">⚡</span> <span class="hps-name">Mythical Gods</span> <span class="hps-count">${mythLine}</span></li>
     </ul>
     <div class="hub-progress-gates">
       <div class="hpg-row"><span class="${apexOpen ? 'hpg-ok' : 'hpg-no'}">${apexOpen ? '✓' : '○'}</span> Apex level gate (Level 6+)</div>
       <div class="hpg-row"><span class="${dinoOpen ? 'hpg-ok' : 'hpg-no'}">${dinoOpen ? '✓' : '○'}</span> Dino level gate (Level 9+)</div>
+      <div class="hpg-row"><span class="${legendOpen ? 'hpg-ok' : 'hpg-no'}">${legendOpen ? '✓' : '○'}</span> Legendary level gate (Level 13+)</div>
+      <div class="hpg-row"><span class="${mythOpen ? 'hpg-ok' : 'hpg-no'}">${mythOpen ? '✓' : '○'}</span> Mythical level gate (Level 17+)</div>
     </div>
     <div class="hub-progress-next">${nextLines.join('<br>')}</div>
     ${
@@ -182,17 +196,21 @@ function renderHub() {
   if (tokEl) tokEl.textContent = String(p.unlockTokens ?? 0);
 
   // Status bar
-  document.getElementById('hsb-level').textContent = p.level > 10 ? 'Complete!' : `${p.level} / 10`;
+  document.getElementById('hsb-level').textContent = p.level > MAX_LEVEL ? 'Complete!' : `${p.level} / ${MAX_LEVEL}`;
 
-  // Tiers unlocked
   const apexCount = APEX_IDS.filter(id => p.quizUnlocked.includes(id)).length;
   const dinoCount = DINO_IDS.filter(id => p.quizUnlocked.includes(id)).length;
+  const legCount = LEGENDARY_IDS.filter(id => p.quizUnlocked.includes(id)).length;
+  const mythCount = MYTHICAL_IDS.filter(id => p.quizUnlocked.includes(id)).length;
   const baseU = countBaseUnlocked(p);
   let tierTxt = `B ${baseU}/10`;
   if (apexLevelGateMet(p)) tierTxt += ` · A ${apexCount}/10`;
   if (dinoLevelGateMet(p)) tierTxt += ` · D ${dinoCount}/10`;
+  if (legendaryLevelGateMet(p)) tierTxt += ` · L ${legCount}/10`;
+  if (mythicalLevelGateMet(p)) tierTxt += ` · M ${mythCount}/10`;
   document.getElementById('hsb-tiers').textContent = tierTxt;
-  document.getElementById('hsb-tiers').className = 'hsb-val ' + (dinoCount > 0 ? 'dino' : apexCount > 0 ? 'purple' : '');
+  const tierColor = mythCount > 0 ? 'mythical' : legCount > 0 ? 'legendary' : dinoCount > 0 ? 'dino' : apexCount > 0 ? 'purple' : '';
+  document.getElementById('hsb-tiers').className = 'hsb-val ' + tierColor;
 
   // Current hybrid
   if (state.playerHybrid) {
@@ -225,22 +243,25 @@ function renderHub() {
   if (tokBtn) tokBtn.disabled = !tokCan;
 
   // Level banner
-  document.getElementById('hub-level-num').textContent = p.level > 10 ? '✓' : p.level;
-  document.getElementById('hub-level-name').textContent = p.level > 10 ? 'Game Complete!' : `Level ${p.level} — ${level.name}`;
-  document.getElementById('hub-level-desc').textContent = p.level > 10 ? 'You conquered all levels.' : level.desc;
+  document.getElementById('hub-level-num').textContent = p.level > MAX_LEVEL ? '✓' : p.level;
+  document.getElementById('hub-level-name').textContent = p.level > MAX_LEVEL ? 'Game Complete!' : `Level ${p.level} — ${level.name}`;
+  document.getElementById('hub-level-desc').textContent = p.level > MAX_LEVEL ? 'You conquered all levels.' : level.desc;
 
   // Badges
   const ba = document.getElementById('hub-badge-area');
   ba.innerHTML = '';
   if (level && level.isFinal) ba.innerHTML += '<span class="lv-badge badge-final">⚠ FINAL BOSS</span>';
+  else if (level && level.isBoss) ba.innerHTML += '<span class="lv-badge badge-final">⚠ BOSS BATTLE</span>';
   else if (level && level.isHard) ba.innerHTML += '<span class="lv-badge badge-hard">DANGER ZONE</span>';
-  if (dinoCount > 0) ba.innerHTML += '<span class="lv-badge badge-dino">🦖 DINO ACTIVE</span>';
+  if (mythCount > 0) ba.innerHTML += '<span class="lv-badge badge-mythical">⚡ MYTHICAL ACTIVE</span>';
+  else if (legCount > 0) ba.innerHTML += '<span class="lv-badge badge-legendary">🐲 LEGENDARY ACTIVE</span>';
+  else if (dinoCount > 0) ba.innerHTML += '<span class="lv-badge badge-dino">🦖 DINO ACTIVE</span>';
   else if (apexCount > 0) ba.innerHTML += '<span class="lv-badge badge-apex">◈ APEX UNLOCKED</span>';
 
   // Progress pips
   const pips = document.getElementById('lv-progress-pips');
   pips.innerHTML = '';
-  for (let i = 1; i <= 10; i++) {
+  for (let i = 1; i <= MAX_LEVEL; i++) {
     const pip = document.createElement('div');
     pip.className = 'lv-pip' + (i < p.level ? ' done' : i === p.level ? ' current' : '');
     pips.appendChild(pip);
@@ -275,7 +296,10 @@ function renderHub() {
   if (rosterHint) {
     rosterHint.innerHTML =
       '<strong>Base</strong> — win levels to recruit the full roster (3 starters, then 7 more).<br>' +
-      '<strong>Apex</strong> — beat Level 5, then pass each Apex quiz in the Forge.<br>' +
+      '<strong>Apex</strong> — beat Level 5, then pass each Apex quiz.<br>' +
+      '<strong>Dinos</strong> — beat Level 8, then pass each Dino quiz.<br>' +
+      '<strong>Legendary</strong> — beat Level 12 to unlock Legendary Beast quizzes.<br>' +
+      '<strong>Mythical</strong> — beat Level 16 to unlock Mythical God quizzes.'; //
       '<strong>Dinos</strong> — beat Level 8, then pass each Dino quiz. Locked rows show ✓/○ for what’s done.';
   }
 
@@ -290,7 +314,7 @@ function renderHub() {
     }
     hintEl.textContent =
       t ||
-      (p.level > 10
+      (p.level > MAX_LEVEL
         ? 'Campaign clear — climb the leaderboard or experiment in the Forge.'
         : 'Forge a hybrid below, then fight this level.');
   }
@@ -313,17 +337,21 @@ function renderHubAnimalGrid() {
     const isLL = isLevelLocked(id, p);
 
     const chip = document.createElement('div');
-    const tierCls = a.stage === STAGE_DINO ? 'dino-chip' : a.stage === STAGE_APEX ? 'apex-chip' : '';
+    const stageChipMap = { [STAGE_MYTHICAL]: 'mythical-chip', [STAGE_LEGENDARY]: 'legendary-chip', [STAGE_DINO]: 'dino-chip', [STAGE_APEX]: 'apex-chip' };
+    const tierCls = stageChipMap[a.stage] || '';
     let cls = 'a-chip ' + tierCls;
     if (isAvail) cls += ' available';
     else if (isQL) cls += ' quiz-locked';
     else if (isLL) cls += ' locked';
     chip.className = cls;
 
-    const tierLbl = a.stage === STAGE_DINO ? 'DINO' : a.stage === STAGE_APEX ? 'APEX' : 'BASE';
-    const tierClass = a.stage === STAGE_DINO ? 't4' : a.stage === STAGE_APEX ? 't3' : '';
+    const tierLblMap = { [STAGE_MYTHICAL]: 'MYTHICAL', [STAGE_LEGENDARY]: 'LEGEND', [STAGE_DINO]: 'DINO', [STAGE_APEX]: 'APEX' };
+    const tierClsMap = { [STAGE_MYTHICAL]: 't6', [STAGE_LEGENDARY]: 't5', [STAGE_DINO]: 't4', [STAGE_APEX]: 't3' };
+    const tierLbl = tierLblMap[a.stage] || 'BASE';
+    const tierClass = tierClsMap[a.stage] || '';
+    const isPremium = a.stage !== STAGE_BASE;
     const premiumPreview =
-      !isAvail && !isQL && (a.stage === STAGE_APEX || a.stage === STAGE_DINO)
+      !isAvail && !isQL && isPremium
         ? `<div class="a-chip-stats-preview" aria-hidden="true">${formatMiniStatPreview(a)}</div>`
         : '';
     if (premiumPreview) chip.classList.add('premium-preview');

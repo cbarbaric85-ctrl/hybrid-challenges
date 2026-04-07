@@ -1,6 +1,6 @@
 import {
   STAT_MAX, ANIMALS, ALL_ANIMALS,
-  BASE_IDS, APEX_IDS, DINO_IDS,
+  BASE_IDS, APEX_IDS, DINO_IDS, LEGENDARY_IDS, MYTHICAL_IDS,
 } from '../data/animals.js';
 import { LEVEL_REWARDS, LEVELS } from '../data/levels.js';
 import {
@@ -960,15 +960,17 @@ async function showLevelComplete() {
   const currentLevel = p.level;
   const isApexUnlock = currentLevel === 5;
   const isDinoUnlock = currentLevel === 8;
-  const isFinalLevel = currentLevel === 10;
+  const isLegendaryUnlock = currentLevel === 12;
+  const isMythicalUnlock = currentLevel === 16;
+  const isFinalLevel = currentLevel === LEVELS.length;
+  const isBossLevel = LEVELS[currentLevel - 1]?.isBoss;
   const reward = LEVEL_REWARDS[currentLevel];
 
   updateStreakOnLevelComplete(p);
 
   p.highestLevelReached = Math.max(p.highestLevelReached || 0, currentLevel);
 
-  // Advance level
-  if (currentLevel <= 10) {
+  if (currentLevel <= LEVELS.length) {
     p.level++;
     if (reward && ANIMALS[reward] && !p.unlockedAnimals.includes(reward)) p.unlockedAnimals.push(reward);
   }
@@ -980,7 +982,7 @@ async function showLevelComplete() {
   }
 
   document.getElementById('lc-sub').textContent = `LEVEL ${currentLevel} CLEARED`;
-  document.getElementById('lc-icon').textContent = isFinalLevel ? '👑' : '🏆';
+  document.getElementById('lc-icon').textContent = isFinalLevel ? '👑' : isBossLevel ? '⚔️' : '🏆';
 
   // Animal unlock box
   const ub = document.getElementById('unlock-box');
@@ -1025,7 +1027,7 @@ async function showLevelComplete() {
     db.classList.remove('hidden');
     db.innerHTML = `
       <div class="dino-bonus-title">🦖 Dinosaur Tier Now Available!</div>
-      <p style="font-size:.82rem;color:var(--text-dim);margin-bottom:10px">You've reached the ultimate tier. Dinosaurs have stats far beyond anything you've faced.<br>Each unlock uses 3 random questions from a bigger dinosaur deck.</p>
+      <p style="font-size:.82rem;color:var(--text-dim);margin-bottom:10px">Dinosaurs have stats far beyond anything you've faced.<br>Each unlock uses 3 random questions from a bigger dinosaur deck.</p>
       <div class="apex-chips" style="gap:14px">
         ${DINO_IDS.map(id => {
           const a = ANIMALS[id];
@@ -1035,6 +1037,46 @@ async function showLevelComplete() {
       <p style="font-size:.7rem;color:var(--text-dim);margin-top:10px;font-family:var(--fm)">Find them in the Forge → Dinosaur Tier section.</p>`;
   } else {
     db.classList.add('hidden');
+  }
+
+  // Legendary unlock notification
+  const lb = document.getElementById('legendary-box');
+  if (lb) {
+    if (isLegendaryUnlock) {
+      lb.classList.remove('hidden');
+      lb.innerHTML = `
+        <div class="legendary-bonus-title">🐲 Legendary Beasts Now Available!</div>
+        <p style="font-size:.82rem;color:var(--text-dim);margin-bottom:10px"><em>Ancient creatures of myth, forged in fire, magic, and legend.</em><br>Each unlock uses 3 random questions from a mythological fact deck.</p>
+        <div class="apex-chips" style="gap:14px">
+          ${LEGENDARY_IDS.map(id => {
+            const a = ANIMALS[id];
+            return `<div class="apex-chip"><span>${a.emoji}</span><span style="color:var(--legendary)">${a.name}</span></div>`;
+          }).join('')}
+        </div>
+        <p style="font-size:.7rem;color:var(--text-dim);margin-top:10px;font-family:var(--fm)">Find them in the Forge → Legendary Beasts section.</p>`;
+    } else {
+      lb.classList.add('hidden');
+    }
+  }
+
+  // Mythical unlock notification
+  const mb = document.getElementById('mythical-box');
+  if (mb) {
+    if (isMythicalUnlock) {
+      mb.classList.remove('hidden');
+      mb.innerHTML = `
+        <div class="mythical-bonus-title">⚡ Mythical Gods Now Available!</div>
+        <p style="font-size:.82rem;color:var(--text-dim);margin-bottom:10px"><em>Beyond beasts — these are rulers of realms, masters of power itself.</em><br>Each unlock uses 3 random questions from a divine knowledge deck.</p>
+        <div class="apex-chips" style="gap:14px">
+          ${MYTHICAL_IDS.map(id => {
+            const a = ANIMALS[id];
+            return `<div class="apex-chip"><span>${a.emoji}</span><span style="color:var(--mythical)">${a.name}</span></div>`;
+          }).join('')}
+        </div>
+        <p style="font-size:.7rem;color:var(--text-dim);margin-top:10px;font-family:var(--fm)">Find them in the Forge → Mythical Gods section.</p>`;
+    } else {
+      mb.classList.add('hidden');
+    }
   }
 
   // Actions
