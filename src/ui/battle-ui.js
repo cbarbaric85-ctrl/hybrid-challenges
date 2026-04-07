@@ -302,16 +302,16 @@ function renderBattleScreen() {
 function renderFighterStats(containerId, stats) {
   const el = document.getElementById(containerId);
   if (!el) return;
-  el.innerHTML = ['spd', 'agi', 'int', 'str']
+  el.innerHTML = `<div class="stat-pillars">${['spd', 'agi', 'int', 'str']
     .map(
       s =>
-        `<div class="stat-row battle-stat-row" data-stat="${s}">
-        <div class="stat-lbl">${s.toUpperCase()}</div>
-        <div class="stat-track"><div class="stat-fill sf-${s}" style="width:${Math.min((stats[s] / STAT_MAX) * 100, 100)}%"></div></div>
-        <div class="stat-val">${stats[s]}</div>
-      </div>`
+        `<div class="stat-pillar battle-stat-pillar" data-stat="${s}">
+          <div class="sp-val">${stats[s]}</div>
+          <div class="sp-track"><div class="sp-fill sf-${s}" style="height:${Math.min((stats[s] / STAT_MAX) * 100, 100)}%"></div></div>
+          <div class="sp-lbl-row"><span class="sp-lbl">${s.toUpperCase()}</span><span class="sp-info" data-stat="${s}">i</span></div>
+        </div>`
     )
-    .join('');
+    .join('')}</div>`;
 }
 
 function resetHearts() {
@@ -399,12 +399,16 @@ function runBattleCountdown(done) {
 }
 
 function clearClashStatHighlight() {
-  document.querySelectorAll('.battle-stat-row').forEach(el => el.classList.remove('clash-stat-active'));
+  document.querySelectorAll('.battle-stat-pillar').forEach(el => {
+    el.classList.remove('clash-stat-active', 'sp-anim-active', 'sp-anim-spd', 'sp-anim-agi', 'sp-anim-int', 'sp-anim-str', 'sp-clash-win', 'sp-clash-lose');
+  });
 }
 
 function setClashStatHighlight(stat) {
   clearClashStatHighlight();
-  document.querySelectorAll(`.battle-stat-row[data-stat="${stat}"]`).forEach(el => el.classList.add('clash-stat-active'));
+  document.querySelectorAll(`.battle-stat-pillar[data-stat="${stat}"]`).forEach(el => {
+    el.classList.add('clash-stat-active', 'sp-anim-active', `sp-anim-${stat}`);
+  });
 }
 
 /** Player bar only (rival bar still 0) — staggered reveal */
@@ -776,6 +780,16 @@ function animateBattle(result, roundIdx) {
     else if (round.winner === 'enemy') setClashMeterWinHighlight('enemy');
     else clearClashMeterWinHighlight();
 
+    const pPillar = document.querySelector(`#bp-stats .battle-stat-pillar[data-stat="${round.stat}"]`);
+    const ePillar = document.querySelector(`#be-stats .battle-stat-pillar[data-stat="${round.stat}"]`);
+    if (round.winner === 'player') {
+      pPillar?.classList.add('sp-clash-win');
+      ePillar?.classList.add('sp-clash-lose');
+    } else if (round.winner === 'enemy') {
+      ePillar?.classList.add('sp-clash-win');
+      pPillar?.classList.add('sp-clash-lose');
+    }
+
     addLog(
       `<div class="round-trail-row ${rowCls}"><span class="rt-icon">${statIcon}</span><span class="rt-cat">${statWord}</span><span class="rt-badge ${badgeCls}">${badgeTxt}</span></div>`,
       0,
@@ -812,15 +826,14 @@ function scrollDefeatIntoView() {
 
 async function finishBattle(result) {
   const flowGen = state.battleFlowGen;
+  const won = result.winner === 'player';
+  try {
   const box = document.getElementById('clash-box');
-  box.classList.add('hidden');
-  box.classList.remove('clash-active');
+  if (box) { box.classList.add('hidden'); box.classList.remove('clash-active'); }
   clearClashStatHighlight();
   resetClashMeters();
   document.getElementById('fighter-player')?.classList.remove('f-side-win', 'f-side-lose');
   document.getElementById('fighter-enemy')?.classList.remove('f-side-win', 'f-side-lose');
-
-  const won = result.winner === 'player';
   console.log('[battle] resolved', { won, score: `${result.pWins}-${result.eWins}`, flowGen });
   const p = state.progress;
   ensureDailyChallengeRolled(p);
@@ -922,6 +935,19 @@ async function finishBattle(result) {
         }
       }, 9000));
     }, 3800);
+  }
+  } catch (fatalErr) {
+    console.error('[battle] finishBattle crashed — forcing transition', fatalErr);
+    hideBattleResultOverlay();
+    state.battle = null;
+    if (won) {
+      showLevelComplete().catch(e => {
+        console.error('[battle] fallback showLevelComplete also failed', e);
+        showScreen('hub');
+      });
+    } else {
+      showScreen('defeat');
+    }
   }
 }
 
@@ -1053,6 +1079,7 @@ function buildMiniStats(a) {
 function goNextLevel() {
   clearLevelCompleteAutoNav();
   clearDefeatAutoReturn();
+  hideBattleResultOverlay();
   state.battle = null;
   state.playerHybrid = null;
   state.selectedAnimals = [];
@@ -1062,6 +1089,7 @@ function goNextLevel() {
 function retryLevel() {
   clearLevelCompleteAutoNav();
   clearDefeatAutoReturn();
+  hideBattleResultOverlay();
   state.battle = null;
   state.playerHybrid = null;
   state.selectedAnimals = [];

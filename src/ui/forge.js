@@ -27,6 +27,8 @@ function showBuilder() {
 function showHub() {
   clearLevelCompleteAutoNav();
   clearDefeatAutoReturn();
+  document.getElementById('battle-result-overlay')?.classList.add('hidden');
+  document.getElementById('battle-countdown-overlay')?.classList.add('hidden');
   console.log('[flow] hub shown');
   showScreen('hub');
 }
@@ -359,10 +361,11 @@ function renderHybridPreview(h) {
   // Power score
   document.getElementById('h-power').classList.remove('hidden');
   document.getElementById('h-power-num').textContent = h.power;
-  // Stats
   for (const stat of ['spd','agi','int','str']) {
-    document.getElementById(`hs-${stat}`).style.width = `${Math.min((h.stats[stat]/STAT_MAX)*100,100)}%`;
-    document.getElementById(`hv-${stat}`).textContent = h.stats[stat];
+    const fill = document.getElementById(`hs-${stat}`);
+    if (fill) fill.style.height = `${Math.min((h.stats[stat]/STAT_MAX)*100,100)}%`;
+    const val = document.getElementById(`hv-${stat}`);
+    if (val) val.textContent = h.stats[stat];
   }
   syncHybridNameInput();
 }
@@ -375,8 +378,10 @@ function clearHybridPreview() {
   document.getElementById('hcard').className = 'hcard';
   document.getElementById('h-power').classList.add('hidden');
   for (const stat of ['spd','agi','int','str']) {
-    document.getElementById(`hs-${stat}`).style.width = '0%';
-    document.getElementById(`hv-${stat}`).textContent = '—';
+    const fill = document.getElementById(`hs-${stat}`);
+    if (fill) fill.style.height = '0%';
+    const val = document.getElementById(`hv-${stat}`);
+    if (val) val.textContent = '—';
   }
   syncHybridNameInput();
 }
