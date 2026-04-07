@@ -1,0 +1,369 @@
+import {
+  STAT_MAX, STAGE_BASE, STAGE_APEX, STAGE_DINO,
+  ANIMALS, ALL_ANIMALS, BASE_IDS, APEX_IDS, DINO_IDS,
+} from '../data/animals.js';
+import { LEVELS } from '../data/levels.js';
+import {
+  state, COIN_TUNING_COST, TOKEN_RECRUIT_COST,
+  XP_PER_BATTLE_WIN, COMMANDER_XP_SEGMENT,
+} from '../game/state.js';
+import {
+  countBaseUnlocked, countApexUnlocked, countDinoUnlocked,
+  apexLevelGateMet, dinoLevelGateMet,
+  getPlayerStageLabel, getProgressionNextLines,
+  isLevelLocked, isQuizEligible,
+  ensureDailyChallengeRolled, dailyChallengeMet,
+  DAILY_CHALLENGE_DEFS,
+  RETENTION_SOFT_MONETISE_COPY, getSoftMonetisationHintLines,
+  getRetentionShopTeasers,
+  getNextBaseAnimalId, getNextApexAnimalId, getNextDinoAnimalId,
+  formatMiniStatPreview,
+  getStreakBattleBoost, sumBoostPoints,
+  unlockGateLinesForAnimal,
+  touchDailyStreakIfNeeded,
+  pickDailyChallenge,
+  getAvailableAnimals,
+} from '../game/progression.js';
+import { powerScore } from '../game/hybrid.js';
+import { STAT_LABELS_SIMPLE } from '../game/battle.js';
+import { saveUserProgress, persistGameProgress } from '../persistence/save.js';
+import { backfillLeaderboardIfMissing } from '../persistence/leaderboard.js';
+import { showScreen, escapeHtml } from './screens.js';
+import { localDateString, localYesterdayString } from '../game/utils.js';
+
+
+function getCommanderXpSegment(xp) {
+  const x = Math.max(0, xp | 0);
+  const seg = COMMANDER_XP_SEGMENT;
+  const inSeg = x % seg;
+  const tier = Math.floor(x / seg) + 1;
+  return { tier, inSeg, seg, pct: Math.min(100, (inSeg / seg) * 100) };
+}
+
+function findNextTokenRecruitTarget(p) {
+  const baseNext = getNextBaseAnimalId(p);
+  if (baseNext) return { id: baseNext, mode: 'base' };
+  const na = getNextApexAnimalId(p);
+  if (na) return { id: na, mode: 'quiz' };
+  const nd = getNextDinoAnimalId(p);
+  if (nd) return { id: nd, mode: 'quiz' };
+  return null;
+}
+
+let hubRewardMsgTimer = null;
+function flashHubRewardMsg(msg) {
+  const el = document.getElementById('hub-reward-msg');
+  if (!el) return;
+  el.textContent = msg;
+  el.classList.remove('hidden');
+  if (hubRewardMsgTimer) clearTimeout(hubRewardMsgTimer);
+  hubRewardMsgTimer = setTimeout(() => {
+    el.classList.add('hidden');
+    hubRewardMsgTimer = null;
+  }, 3200);
+}
+
+function hubSpendCoinTune() {
+  const p = state.progress;
+  if (!p || (p.coins || 0) < COIN_TUNING_COST) {
+    flashHubRewardMsg('You need more Fusion Coins — win battles!');
+    return;
+  }
+  if (!state.playerHybrid) {
+    flashHubRewardMsg('Forge a hybrid in the Forge, then tune stats here.');
+    return;
+  }
+  p.coins -= COIN_TUNING_COST;
+  const h = state.playerHybrid;
+  const keys = ['spd', 'agi', 'int', 'str'];
+  const stat = keys[Math.floor(Math.random() * keys.length)];
+  h.stats[stat] = Math.min(STAT_MAX, (h.stats[stat] || 0) + 1);
+  h.power = powerScore(h.stats);
+  saveUserProgress(p).catch(e => console.error('[hub] coinTune save failed', e));
+  flashHubRewardMsg(`+1 ${STAT_LABELS_SIMPLE[stat]} — your hybrid grows stronger!`);
+  renderHub();
+}
+
+function hubSpendTokenRecruit() {
+  const p = state.progress;
+  if (!p || (p.unlockTokens || 0) < TOKEN_RECRUIT_COST) {
+    flashHubRewardMsg('You need more Unlock Tokens — clear levels and daily goals.');
+    return;
+  }
+  const t = findNextTokenRecruitTarget(p);
+  if (!t) {
+    flashHubRewardMsg('Every animal is unlocked. Use tokens in future updates!');
+    return;
+  }
+  p.unlockTokens -= TOKEN_RECRUIT_COST;
+  if (t.mode === 'base') {
+    if (!p.unlockedAnimals.includes(t.id)) p.unlockedAnimals.push(t.id);
+    flashHubRewardMsg(`${ANIMALS[t.id].name} joined your roster!`);
+  } else {
+    if (!p.quizUnlocked.includes(t.id)) p.quizUnlocked.push(t.id);
+    flashHubRewardMsg(`${ANIMALS[t.id].name} is unlocked — find them in the Forge!`);
+  }
+  saveUserProgress(p).catch(e => console.error('[hub] tokenRecruit save failed', e));
+  renderHub();
+}
+
+function renderHubProgressionPanel() {
+  const el = document.getElementById('hub-progress-panel');
+  if (!el || !state.progress) return;
+  const p = state.progress;
+  const bU = countBaseUnlocked(p);
+  const aU = countApexUnlocked(p);
+  const dU = countDinoUnlocked(p);
+  const stage = getPlayerStageLabel(p);
+  const apexOpen = apexLevelGateMet(p);
+  const dinoOpen = dinoLevelGateMet(p);
+  const apexLine = apexOpen ? `${aU} / ${APEX_IDS.length} unlocked` : 'Locked — beat Level 5 first';
+  const dinoLine = dinoOpen ? `${dU} / ${DINO_IDS.length} unlocked` : 'Locked — beat Level 8 first';
+  const nextLines = getProgressionNextLines(p);
+  el.innerHTML = `
+    <div class="hub-progress-hdr">Progression</div>
+    <div class="hub-progress-meta">
+      <span><em>Level</em> <strong>${p.level > 10 ? '✓' : p.level}</strong></span>
+      <span><em>Stage</em> <strong>${stage}</strong></span>
+    </div>
+    <ul class="hub-progress-stages">
+      <li><span class="hps-emoji">◇</span> <span class="hps-name">Base Animals</span> <span class="hps-count">${bU} / ${BASE_IDS.length}</span></li>
+      <li><span class="hps-emoji">◈</span> <span class="hps-name">Apex Predators</span> <span class="hps-count">${apexLine}</span></li>
+      <li><span class="hps-emoji">🦖</span> <span class="hps-name">Dinosaurs</span> <span class="hps-count">${dinoLine}</span></li>
+    </ul>
+    <div class="hub-progress-gates">
+      <div class="hpg-row"><span class="${apexOpen ? 'hpg-ok' : 'hpg-no'}">${apexOpen ? '✓' : '○'}</span> Apex level gate (Level 6+)</div>
+      <div class="hpg-row"><span class="${dinoOpen ? 'hpg-ok' : 'hpg-no'}">${dinoOpen ? '✓' : '○'}</span> Dino level gate (Level 9+)</div>
+    </div>
+    <div class="hub-progress-next">${nextLines.join('<br>')}</div>
+    ${
+      sumBoostPoints(getStreakBattleBoost(p)) > 0
+        ? `<div class="hub-streak-bonus">🔥 Streak power: +${sumBoostPoints(getStreakBattleBoost(p))} bonus stats in your next battle.</div>`
+        : ''
+    }
+    <div class="hub-soft-gates">${[...getRetentionShopTeasers(), ...getSoftMonetisationHintLines(p)].map(s => `<div class="soft-gate-line">${s}</div>`).join('')}</div>`;
+}
+
+function renderHubDailyChallenge() {
+  const el = document.getElementById('hub-daily-challenge');
+  if (!el || !state.progress) return;
+  const p = state.progress;
+  ensureDailyChallengeRolled(p);
+  const ch = pickDailyChallenge(localDateString());
+  const done = p.dailyChallengeRewardClaimed;
+  const wins = p.dailyWinsToday || 0;
+  let sub = done ? '✓ Reward claimed today — new challenge tomorrow!' : `${wins} mission win${wins === 1 ? '' : 's'} today`;
+  if (!done && ch.id === 'double' && wins < 2) sub += ' · need 2 wins today';
+  el.innerHTML = `
+    <div class="hub-dc-hdr">🎯 Daily Challenge</div>
+    <div class="hub-dc-title">${ch.title}</div>
+    <div class="hub-dc-desc">${ch.desc}</div>
+    <div class="hub-dc-status">${sub}</div>`;
+}
+
+function renderHub() {
+  const p = state.progress;
+  if (touchDailyStreakIfNeeded(p)) persistGameProgress().catch(e => console.error('[hub] streak save failed', e));
+  backfillLeaderboardIfMissing().catch(e => console.error('[hub] lb backfill failed', e));
+  const levelIdx = Math.min(p.level - 1, LEVELS.length - 1);
+  const level = LEVELS[levelIdx];
+
+  document.getElementById('hub-username').textContent = state.profile?.username || '—';
+  document.getElementById('hub-wins').textContent = p.totalWins;
+  document.getElementById('hub-losses').textContent = p.totalLosses;
+  const streakEl = document.getElementById('hub-streak');
+  if (streakEl) {
+    const n = p.streakCount || 0;
+    streakEl.textContent = `🔥 ${n} day streak`;
+  }
+  const coinsEl = document.getElementById('hsb-coins');
+  if (coinsEl) coinsEl.textContent = String(p.coins ?? 0);
+  const tokEl = document.getElementById('hsb-tokens');
+  if (tokEl) tokEl.textContent = String(p.unlockTokens ?? 0);
+
+  // Status bar
+  document.getElementById('hsb-level').textContent = p.level > 10 ? 'Complete!' : `${p.level} / 10`;
+
+  // Tiers unlocked
+  const apexCount = APEX_IDS.filter(id => p.quizUnlocked.includes(id)).length;
+  const dinoCount = DINO_IDS.filter(id => p.quizUnlocked.includes(id)).length;
+  const baseU = countBaseUnlocked(p);
+  let tierTxt = `B ${baseU}/10`;
+  if (apexLevelGateMet(p)) tierTxt += ` · A ${apexCount}/10`;
+  if (dinoLevelGateMet(p)) tierTxt += ` · D ${dinoCount}/10`;
+  document.getElementById('hsb-tiers').textContent = tierTxt;
+  document.getElementById('hsb-tiers').className = 'hsb-val ' + (dinoCount > 0 ? 'dino' : apexCount > 0 ? 'purple' : '');
+
+  // Current hybrid
+  if (state.playerHybrid) {
+    const h = state.playerHybrid;
+    document.getElementById('hsb-hybrid').textContent = `${h.emojis} ${h.name}`;
+    document.getElementById('hsb-power').textContent = `${h.power} ⚡`;
+  } else {
+    document.getElementById('hsb-hybrid').textContent = '—';
+    document.getElementById('hsb-power').textContent = '—';
+  }
+
+  const xpUi = getCommanderXpSegment(p.commanderXp || 0);
+  const xpFill = document.getElementById('hub-xp-bar-fill');
+  const xpMeta = document.getElementById('hub-xp-meta');
+  const xpSegLbl = document.getElementById('hub-xp-seg-lbl');
+  const xpTrack = document.getElementById('hub-xp-bar-track');
+  if (xpFill) xpFill.style.width = `${xpUi.pct}%`;
+  if (xpSegLbl) xpSegLbl.textContent = `Spark ${xpUi.tier}`;
+  if (xpTrack) xpTrack.setAttribute('aria-valuenow', String(Math.round(xpUi.pct)));
+  if (xpMeta) {
+    xpMeta.textContent = `Commander XP · ${xpUi.inSeg} / ${xpUi.seg} points in this spark (wins fill the bar)`;
+  }
+
+  const coinBtn = document.getElementById('hub-btn-coin-tune');
+  const tokBtn = document.getElementById('hub-btn-token-recruit');
+  const coinCan = (p.coins || 0) >= COIN_TUNING_COST && !!state.playerHybrid;
+  const tokTgt = findNextTokenRecruitTarget(p);
+  const tokCan = (p.unlockTokens || 0) >= TOKEN_RECRUIT_COST && !!tokTgt;
+  if (coinBtn) coinBtn.disabled = !coinCan;
+  if (tokBtn) tokBtn.disabled = !tokCan;
+
+  // Level banner
+  document.getElementById('hub-level-num').textContent = p.level > 10 ? '✓' : p.level;
+  document.getElementById('hub-level-name').textContent = p.level > 10 ? 'Game Complete!' : `Level ${p.level} — ${level.name}`;
+  document.getElementById('hub-level-desc').textContent = p.level > 10 ? 'You conquered all levels.' : level.desc;
+
+  // Badges
+  const ba = document.getElementById('hub-badge-area');
+  ba.innerHTML = '';
+  if (level && level.isFinal) ba.innerHTML += '<span class="lv-badge badge-final">⚠ FINAL BOSS</span>';
+  else if (level && level.isHard) ba.innerHTML += '<span class="lv-badge badge-hard">DANGER ZONE</span>';
+  if (dinoCount > 0) ba.innerHTML += '<span class="lv-badge badge-dino">🦖 DINO ACTIVE</span>';
+  else if (apexCount > 0) ba.innerHTML += '<span class="lv-badge badge-apex">◈ APEX UNLOCKED</span>';
+
+  // Progress pips
+  const pips = document.getElementById('lv-progress-pips');
+  pips.innerHTML = '';
+  for (let i = 1; i <= 10; i++) {
+    const pip = document.createElement('div');
+    pip.className = 'lv-pip' + (i < p.level ? ' done' : i === p.level ? ' current' : '');
+    pips.appendChild(pip);
+  }
+
+  // Enemy preview
+  if (level) {
+    const comps = level.animals.map(id => ALL_ANIMALS[id]).filter(Boolean);
+    document.getElementById('hub-enemy-preview').innerHTML =
+      `Enemy: <span>${comps.map(a => a.emoji + ' ' + a.name).join(' + ')}</span>`;
+  }
+
+  // Hybrid display card
+  const hd = document.getElementById('hub-hybrid-display');
+  if (state.playerHybrid) {
+    const h = state.playerHybrid;
+    hd.innerHTML = `
+      <div style="font-size:1.9rem;margin-bottom:4px">${h.emojis}</div>
+      <div style="font-family:var(--fd);font-size:1rem;font-weight:700;color:var(--text-bright);margin-bottom:2px">${h.name}</div>
+      <div style="font-size:.6rem;font-family:var(--fm);color:var(--text-dim);margin-bottom:8px">${h.composition}</div>
+      <div class="hub-power-row" style="justify-content:center;gap:16px">
+        <div style="text-align:center">
+          <div class="hub-power-score">${h.power}</div>
+          <div class="hub-power-lbl">Power Score</div>
+        </div>
+      </div>`;
+  } else {
+    hd.innerHTML = `<div style="padding:8px 0;color:var(--text-dim);font-size:.72rem">No hybrid forged yet.<br>Go to the Forge to build one.</div>`;
+  }
+
+  const rosterHint = document.getElementById('hub-roster-hint');
+  if (rosterHint) {
+    rosterHint.innerHTML =
+      '<strong>Base</strong> — win levels to recruit the full roster (3 starters, then 7 more).<br>' +
+      '<strong>Apex</strong> — beat Level 5, then pass each Apex quiz in the Forge.<br>' +
+      '<strong>Dinos</strong> — beat Level 8, then pass each Dino quiz. Locked rows show ✓/○ for what’s done.';
+  }
+
+  const hintEl = document.getElementById('hub-primary-hint');
+  if (hintEl) {
+    const lines = getProgressionNextLines(p);
+    let t = '';
+    if (lines.length) {
+      const tmp = document.createElement('div');
+      tmp.innerHTML = lines[0];
+      t = (tmp.textContent || tmp.innerText || '').replace(/\s+/g, ' ').trim();
+    }
+    hintEl.textContent =
+      t ||
+      (p.level > 10
+        ? 'Campaign clear — climb the leaderboard or experiment in the Forge.'
+        : 'Forge a hybrid below, then fight this level.');
+  }
+
+  renderHubProgressionPanel();
+  renderHubDailyChallenge();
+  renderHubAnimalGrid();
+}
+
+function renderHubAnimalGrid() {
+  const p = state.progress;
+  const available = getAvailableAnimals(p);
+  const grid = document.getElementById('hub-animal-grid');
+  grid.innerHTML = '';
+
+  for (const id of Object.keys(ANIMALS)) {
+    const a = ANIMALS[id];
+    const isAvail = available.includes(id);
+    const isQL = isQuizEligible(id, p);
+    const isLL = isLevelLocked(id, p);
+
+    const chip = document.createElement('div');
+    const tierCls = a.stage === STAGE_DINO ? 'dino-chip' : a.stage === STAGE_APEX ? 'apex-chip' : '';
+    let cls = 'a-chip ' + tierCls;
+    if (isAvail) cls += ' available';
+    else if (isQL) cls += ' quiz-locked';
+    else if (isLL) cls += ' locked';
+    chip.className = cls;
+
+    const tierLbl = a.stage === STAGE_DINO ? 'DINO' : a.stage === STAGE_APEX ? 'APEX' : 'BASE';
+    const tierClass = a.stage === STAGE_DINO ? 't4' : a.stage === STAGE_APEX ? 't3' : '';
+    const premiumPreview =
+      !isAvail && !isQL && (a.stage === STAGE_APEX || a.stage === STAGE_DINO)
+        ? `<div class="a-chip-stats-preview" aria-hidden="true">${formatMiniStatPreview(a)}</div>`
+        : '';
+    if (premiumPreview) chip.classList.add('premium-preview');
+    chip.innerHTML = `<span class="a-chip-em">${a.emoji}</span>
+      <span class="a-chip-nm">${a.name}</span>
+      <span class="a-chip-tier ${tierClass}">${isLL ? '🔒' : isQL ? '📝' : tierLbl}</span>${premiumPreview}`;
+
+    const gates = unlockGateLinesForAnimal(id, p);
+    if (gates && !isAvail) {
+      const gateHtml = gates
+        .map(
+          g =>
+            `<div class="unlock-gate-row"><span class="${g.ok ? 'unlock-gate-ok' : 'unlock-gate-no'}">${g.ok ? '✓' : '○'}</span> ${g.text}</div>`
+        )
+        .join('');
+      chip.innerHTML += `<div class="unlock-gate-list">${gateHtml}</div>`;
+    }
+
+    if (isQL) {
+      chip.title = `Unlock ${a.name}: level done ✓ — tap to try the quiz.`;
+      chip.onclick = () => {
+        state.quizReturnScreen = 'hub';
+        window.openQuiz(id);
+      };
+    } else if (isLL && gates) {
+      chip.title = gates.map(g => `${g.ok ? 'Done' : 'Todo'}: ${g.text}`).join('\n');
+    }
+
+    grid.appendChild(chip);
+  }
+}
+
+export {
+  getCommanderXpSegment,
+  findNextTokenRecruitTarget,
+  flashHubRewardMsg,
+  hubSpendCoinTune,
+  hubSpendTokenRecruit,
+  renderHubProgressionPanel,
+  renderHubDailyChallenge,
+  renderHub,
+  renderHubAnimalGrid,
+};
