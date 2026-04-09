@@ -257,9 +257,9 @@ function showClashQuiz(stat, callback) {
     timerFill.style.width = '100%';
     timerFill.classList.remove('cq-urgent');
     void timerFill.offsetWidth;
-    timerFill.style.transition = 'width 3s linear';
+    timerFill.style.transition = 'width 5s linear';
     timerFill.style.width = '0%';
-    setTimeout(() => timerFill?.classList.add('cq-urgent'), 2000);
+    setTimeout(() => timerFill?.classList.add('cq-urgent'), 3500);
   }
 
   el.classList.remove('hidden');
@@ -269,7 +269,7 @@ function showClashQuiz(stat, callback) {
 
   _cqTimer = setTimeout(() => {
     if (!_cqAnswered) answerClashQuiz(-1);
-  }, 3000);
+  }, 5000);
 }
 
 function answerClashQuiz(optIdx) {
