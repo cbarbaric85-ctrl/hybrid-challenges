@@ -266,7 +266,6 @@ function showClashQuiz(stat, callback) {
   el.style.animation = 'none';
   void el.offsetWidth;
   el.style.animation = '';
-  scrollToBattleFocus();
 
   _cqTimer = setTimeout(() => {
     if (!_cqAnswered) answerClashQuiz(-1);
