@@ -5,7 +5,7 @@ import { showScreen } from './ui/screens.js';
 import { switchTab, handleAuth, logout, setupAuth } from './ui/auth.js';
 import {
   renderHub, hubSpendCoinTune, hubSpendTokenRecruit,
-  hubActionTrain, hubActionUnlock, hubActionImprove, hubActionNewFusion,
+  hubActionAllegiance, hubActionUnlock, hubActionImprove, hubActionNewFusion,
 } from './ui/hub.js';
 import {
   renderFactionSelect, pickFactionAndContinue, openFactionSelectFromHub,
@@ -63,7 +63,7 @@ Object.assign(window, {
   applyHybridDisplayName,
   hubSpendCoinTune,
   hubSpendTokenRecruit,
-  hubActionTrain,
+  hubActionAllegiance,
   hubActionUnlock,
   hubActionImprove,
   hubActionNewFusion,

@@ -35,7 +35,7 @@ import { backfillLeaderboardIfMissing } from '../persistence/leaderboard.js';
 import { showScreen, escapeHtml } from './screens.js';
 import { localDateString, localYesterdayString } from '../game/utils.js';
 import { needsFactionSelection, getFaction } from '../data/factions.js';
-import { applyFactionThemeToRoot } from './faction-ui.js';
+import { applyFactionThemeToRoot, openFactionSelectFromHub } from './faction-ui.js';
 
 
 function getCommanderXpSegment(xp) {
@@ -445,9 +445,15 @@ function getFirstQuizEligibleId(p) {
 }
 
 function getRecommendedAction(p) {
-  if (state.lastBattleResult === 'loss') return 'TRAIN';
-
   const unlockTarget = getFirstQuizEligibleId(p);
+  const hasHybrid = !!state.playerHybrid;
+
+  if (state.lastBattleResult === 'loss') {
+    if (unlockTarget) return 'UNLOCK';
+    if (hasHybrid) return 'IMPROVE';
+    return 'FIGHT';
+  }
+
   if (unlockTarget) return 'UNLOCK';
 
   if (state.playerHybrid && state.enemyHybrid) {
@@ -477,7 +483,7 @@ function renderActionPanel() {
 
   const rec = getRecommendedAction(p);
 
-  const trainBtn = document.getElementById('hap-train');
+  const allegianceBtn = document.getElementById('hap-allegiance');
   const unlockBtn = document.getElementById('hap-unlock');
   const improveBtn = document.getElementById('hap-improve');
   const fusionBtn = document.getElementById('hap-fusion');
@@ -485,13 +491,7 @@ function renderActionPanel() {
   const hasHybrid = !!state.playerHybrid;
   const unlockTarget = getFirstQuizEligibleId(p);
 
-  // Train — available if any quiz-eligible creature exists (reuses unlock quiz)
-  // or hybrid exists (re-enter forge for quiz boost)
-  trainBtn.disabled = !unlockTarget && !hasHybrid;
-  const trainSub = document.getElementById('hap-train-sub');
-  if (trainSub) trainSub.textContent = unlockTarget
-    ? `Quiz for XP & stat boost`
-    : hasHybrid ? 'Re-enter forge for quiz' : 'Unlock a creature first';
+  if (allegianceBtn) allegianceBtn.disabled = false;
 
   // Unlock — available if a quiz-eligible creature exists
   const unlockLabel = document.getElementById('hap-unlock-label');
@@ -530,9 +530,9 @@ function renderActionPanel() {
   fusionBtn.disabled = false;
 
   // Recommended highlight
-  const btnMap = { TRAIN: trainBtn, UNLOCK: unlockBtn, IMPROVE: improveBtn, FIGHT: null };
-  const recMap = { TRAIN: 'hap-rec-train', UNLOCK: 'hap-rec-unlock', IMPROVE: 'hap-rec-improve', FUSION: 'hap-rec-fusion' };
-  [trainBtn, unlockBtn, improveBtn, fusionBtn].forEach(b => b?.classList.remove('hap-recommended'));
+  const btnMap = { UNLOCK: unlockBtn, IMPROVE: improveBtn, FIGHT: null };
+  const recMap = { UNLOCK: 'hap-rec-unlock', IMPROVE: 'hap-rec-improve', FUSION: 'hap-rec-fusion' };
+  [allegianceBtn, unlockBtn, improveBtn, fusionBtn].forEach(b => b?.classList.remove('hap-recommended'));
   for (const id of Object.values(recMap)) {
     document.getElementById(id)?.classList.add('hidden');
   }
@@ -546,16 +546,8 @@ function renderActionPanel() {
   }
 }
 
-function hubActionTrain() {
-  const p = state.progress;
-  if (!p) return;
-  const target = getFirstQuizEligibleId(p);
-  if (target) {
-    state.quizReturnScreen = 'hub';
-    window.openQuiz(target);
-  } else {
-    showScreen('builder');
-  }
+function hubActionAllegiance() {
+  openFactionSelectFromHub();
 }
 
 function hubActionUnlock() {
@@ -596,7 +588,7 @@ export {
   renderHubAnimalGrid,
   getRecommendedAction,
   renderActionPanel,
-  hubActionTrain,
+  hubActionAllegiance,
   hubActionUnlock,
   hubActionImprove,
   hubActionNewFusion,

@@ -660,8 +660,21 @@ function showQuizResult(passed) {
   saveUserProgress(p).catch(e => console.error('[forge] quiz result save failed', e));
 
   const body = document.getElementById('quiz-body');
+  const fromHub = state.quizReturnScreen === 'hub';
 
   if (passed) {
+    const hubNextHint = fromHub
+      ? `<p class="qr-sub" style="margin-top:10px;max-width:36ch;margin-left:auto;margin-right:auto;line-height:1.5">Head back to the <strong>Hub</strong> to plan your next mission, or open the <strong>Forge</strong> to fuse your new recruit.</p>`
+      : '';
+    const passActs = fromHub
+      ? `<div class="qr-acts">
+          <button class="btn btn-primary btn-lg" onclick="returnFromQuizHub()">Return to Hub</button>
+          <button class="btn btn-secondary" onclick="returnFromQuiz()">Open Forge</button>
+        </div>`
+      : `<div class="qr-acts">
+          <button class="btn btn-primary btn-lg" onclick="returnFromQuiz()">⚗ Go to Forge</button>
+          <button class="btn btn-ghost btn-sm" onclick="returnFromQuizHub()">Hub</button>
+        </div>`;
     body.innerHTML = `
       <div class="quiz-result">
         <span class="qr-icon">🔓</span>
@@ -674,13 +687,21 @@ function showQuizResult(passed) {
           ${window.buildMiniStats(a)}
           <div style="margin-top:12px;font-family:var(--fm);font-size:.62rem;color:var(--text-dim)">Now available in the Hybrid Forge.</div>
         </div>
-        <div class="qr-acts">
-          <button class="btn btn-primary btn-lg" onclick="returnFromQuiz()">⚗ Go to Forge</button>
-          <button class="btn btn-ghost btn-sm" onclick="returnFromQuizHub()">Hub</button>
-        </div>
+        ${hubNextHint}
+        ${passActs}
       </div>`;
   } else {
     const correctCount = quizState.correctCount;
+    const failActs = fromHub
+      ? `<div class="qr-acts">
+          <button class="btn btn-secondary" onclick="openQuiz('${animalId}')">↺ Try Again</button>
+          <button class="btn btn-primary btn-sm" onclick="returnFromQuizHub()">Return to Hub</button>
+          <button class="btn btn-ghost btn-sm" onclick="returnFromQuiz()">Forge</button>
+        </div>`
+      : `<div class="qr-acts">
+          <button class="btn btn-secondary" onclick="openQuiz('${animalId}')">↺ Try Again</button>
+          <button class="btn btn-ghost btn-sm" onclick="returnFromQuiz()">Back to Forge</button>
+        </div>`;
     body.innerHTML = `
       <div class="quiz-result">
         <span class="qr-icon">😞</span>
@@ -691,10 +712,7 @@ function showQuizResult(passed) {
           <div style="font-family:var(--fd);font-size:1rem;color:var(--text-dim);margin-bottom:6px">${a.name} remains locked.</div>
           <div style="font-family:var(--fm);font-size:.7rem;color:var(--text-dim)">You can attempt the quiz again any time from the Forge or Hub.</div>
         </div>
-        <div class="qr-acts">
-          <button class="btn btn-secondary" onclick="openQuiz('${animalId}')">↺ Try Again</button>
-          <button class="btn btn-ghost btn-sm" onclick="returnFromQuiz()">Back to Forge</button>
-        </div>
+        ${failActs}
       </div>`;
   }
 }
