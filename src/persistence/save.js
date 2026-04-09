@@ -15,11 +15,12 @@ function normalizeProgress(p) {
   if (!p.quizUnlocked) p.quizUnlocked = [];
   if (p.highestLevelReached == null) p.highestLevelReached = 0;
   if (p.streakCount == null) p.streakCount = 0;
-  if (!p.stageAccess) p.stageAccess = { base: true, apex: true, dinosaur: true, legendary: true, mythical: true, egyptian: true };
+  if (!p.stageAccess) p.stageAccess = { base: true, apex: true, dinosaur: true, legendary: true, mythical: true, egyptian: true, knights: true };
   else {
     if (p.stageAccess.legendary == null) p.stageAccess.legendary = true;
     if (p.stageAccess.mythical == null) p.stageAccess.mythical = true;
     if (p.stageAccess.egyptian == null) p.stageAccess.egyptian = true;
+    if (p.stageAccess.knights == null) p.stageAccess.knights = true;
   }
   if (p.progressSchemaVersion == null) p.progressSchemaVersion = 0;
   if (p.coins == null) p.coins = 0;
@@ -114,6 +115,7 @@ function firestoreDataToProgress(data) {
       legendary: data.stageAccess?.legendary !== false,
       mythical: data.stageAccess?.mythical !== false,
       egyptian: data.stageAccess?.egyptian !== false,
+      knights: data.stageAccess?.knights !== false,
     },
   };
   normalizeProgress(p);

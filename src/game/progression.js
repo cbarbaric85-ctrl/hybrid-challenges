@@ -1,19 +1,20 @@
 import {
-  STAGE_BASE, STAGE_APEX, STAGE_DINO, STAGE_LEGENDARY, STAGE_MYTHICAL, STAGE_EGYPTIAN,
-  ANIMALS, BASE_IDS, APEX_IDS, DINO_IDS, LEGENDARY_IDS, MYTHICAL_IDS, EGYPTIAN_IDS, STARTER_BASE_IDS,
+  STAGE_BASE, STAGE_APEX, STAGE_DINO, STAGE_LEGENDARY, STAGE_MYTHICAL, STAGE_EGYPTIAN, STAGE_KNIGHTS,
+  ANIMALS, BASE_IDS, APEX_IDS, DINO_IDS, LEGENDARY_IDS, MYTHICAL_IDS, EGYPTIAN_IDS, KNIGHT_IDS, STARTER_BASE_IDS,
 } from '../data/animals.js';
 import { LEVEL_REWARDS } from '../data/levels.js';
 import { state, MONETIZE_PLACEHOLDER } from './state.js';
 import { localDateString, localYesterdayString, EMPTY_STAT_BOOST } from './utils.js';
 
 function canAccessStage(progress, stage) {
-  const a = progress.stageAccess || { base: true, apex: true, dinosaur: true, legendary: true, mythical: true, egyptian: true };
+  const a = progress.stageAccess || { base: true, apex: true, dinosaur: true, legendary: true, mythical: true, egyptian: true, knights: true };
   if (stage === STAGE_BASE) return a.base !== false && MONETIZE_PLACEHOLDER.fullBaseStageOwned;
   if (stage === STAGE_APEX) return a.apex !== false && MONETIZE_PLACEHOLDER.apexStageOwned;
   if (stage === STAGE_DINO) return a.dinosaur !== false && MONETIZE_PLACEHOLDER.dinosaurStageOwned;
   if (stage === STAGE_LEGENDARY) return a.legendary !== false && MONETIZE_PLACEHOLDER.legendaryStageOwned;
   if (stage === STAGE_MYTHICAL) return a.mythical !== false && MONETIZE_PLACEHOLDER.mythicalStageOwned;
   if (stage === STAGE_EGYPTIAN) return a.egyptian !== false && MONETIZE_PLACEHOLDER.egyptianStageOwned;
+  if (stage === STAGE_KNIGHTS) return a.knights !== false && MONETIZE_PLACEHOLDER.knightsStageOwned;
   return true;
 }
 
@@ -50,9 +51,18 @@ function countEgyptianUnlocked(progress) {
   return EGYPTIAN_IDS.filter(id => progress.quizUnlocked.includes(id)).length;
 }
 
+function countKnightsUnlocked(progress) {
+  return KNIGHT_IDS.filter(id => progress.quizUnlocked.includes(id)).length;
+}
+
 /** All Mythical God quizzes cleared — Egyptian Guardian quizzes open. */
 function egyptianTierQuizOpen(progress) {
   return countMythicalUnlocked(progress) >= MYTHICAL_IDS.length;
+}
+
+/** All Egyptian Guardian quizzes cleared — Knights of the Realm quizzes open. */
+function knightTierQuizOpen(progress) {
+  return countEgyptianUnlocked(progress) >= EGYPTIAN_IDS.length;
 }
 
 /** Beat level 5 (campaign level 6+) → apex quizzes open. */
@@ -76,6 +86,7 @@ function mythicalLevelGateMet(progress) {
 }
 
 function getPlayerStageLabel(progress) {
+  if (knightTierQuizOpen(progress) && countKnightsUnlocked(progress) > 0) return 'Knights of the Realm';
   if (egyptianTierQuizOpen(progress) && countEgyptianUnlocked(progress) > 0) return 'Egyptian Guardians';
   if (mythicalLevelGateMet(progress) && countMythicalUnlocked(progress) > 0) return 'Mythical Gods';
   if (legendaryLevelGateMet(progress) && countLegendaryUnlocked(progress) > 0) return 'Legendary Beasts';
@@ -122,7 +133,12 @@ function getNextEgyptianAnimalId(progress) {
   return EGYPTIAN_IDS.find(id => !progress.quizUnlocked.includes(id)) || null;
 }
 
-const MAX_LEVEL = 25;
+function getNextKnightAnimalId(progress) {
+  if (!knightTierQuizOpen(progress)) return null;
+  return KNIGHT_IDS.find(id => !progress.quizUnlocked.includes(id)) || null;
+}
+
+const MAX_LEVEL = 30;
 
 /** One-line hints for hub / battle overlay (short, kid-friendly). */
 function getProgressionNextLines(progress) {
@@ -163,6 +179,11 @@ function getProgressionNextLines(progress) {
   } else if (getNextEgyptianAnimalId(p)) {
     const id = getNextEgyptianAnimalId(p);
     lines.push(`<strong>⚱️ Egyptian Guardians Unlocked!</strong> Pass the <strong>${ANIMALS[id].name}</strong> quiz in the Forge.`);
+  } else if (!knightTierQuizOpen(p)) {
+    lines.push(`<strong>🛡️ Almost there:</strong> Recruit every <strong>Egyptian Guardian</strong> to unlock <strong>Knights of the Realm</strong>.`);
+  } else if (getNextKnightAnimalId(p)) {
+    const id = getNextKnightAnimalId(p);
+    lines.push(`<strong>🛡️ Knights of the Realm Unlocked!</strong> Pass the <strong>${ANIMALS[id].name}</strong> quiz in the Forge.`);
   } else {
     lines.push(`<strong>You cleared the full roster!</strong> Push levels, coins, and leaderboard rank.`);
   }
@@ -190,6 +211,9 @@ function getAvailableAnimals(progress) {
     if (a.stage === STAGE_EGYPTIAN) {
       return canAccessStage(progress, STAGE_EGYPTIAN) && egyptianTierQuizOpen(progress) && progress.quizUnlocked.includes(id);
     }
+    if (a.stage === STAGE_KNIGHTS) {
+      return canAccessStage(progress, STAGE_KNIGHTS) && knightTierQuizOpen(progress) && progress.quizUnlocked.includes(id);
+    }
     return false;
   });
 }
@@ -203,6 +227,7 @@ function isQuizEligible(id, progress) {
   if (a.stage === STAGE_LEGENDARY) return canAccessStage(progress, STAGE_LEGENDARY) && legendaryLevelGateMet(progress);
   if (a.stage === STAGE_MYTHICAL) return canAccessStage(progress, STAGE_MYTHICAL) && mythicalLevelGateMet(progress);
   if (a.stage === STAGE_EGYPTIAN) return canAccessStage(progress, STAGE_EGYPTIAN) && egyptianTierQuizOpen(progress);
+  if (a.stage === STAGE_KNIGHTS) return canAccessStage(progress, STAGE_KNIGHTS) && knightTierQuizOpen(progress);
   return false;
 }
 
@@ -213,6 +238,7 @@ function isLevelLocked(id, progress) {
   if (a.stage === STAGE_LEGENDARY) return progress.level < 13;
   if (a.stage === STAGE_MYTHICAL) return progress.level < 17;
   if (a.stage === STAGE_EGYPTIAN) return !egyptianTierQuizOpen(progress);
+  if (a.stage === STAGE_KNIGHTS) return !knightTierQuizOpen(progress);
   return false;
 }
 
@@ -253,11 +279,18 @@ function unlockGateLinesForAnimal(id, progress) {
       { ok: progress.quizUnlocked.includes(id), text: 'Pass Egyptian quiz' },
     ];
   }
+  if (a.stage === STAGE_KNIGHTS) {
+    return [
+      { ok: knightTierQuizOpen(progress), text: 'Recruit every Egyptian Guardian (quizzes)' },
+      { ok: progress.quizUnlocked.includes(id), text: 'Pass Knight quiz' },
+    ];
+  }
   return null;
 }
 
 function quizUiTierType(animalId) {
   const stage = ANIMALS[animalId]?.stage;
+  if (stage === STAGE_KNIGHTS) return 'knights';
   if (stage === STAGE_EGYPTIAN) return 'egyptian';
   if (stage === STAGE_MYTHICAL) return 'mythical';
   if (stage === STAGE_LEGENDARY) return 'legendary';
@@ -375,6 +408,9 @@ function getSoftMonetisationHintLines(progress) {
   if (!MONETIZE_PLACEHOLDER.egyptianStageOwned && egyptianTierQuizOpen(progress) && countEgyptianUnlocked(progress) < EGYPTIAN_IDS.length) {
     lines.push('<span class="soft-gate-pill">Unlock Egyptian</span> Or earn each guardian with <strong>Egyptian quizzes</strong>.');
   }
+  if (!MONETIZE_PLACEHOLDER.knightsStageOwned && knightTierQuizOpen(progress) && countKnightsUnlocked(progress) < KNIGHT_IDS.length) {
+    lines.push('<span class="soft-gate-pill">Unlock Knights</span> Or earn each knight with <strong>Knights quizzes</strong>.');
+  }
   return lines;
 }
 
@@ -391,7 +427,9 @@ export {
   countLegendaryUnlocked,
   countMythicalUnlocked,
   countEgyptianUnlocked,
+  countKnightsUnlocked,
   egyptianTierQuizOpen,
+  knightTierQuizOpen,
   apexLevelGateMet,
   dinoLevelGateMet,
   legendaryLevelGateMet,
@@ -405,6 +443,7 @@ export {
   getNextLegendaryAnimalId,
   getNextMythicalAnimalId,
   getNextEgyptianAnimalId,
+  getNextKnightAnimalId,
   getProgressionNextLines,
   getAvailableAnimals,
   isQuizEligible,

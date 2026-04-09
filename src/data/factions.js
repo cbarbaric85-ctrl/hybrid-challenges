@@ -7,8 +7,9 @@ import { mythicalLevelGateMet } from '../game/progression.js';
 
 export const FACTION_EGYPTIAN = 'egyptian_guardians';
 export const FACTION_VIKING = 'viking_raiders';
+export const FACTION_KNIGHTS = 'knights';
 
-export const FACTION_ORDER = [FACTION_EGYPTIAN, FACTION_VIKING];
+export const FACTION_ORDER = [FACTION_EGYPTIAN, FACTION_VIKING, FACTION_KNIGHTS];
 
 export const FACTIONS = {
   [FACTION_EGYPTIAN]: {
@@ -43,6 +44,23 @@ export const FACTIONS = {
       accent: 'red-ice',
       glow: 'rgba(255, 60, 60, 0.22)',
       accent2: 'rgba(120, 200, 255, 0.3)',
+    },
+  },
+  [FACTION_KNIGHTS]: {
+    id: FACTION_KNIGHTS,
+    name: 'Knights of the Realm',
+    shortName: 'Knights',
+    description: 'Honour-bound warriors who defend, endure, and outlast their enemies.',
+    icon: '🏰',
+    passiveBonus: {
+      enemyTotalShave: 1,
+      lateRoundFromIndex: 3,
+      lateRoundBonus: 1,
+    },
+    visualTheme: {
+      accent: 'silver-blue',
+      glow: 'rgba(180, 200, 230, 0.28)',
+      accent2: 'rgba(61, 120, 200, 0.35)',
     },
   },
 };
@@ -87,7 +105,63 @@ export function getFactionRoundBonus(ctx) {
     }
   }
 
+  if (factionId === FACTION_KNIGHTS) {
+    const lateFromK = FACTIONS[FACTION_KNIGHTS].passiveBonus.lateRoundFromIndex;
+    if (roundIdx >= lateFromK) {
+      bonus += 1;
+      messages.push('🛡️ Knight endurance — you hold the line!');
+    }
+  }
+
   return { bonus, messages };
+}
+
+/**
+ * Knights faction: shave enemy effective total each round (extra once if Paladin in hybrid).
+ * Recompute winner; message when resilience flips an enemy win.
+ */
+export function applyKnightFactionResilience(round, factionId, battleState, animalIds = []) {
+  if (factionId !== FACTION_KNIGHTS || !round) return round;
+  const shaveBase = FACTIONS[FACTION_KNIGHTS].passiveBonus.enemyTotalShave || 1;
+  let shave = shaveBase;
+  if (animalIds.includes('paladin_guardian') && battleState && !battleState.knightPaladinShaveUsed) {
+    shave += 1;
+    battleState.knightPaladinShaveUsed = true;
+  }
+  const origWinner = round.winner;
+  const eTotalAdj = Math.max(round.eBase, round.eTotal - shave);
+  const eRollAdj = eTotalAdj - round.eBase;
+  let newWinner = origWinner;
+  if (round.pTotal > eTotalAdj) newWinner = 'player';
+  else if (round.pTotal < eTotalAdj) newWinner = 'enemy';
+  else newWinner = 'tie';
+
+  const messages = [...(round.factionMessages || [])];
+  if (origWinner === 'enemy' && newWinner !== 'enemy') {
+    messages.push('🛡️ Knight resilience reduces damage!');
+  }
+
+  return {
+    ...round,
+    eTotal: eTotalAdj,
+    eRoll: eRollAdj,
+    winner: newWinner,
+    factionMessages: messages,
+  };
+}
+
+/** Shield Knight: once per battle, turn one enemy round win into a tie. */
+export function tryKnightBlockStance(round, battleState, animalIds = []) {
+  if (round.winner !== 'enemy') return round;
+  if (!animalIds.includes('shield_knight')) return round;
+  if (battleState.knightBlockStanceUsed) return round;
+  battleState.knightBlockStanceUsed = true;
+  return {
+    ...round,
+    winner: 'tie',
+    pTotal: round.eTotal,
+    factionMessages: [...(round.factionMessages || []), '🪖 Block Stance — shield turns the blow!'],
+  };
 }
 
 /**

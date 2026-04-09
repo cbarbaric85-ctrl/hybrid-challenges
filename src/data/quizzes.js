@@ -681,6 +681,87 @@ export const QUIZZES = {
       { q: 'Solar disks in art hint that Ra brought…', opts: ['Darkness forever', 'Light, order, and life energy', 'Only shadows', 'Nothing'], correct: 1, fact: 'Light wasn’t just nice — it was the fuel of ma’at (balance).' },
     ],
   },
+
+  paladin_guardian: {
+    intro: 'Paladin Guardian — blessed shield, steady heart.',
+    questions: [
+      { q: 'What did knights often wear to protect their bodies in battle?', opts: ['Paper hats only', 'Metal armour', 'Just socks', 'Raincoats made of leaves'], correct: 1, fact: 'Plate and mail spread force so blades and arrows glanced instead of biting deep.' },
+      { q: 'A paladin in stories is usually known for…', opts: ['Ignoring rules', 'Protecting others and keeping a strong code', 'Only sleeping', 'Hiding from danger'], correct: 1, fact: '“Paladin” became a fantasy word for a champion who stands for what’s right.' },
+      { q: 'Shields in real history helped knights…', opts: ['Carry snacks only', 'Block strikes and cover teammates', 'Fly', 'Cook soup'], correct: 1, fact: 'Good shield work turns a scary swing into a loud clang instead of a hit.' },
+    ],
+  },
+  shield_knight: {
+    intro: 'Shield Knight — the wall that walks.',
+    questions: [
+      { q: 'A kite shield is shaped to…', opts: ['Hold pizza', 'Cover legs while on horseback', 'Store water', 'Glow in the dark'], correct: 1, fact: 'Tall shields guarded a rider’s side from spears and arrows at the gallop.' },
+      { q: 'Shield bosses (the round bump in the middle) sometimes helped…', opts: ['Ricochet blows sideways', 'Hold a candle', 'Play music', 'Grow plants'], correct: 0, fact: 'A curved boss could steer a weapon offline so it slid past the holder.' },
+      { q: 'Training with a shield taught knights to…', opts: ['Only dance', 'Move feet and shield together as one guard', 'Ignore teamwork', 'Never look up'], correct: 1, fact: 'Footwork + shield angle = you become a moving fortress.' },
+    ],
+  },
+  swordmaster: {
+    intro: 'Swordmaster — where steel meets timing.',
+    questions: [
+      { q: 'What weapon are knights most famous for in stories?', opts: ['A spoon', 'A sword', 'A rubber duck', 'A pillow'], correct: 1, fact: 'Swords were sidearms of status — skill mattered as much as the shiny blade.' },
+      { q: 'A “parry” in fencing means…', opts: ['Taking a nap', 'Turning an enemy blade aside', 'Dropping the sword', 'Singing'], correct: 1, fact: 'Small angles save energy — you guide danger away instead of catching it.' },
+      { q: 'Medieval sword practice often started with…', opts: ['Wooden weapons and slow drills', 'Instant dragon fights', 'Swimming only', 'Juggling only'], correct: 0, fact: 'Coaches used wasters (wooden swords) so students learned rhythm without ER trips.' },
+    ],
+  },
+  royal_champion: {
+    intro: 'Royal Champion — the crown’s chosen fighter.',
+    questions: [
+      { q: 'A royal champion sometimes fought to…', opts: ['Decide a dispute in a formal duel', 'Sell ice cream', 'Hide treasure', 'Paint clouds'], correct: 0, fact: 'Trials by combat were rare and brutal — but stories love the drama.' },
+      { q: 'Heraldry (coats of arms) helped knights…', opts: ['Be spotted friend-or-foe across a battlefield', 'Count to three only', 'Cook faster', 'Sleep better'], correct: 0, fact: 'Bright symbols on shield and surcoat were medieval name-tags.' },
+      { q: 'A champion who serves the king still had to follow…', opts: ['Only their cat', 'Laws and oaths of the realm', 'Random dice', 'Bird songs'], correct: 1, fact: 'Even stars answer to rules — stories teach that power needs responsibility.' },
+    ],
+  },
+  iron_defender: {
+    intro: 'Iron Defender — plate, rivet, resolve.',
+    questions: [
+      { q: 'Full plate armour was heavy, but well-fitted knights could still…', opts: ['Only stand still', 'Move, mount horses, and fight', 'Float upward', 'Turn invisible'], correct: 1, fact: 'Armour spread weight across the body — movies exaggerate the “tin can” stiffness.' },
+      { q: 'Chainmail is made of…', opts: ['Plastic bubbles', 'Thousands of linked metal rings', 'Cotton candy', 'Glass'], correct: 1, fact: 'Rings caught slashes; plate later added hard shells for smash hits.' },
+      { q: 'A castle gate was defended because…', opts: ['It was pretty', 'It was the easiest path for attackers to rush through', 'Birds liked it', 'It rained less there'], correct: 1, fact: 'Hold the door — if the gate holds, the story changes.' },
+    ],
+  },
+  templar_knight: {
+    intro: 'Templar Knight — oath, order, iron discipline.',
+    questions: [
+      { q: 'Knightly orders often lived by…', opts: ['No rules ever', 'Written rules and shared rituals', 'Only jokes', 'Random maps'], correct: 1, fact: 'Rules kept warriors united — like a team playbook carved in stone.' },
+      { q: 'A red cross on a white cloak in stories often marks…', opts: ['A pirate', 'A crusader-knight emblem', 'A baker', 'A fish'], correct: 1, fact: 'Real history is complicated; in games the look signals “holy knight squad.”' },
+      { q: 'Discipline for knights included caring for…', opts: ['Only swords', 'Horses, gear, and fellow soldiers', 'Only dessert', 'Clouds'], correct: 1, fact: 'War horses were elite athletes — brushing, feeding, and training mattered.' },
+    ],
+  },
+  lance_cavalier: {
+    intro: 'Lance Cavalier — thunder at the tilt.',
+    questions: [
+      { q: 'A lance in a joust was built to…', opts: ['Spread paint', 'Hit hard but often shatter safely', 'Cook food', 'Measure rain'], correct: 1, fact: 'Splintering lances dumped energy so riders survived dramatic hits.' },
+      { q: 'Why charge in a straight line at a tournament?', opts: ['It is random', 'Fair lanes let judges see a clean hit', 'To confuse birds', 'To hide'], correct: 1, fact: 'Lists (fenced lanes) kept horses parallel — sport with serious horsepower.' },
+      { q: 'Cavaliers relied on horses for…', opts: ['Decoration only', 'Speed and height in battle', 'Swimming', 'Typing'], correct: 1, fact: 'A mounted knight leveraged mass — physics with hooves.' },
+    ],
+  },
+  castle_guardian: {
+    intro: 'Castle Guardian — stone, sentry, story.',
+    questions: [
+      { q: 'Castle walls were thick partly to…', opts: ['Block Wi‑Fi', 'Stop siege weapons and ladders', 'Hold jelly', 'Catch butterflies'], correct: 1, fact: 'Depth absorbs hits — thin walls crumble; thick walls buy time.' },
+      { q: 'A portcullis is…', opts: ['A type of fish', 'A heavy sliding gate that drops to seal an entrance', 'A hat', 'A song'], correct: 1, fact: 'Metal teeth crashing down turned a doorway into a trap.' },
+      { q: 'Guards walked battlements to…', opts: ['Watch for attackers from high ground', 'Count stars only', 'Skip school', 'Plant trees'], correct: 0, fact: 'Height = early warning — see trouble before it reaches the courtyard.' },
+    ],
+  },
+  holy_crusader: {
+    intro: 'Holy Crusader — banner high, mind sharp.',
+    questions: [
+      { q: 'Crusades are remembered today partly because…', opts: ['They never happened', 'They mixed religion, trade, and conflict across cultures', 'They were only about pizza', 'They invented phones'], correct: 1, fact: 'Historians study how ideas and armies moved — lots of lessons, few simple heroes.' },
+      { q: 'A pilgrim in medieval times might travel to…', opts: ['A holy site far from home', 'Only the backyard', 'The moon', 'A video game'], correct: 0, fact: 'Long journeys needed maps, money, and courage — real adventure logistics.' },
+      { q: 'Chivalry asked knights to protect…', opts: ['Only treasure chests', 'Weaker people in theory — the idea mattered in stories', 'Only dragons', 'Only spoons'], correct: 1, fact: 'Real knights were flawed humans; stories used chivalry to push kindness.' },
+    ],
+  },
+  dark_knight: {
+    intro: 'Dark Knight — when honour wears shadow.',
+    questions: [
+      { q: 'A “dark knight” in fiction often shows that…', opts: ['Heroes must be perfect', 'Heroes can be complicated and still choose good', 'Knights hated horses', 'Castles float'], correct: 1, fact: 'Shades-of-gray characters ask: what would you do when it is hard?' },
+      { q: 'Black armour in stories can symbolize…', opts: ['Only fashion', 'Mystery, fear, or a loner path', 'Happy clowns', 'Dessert'], correct: 1, fact: 'Color shorthand helps readers feel mood before a wordy speech.' },
+      { q: 'Even a grim knight might still keep…', opts: ['A personal code they refuse to break', 'Only bubble gum', 'Zero skills', 'A pet rock only'], correct: 0, fact: 'Codes create drama — breaking them hurts because they meant something.' },
+    ],
+  },
 };
 
 /** Surprising fact MCQs — one pool per roster animal; boostStat tags which stat gets +1 when correct. */

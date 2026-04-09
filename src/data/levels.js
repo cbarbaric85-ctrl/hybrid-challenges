@@ -25,6 +25,11 @@ export const LEVEL_REWARDS = {
   23: null,
   24: null,
   25: null,
+  26: null,
+  27: null,
+  28: null,
+  29: null,
+  30: null,
 };
 
 export const LEVELS = [
@@ -59,5 +64,12 @@ export const LEVELS = [
   {id:22, name:'Scarab March',        desc:'Scarabs, tombs, and stone sentinels rise from the heat.',      animals:['scarab_warrior','tomb_defender','obelisk_titan'], diceBonus:3,useMax:true, isHard:true, arena:'desert'},
   {id:23, name:'Falcon’s Crown',      desc:'Horus circles above; Ra’s light blinds the slow.',            animals:['horus_champion','ra_avenger','anubis_guardian'], diceBonus:4,useMax:true, isHard:true, arena:'desert'},
   {id:24, name:'Throne of Kemet',     desc:'The Pharaoh’s court marches — every grain obeys.',            animals:['pharaoh_king','sun_priest','scarab_warrior'], diceBonus:4,useMax:true, isHard:true, arena:'desert'},
-  {id:25, name:'DUAT OVERLORD',       desc:'The jackal and the crown — final trial of the guardians.',     animals:['pharaoh_king','anubis_guardian'], diceBonus:5,useMax:true, isHard:true, isBoss:true, isFinal:true, arena:'desert', bossTitle:'👑 DUAT OVERLORD', bossTagline:'The sands part for the living god.', bossAbility:{name:'Royal Decree',emoji:'👑',stat:'int',bonus:3}},
+  {id:25, name:'DUAT OVERLORD',       desc:'The jackal and the crown — final trial of the guardians.',     animals:['pharaoh_king','anubis_guardian'], diceBonus:5,useMax:true, isHard:true, isBoss:true, isFinal:false, arena:'desert', bossTitle:'👑 DUAT OVERLORD', bossTagline:'The sands part for the living god.', bossAbility:{name:'Royal Decree',emoji:'👑',stat:'int',bonus:3}},
+
+  // ── KNIGHTS / MEDIEVAL ORDER ARC (Levels 26–30) ──
+  {id:26, name:'Curtain Wall',        desc:'Stone rises — knights drill for the long siege.',              animals:['iron_defender','castle_guardian','shield_knight'], diceBonus:3,useMax:true, isHard:true, arena:'castle'},
+  {id:27, name:'Tourney Grounds',     desc:'Lances levelled — honour meets steel in the lists.',           animals:['lance_cavalier','swordmaster','royal_champion'], diceBonus:3,useMax:true, isHard:true, arena:'castle'},
+  {id:28, name:'Sanctified Vanguard', desc:'Templars and paladins — oaths echo off the bailey.',          animals:['templar_knight','paladin_guardian','holy_crusader'], diceBonus:4,useMax:true, isHard:true, arena:'castle'},
+  {id:29, name:'Shadow of the Keep',  desc:'Even heroes cast long shadows — the dark knight rides.',       animals:['dark_knight','swordmaster','iron_defender'], diceBonus:4,useMax:true, isHard:true, arena:'castle'},
+  {id:30, name:'KING’S CHAMPION',     desc:'The realm’s last line — crown steel against your name.',       animals:['kings_champion','royal_champion','paladin_guardian'], diceBonus:5,useMax:true, isHard:true, isBoss:true, isFinal:true, arena:'castle', bossTitle:'👑 KING’S CHAMPION — DEFENDER OF THE REALM', bossTagline:'Bow or break — the throne does not yield.', bossAbility:{name:'Royal Endurance',emoji:'🛡️',stat:'str',bonus:3}},
 ];

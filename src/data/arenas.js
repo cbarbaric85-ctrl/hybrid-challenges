@@ -60,6 +60,14 @@ export const ARENAS = {
     statMods: { spd: -1, agi: 1, int: 1, str: 0 },
     cssClass: 'arena-desert',
   },
+  castle: {
+    id: 'castle',
+    name: 'Castle Arena',
+    emoji: '🏰',
+    banner: '🏰 Castle Arena favours strength and defence!',
+    statMods: { spd: -1, agi: 0, int: 0, str: 1 },
+    cssClass: 'arena-castle',
+  },
 };
 
 export function getArena(arenaId) {

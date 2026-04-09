@@ -7,9 +7,11 @@ export const STAGE_LEGENDARY = 'legendary';
 export const STAGE_MYTHICAL = 'mythical';
 /** Egyptian Guardians — unlock roster after all Mythical God quizzes; missions from Level 21+. */
 export const STAGE_EGYPTIAN = 'egyptian';
+/** Knights / Medieval Order — unlock roster after all Egyptian Guardian quizzes; missions from Level 26+. */
+export const STAGE_KNIGHTS = 'knights';
 
 export const STAGE_RANK = {
-  [STAGE_BASE]: 1, [STAGE_APEX]: 2, [STAGE_DINO]: 3, [STAGE_LEGENDARY]: 4, [STAGE_MYTHICAL]: 5, [STAGE_EGYPTIAN]: 6,
+  [STAGE_BASE]: 1, [STAGE_APEX]: 2, [STAGE_DINO]: 3, [STAGE_LEGENDARY]: 4, [STAGE_MYTHICAL]: 5, [STAGE_EGYPTIAN]: 6, [STAGE_KNIGHTS]: 7,
 };
 
 /**
@@ -155,6 +157,65 @@ export const TIER_REGISTRY = {
       },
     },
   },
+  knights: {
+    label: 'Knights of the Realm',
+    stage: STAGE_KNIGHTS,
+    intro: 'Honour-bound defenders — steel, stone, and unbroken will.',
+    animals: {
+      paladin_guardian: {
+        id: 'paladin_guardian', name: 'Paladin Guardian', icon: '🛡️', emoji: '🛡️', spd: 15, agi: 17, int: 18, str: 23, stage: STAGE_KNIGHTS,
+        bio: 'Blessed aegis — Holy Shield dulls the first crushing blow of the battle.',
+      },
+      shield_knight: {
+        id: 'shield_knight', name: 'Shield Knight', icon: '🪖', emoji: '🪖', spd: 14, agi: 16, int: 17, str: 22, stage: STAGE_KNIGHTS,
+        bio: 'Tower shield raised — Block Stance may turn one lost clash into a stalemate.',
+      },
+      swordmaster: {
+        id: 'swordmaster', name: 'Swordmaster', icon: '⚔️', emoji: '⚔️', spd: 16, agi: 20, int: 18, str: 21, stage: STAGE_KNIGHTS,
+        bio: 'Blade ballet — precision cuts where armour thins.',
+        battleAbility: { type: 'stat_bonus', stat: 'agi', amount: 1, flash: '⚔️ Swordmaster finds the gap!' },
+      },
+      royal_champion: {
+        id: 'royal_champion', name: 'Royal Champion', icon: '👑', emoji: '👑', spd: 15, agi: 18, int: 19, str: 22, stage: STAGE_KNIGHTS,
+        bio: 'Crown on the field — Inspire rallies every stat one decisive round.',
+        battleAbility: { type: 'inspire_round', roundIndex: 2, amount: 1, flash: '👑 Royal Inspire — the line holds!' },
+      },
+      iron_defender: {
+        id: 'iron_defender', name: 'Iron Defender', icon: '🔩', emoji: '🔩', spd: 13, agi: 16, int: 16, str: 24, stage: STAGE_KNIGHTS,
+        bio: 'Full plate, iron nerve — nothing yields.',
+        battleAbility: { type: 'stat_bonus', stat: 'str', amount: 1, flash: '🔩 Iron wall — no quarter!' },
+      },
+      templar_knight: {
+        id: 'templar_knight', name: 'Templar Knight', icon: '✝️', emoji: '✝️', spd: 15, agi: 18, int: 19, str: 21, stage: STAGE_KNIGHTS,
+        bio: 'Oath and order — discipline beats chaos.',
+        battleAbility: { type: 'stat_pair_bonus', stats: ['str', 'int'], amount: 1, flash: '✝️ Templar focus!' },
+      },
+      lance_cavalier: {
+        id: 'lance_cavalier', name: 'Lance Cavalier', icon: '🐴', emoji: '🐴', spd: 17, agi: 19, int: 16, str: 21, stage: STAGE_KNIGHTS,
+        bio: 'Thunder charge — the lists remember his name.',
+        battleAbility: { type: 'stat_bonus', stat: 'spd', amount: 1, flash: '🐴 Lance charges — speed strikes!' },
+      },
+      castle_guardian: {
+        id: 'castle_guardian', name: 'Castle Guardian', icon: '🏰', emoji: '🏰', spd: 14, agi: 17, int: 18, str: 23, stage: STAGE_KNIGHTS,
+        bio: 'Gate and battlement given legs — the keep never sleeps.',
+        battleAbility: { type: 'stat_bonus', stat: 'str', amount: 1, flash: '🏰 Castle ward stands firm!' },
+      },
+      holy_crusader: {
+        id: 'holy_crusader', name: 'Holy Crusader', icon: '✨', emoji: '✨', spd: 15, agi: 17, int: 20, str: 21, stage: STAGE_KNIGHTS,
+        bio: 'Banner high — faith sharpens the mind in the fray.',
+        battleAbility: { type: 'stat_bonus', stat: 'int', amount: 1, flash: '✨ Holy clarity!' },
+      },
+      dark_knight: {
+        id: 'dark_knight', name: 'Dark Knight', icon: '🖤', emoji: '🖤', spd: 16, agi: 18, int: 19, str: 22, stage: STAGE_KNIGHTS,
+        bio: 'When the cause seems lost, the shadow armours up.',
+        battleAbility: { type: 'last_stand', minEnemyWins: 2, stat: 'str', amount: 1, flash: '🖤 Last Stand — darkness answers!' },
+      },
+      kings_champion: {
+        id: 'kings_champion', name: 'King’s Champion', icon: '⚜️', emoji: '⚜️', spd: 16, agi: 18, int: 20, str: 25, stage: STAGE_KNIGHTS,
+        bio: 'The realm’s chosen — final wall before the crown.',
+      },
+    },
+  },
 };
 
 /** Flat animal lookup derived from TIER_REGISTRY — backward-compatible. */
@@ -187,6 +248,9 @@ export const SYLLABLES = {
   anubis_guardian:'AnbG', pharaoh_king:'Phar', sun_priest:'SunP', scarab_warrior:'Scar',
   sandstorm_sentinel:'Sand', horus_champion:'Horu', obelisk_titan:'Obel', tomb_defender:'Tomb',
   desert_spirit:'Dsp', ra_avenger:'RaAv',
+  paladin_guardian:'PalG', shield_knight:'Shld', swordmaster:'Swrd', royal_champion:'RoyC',
+  iron_defender:'Iron', templar_knight:'Temp', lance_cavalier:'Lanc', castle_guardian:'Cast',
+  holy_crusader:'Crus', dark_knight:'DrkK', kings_champion:'KingC',
   cat:'Kat', dog:'Dog', elephant:'Elph', hippo:'Hip', hyena:'Hyen', panther:'Pan',
 };
 
@@ -196,5 +260,8 @@ export const DINO_IDS = Object.keys(TIER_REGISTRY.dino.animals);
 export const LEGENDARY_IDS = Object.keys(TIER_REGISTRY.legendary.animals);
 export const MYTHICAL_IDS = Object.keys(TIER_REGISTRY.mythical.animals);
 export const EGYPTIAN_IDS = Object.keys(TIER_REGISTRY.egyptian.animals);
+
+/** Recruitable knights (excludes boss-only King’s Champion). */
+export const KNIGHT_IDS = Object.keys(TIER_REGISTRY.knights.animals).filter(id => id !== 'kings_champion');
 
 export const STARTER_BASE_IDS = ['wolf', 'bear', 'eagle'];

@@ -1,12 +1,14 @@
 import {
   STAT_MAX, ANIMALS, ALL_ANIMALS,
-  BASE_IDS, APEX_IDS, DINO_IDS, LEGENDARY_IDS, MYTHICAL_IDS, EGYPTIAN_IDS,
+  BASE_IDS, APEX_IDS, DINO_IDS, LEGENDARY_IDS, MYTHICAL_IDS, EGYPTIAN_IDS, KNIGHT_IDS,
 } from '../data/animals.js';
 import { LEVEL_REWARDS, LEVELS } from '../data/levels.js';
 import { getArena } from '../data/arenas.js';
 import { rollWeather } from '../data/weather.js';
 import { getClashQuestion } from '../data/clash-quiz.js';
-import { getFactionRoundBonus, trySanctuaryRevive } from '../data/factions.js';
+import {
+  getFactionRoundBonus, trySanctuaryRevive, applyKnightFactionResilience, tryKnightBlockStance,
+} from '../data/factions.js';
 import {
   state,
   XP_PER_BATTLE_WIN,
@@ -21,7 +23,7 @@ import {
   countBaseUnlocked, countApexUnlocked, countDinoUnlocked,
   isLevelLocked, getPlayerStageLabel,
   BASE_UNLOCK_LEVEL, getStreakBattleBoost,
-  pickDailyChallenge, getProgressionNextLines, egyptianTierQuizOpen,
+  pickDailyChallenge, getProgressionNextLines, egyptianTierQuizOpen, knightTierQuizOpen,
 } from '../game/progression.js';
 import {
   powerScore, hybridTierClass, buildPlayerHybrid, buildEnemyHybrid,
@@ -44,7 +46,7 @@ import { syncLeaderboardEntry } from '../persistence/leaderboard.js';
 import { showScreen, escapeHtml } from './screens.js';
 import { localDateString } from '../game/utils.js';
 
-const ARENA_CLASSES = ['arena-ocean','arena-jungle','arena-sky','arena-volcanic','arena-underworld','arena-celestial','arena-desert'];
+const ARENA_CLASSES = ['arena-ocean','arena-jungle','arena-sky','arena-volcanic','arena-underworld','arena-celestial','arena-desert','arena-castle'];
 
 let _factionHintTimer = null;
 function showFactionBattleHints(messages) {
@@ -436,13 +438,19 @@ function playInteractiveRound(roundIdx) {
         roundIdx,
         playerLostLastRound: !!b.playerLostLastRound,
       });
-      const hyb = hybridAbilityRoundBonus(state.playerHybrid, stat, !!b.playerLostLastRound);
+      const hyb = hybridAbilityRoundBonus(state.playerHybrid, stat, !!b.playerLostLastRound, {
+        roundIdx,
+        interactiveEWins: b.interactiveEWins,
+        interactivePWins: b.interactivePWins,
+      });
       let round = resolveRound(b.pFighter, b.eFighter, stat, quizPts + fBonus + hyb.bonus);
       round.factionMessages = [...fMsgs, ...hyb.messages];
+      round = applyKnightFactionResilience(round, fid, b, state.playerHybrid?.animals || []);
       round = trySanctuaryRevive(round, b, {
         factionId: fid,
         animalIds: state.playerHybrid?.animals || [],
       });
+      round = tryKnightBlockStance(round, b, state.playerHybrid?.animals || []);
       b.roundResults.push(round);
       if (round.winner === 'player') b.interactivePWins++;
       else if (round.winner === 'enemy') b.interactiveEWins++;
@@ -1239,6 +1247,8 @@ function beginBattle() {
   b.interactivePWins = 0;
   b.interactiveEWins = 0;
   b.sanctuaryReviveUsed = false;
+  b.knightPaladinShaveUsed = false;
+  b.knightBlockStanceUsed = false;
   b.playerLostLastRound = false;
 
   const doCountdownAndFight = () => {
@@ -1439,6 +1449,7 @@ async function showLevelComplete() {
   const isLegendaryUnlock = currentLevel === 12;
   const isMythicalUnlock = currentLevel === 16;
   const isEgyptianArcHint = currentLevel === 20;
+  const isKnightsArcHint = currentLevel === 25;
   const isFinalLevel = currentLevel === LEVELS.length;
   const isBossLevel = LEVELS[currentLevel - 1]?.isBoss;
   const reward = LEVEL_REWARDS[currentLevel];
@@ -1577,6 +1588,30 @@ async function showLevelComplete() {
         <p style="font-size:.7rem;color:var(--text-dim);margin-top:10px;font-family:var(--fm)">Forge → ⚱️ Egyptian Guardians · Arena: Desert · Boss: Duat Overlord</p>`;
     } else {
       egyptBox.classList.add('hidden');
+    }
+  }
+
+  const knightBox = document.getElementById('knight-box');
+  if (knightBox) {
+    if (isKnightsArcHint) {
+      knightBox.classList.remove('hidden');
+      const gate = knightTierQuizOpen(p);
+      knightBox.innerHTML = `
+        <div class="knights-bonus-title">🛡️ Knights of the Realm Unlocked!</div>
+        <p style="font-size:.82rem;color:var(--text-dim);margin-bottom:10px">
+          ${gate
+            ? '<strong>All Egyptian Guardians recruited!</strong> Knight quizzes are live in the Forge — castle missions run from <strong>Level 26</strong> to <strong>30</strong>.'
+            : 'You cleared the Duat arc! Finish recruiting <strong>every Egyptian Guardian</strong> in the Forge to unlock <strong>Knights of the Realm</strong>, then march through Levels <strong>26–30</strong>.'}
+        </p>
+        <div class="apex-chips" style="gap:14px">
+          ${KNIGHT_IDS.map(id => {
+            const a = ANIMALS[id];
+            return `<div class="apex-chip"><span>${a.emoji}</span><span style="color:var(--knights)">${a.name}</span></div>`;
+          }).join('')}
+        </div>
+        <p style="font-size:.7rem;color:var(--text-dim);margin-top:10px;font-family:var(--fm)">Forge → 🛡️ Knights / Medieval Order · Arena: Castle · Boss: King’s Champion</p>`;
+    } else {
+      knightBox.classList.add('hidden');
     }
   }
 

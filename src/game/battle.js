@@ -224,8 +224,12 @@ function applyRoyalCommandBoost(fighter, hybrid) {
   return { ...fighter, stats, power: powerScore(stats) };
 }
 
-/** Per-round bonuses from Egyptian Guardian battleAbility hooks. */
-function hybridAbilityRoundBonus(hybrid, stat, playerLostLastRound) {
+/**
+ * Per-round bonuses from tier battleAbility hooks.
+ * @param {object} [battleCtx] roundIdx (0-based), interactiveEWins / interactivePWins for last_stand.
+ */
+function hybridAbilityRoundBonus(hybrid, stat, playerLostLastRound, battleCtx = {}) {
+  const { roundIdx = 0, interactiveEWins = 0, interactivePWins = 0 } = battleCtx;
   let bonus = 0;
   const messages = [];
   if (!hybrid?.animals) return { bonus, messages };
@@ -239,6 +243,16 @@ function hybridAbilityRoundBonus(hybrid, stat, playerLostLastRound) {
       bonus += ba.amount || 0;
       if (ba.flash) messages.push(ba.flash);
     } else if (ba.type === 'bonus_after_loss' && playerLostLastRound) {
+      bonus += ba.amount || 0;
+      if (ba.flash) messages.push(ba.flash);
+    } else if (ba.type === 'inspire_round' && roundIdx === ba.roundIndex) {
+      bonus += ba.amount || 0;
+      if (ba.flash) messages.push(ba.flash);
+    } else if (
+      ba.type === 'last_stand' &&
+      stat === ba.stat &&
+      interactiveEWins >= (ba.minEnemyWins ?? 2)
+    ) {
       bonus += ba.amount || 0;
       if (ba.flash) messages.push(ba.flash);
     }
