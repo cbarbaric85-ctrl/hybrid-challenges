@@ -243,7 +243,6 @@ function renderHub() {
   if (tokBtn) tokBtn.disabled = !tokCan;
 
   // Level banner
-  document.getElementById('hub-level-num').textContent = p.level > MAX_LEVEL ? '✓' : p.level;
   document.getElementById('hub-level-name').textContent = p.level > MAX_LEVEL ? 'Game Complete!' : `Level ${p.level} — ${level.name}`;
   document.getElementById('hub-level-desc').textContent = p.level > MAX_LEVEL ? 'You conquered all levels.' : level.desc;
 

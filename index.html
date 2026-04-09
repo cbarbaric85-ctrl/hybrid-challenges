@@ -195,7 +195,6 @@ body::before{
 .level-banner .btn-primary{font-size:1.05rem;padding:14px 28px}
 .level-banner{background:var(--surface);border:1px solid var(--border);padding:22px 26px;margin-bottom:20px;display:flex;align-items:center;gap:22px;position:relative;overflow:hidden}
 .level-banner::after{content:'';position:absolute;right:-30px;top:50%;transform:translateY(-50%);width:250px;height:250px;background:radial-gradient(circle,rgba(0,232,122,.05) 0%,transparent 70%);pointer-events:none}
-.lv-num{font-family:var(--fd);font-size:5rem;font-weight:700;line-height:1;color:var(--green);text-shadow:0 0 40px var(--green-g);flex-shrink:0;min-width:80px;text-align:center}
 .lv-info h2{font-family:var(--fd);font-size:1.4rem;font-weight:700;color:var(--text-bright);margin-bottom:3px}
 .lv-info p{color:var(--text-dim);font-size:.85rem;margin-bottom:12px}
 .lv-badge{display:inline-block;font-family:var(--fm);font-size:.6rem;letter-spacing:.15em;padding:3px 9px;margin-bottom:8px;margin-right:6px}
@@ -1029,9 +1028,7 @@ body::before{
   .vs-col{flex-direction:row;justify-content:center;padding:5px 0}
   .hub-grid{grid-template-columns:1fr}
   .hsb-seg{padding:8px 12px}
-  .lv-num{font-size:clamp(3rem,14vw,4.2rem);min-width:64px}
   .level-banner{flex-direction:column;align-items:stretch;text-align:center;padding:18px 16px}
-  .level-banner .lv-num{align-self:center}
   .hub-bar-row--nav .hub-bar-nav{width:100%;justify-content:stretch}
   .hub-bar-row--nav .hub-bar-nav .btn{flex:1;justify-content:center}
   .topbar-forge-hint{display:none}
@@ -1461,7 +1458,6 @@ body::before{
   <div class="hub-body hub-scroll">
     <p class="hub-cta-hint" id="hub-primary-hint">Your next step</p>
     <div class="level-banner" id="level-banner">
-      <div class="lv-num" id="hub-level-num">1</div>
       <div class="lv-info" style="flex:1;min-width:0">
         <div id="hub-badge-area"></div>
         <h2 id="hub-level-name">Level 1</h2>
