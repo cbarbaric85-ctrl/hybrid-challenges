@@ -514,6 +514,37 @@ body::before{
 .hub-dc-title{font-family:var(--fd);font-size:1rem;font-weight:700;color:var(--text-bright);margin-bottom:4px}
 .hub-dc-desc{font-family:var(--fb);font-size:.78rem;color:var(--text-dim);line-height:1.4;margin-bottom:8px}
 .hub-dc-status{font-family:var(--fm);font-size:.65rem;color:var(--green)}
+/* ── Action Panel ── */
+.hub-action-panel{margin-top:18px;margin-bottom:16px;padding:16px 14px 14px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;box-shadow:0 0 22px rgba(0,232,122,.04)}
+.hap-title{font-family:var(--fm);font-size:.58rem;letter-spacing:.22em;text-transform:uppercase;color:var(--text-dim);margin-bottom:12px;text-align:center}
+.hap-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.hap-btn{position:relative;display:flex;flex-direction:column;align-items:center;gap:2px;padding:14px 8px 12px;border-radius:8px;border:1px solid var(--border);background:rgba(0,0,0,.25);cursor:pointer;transition:transform .15s,box-shadow .25s,border-color .25s;text-align:center;-webkit-tap-highlight-color:transparent}
+.hap-btn:active{transform:scale(.96)}
+.hap-btn:disabled{opacity:.35;pointer-events:none;filter:grayscale(.6)}
+.hap-icon{font-size:1.35rem;line-height:1;margin-bottom:2px}
+.hap-label{font-family:var(--fd);font-size:.72rem;font-weight:700;line-height:1.2}
+.hap-sub{font-family:var(--fm);font-size:.52rem;color:var(--text-dim);line-height:1.3;margin-top:1px}
+.hap-rec-tag{position:absolute;top:-8px;left:50%;transform:translateX(-50%);font-family:var(--fm);font-size:.42rem;letter-spacing:.12em;text-transform:uppercase;padding:2px 8px;border-radius:10px;white-space:nowrap;z-index:1}
+.hap-rec-tag.hidden{display:none}
+/* Train – purple/blue */
+.hap-train{border-color:rgba(130,100,255,.35);color:#b89cff}
+.hap-train:hover:not(:disabled){box-shadow:0 0 18px rgba(130,100,255,.3);border-color:rgba(130,100,255,.6)}
+.hap-train .hap-rec-tag{background:rgba(130,100,255,.85);color:#fff}
+/* Unlock – gold/orange */
+.hap-unlock{border-color:rgba(255,180,40,.35);color:#ffc355}
+.hap-unlock:hover:not(:disabled){box-shadow:0 0 18px rgba(255,180,40,.3);border-color:rgba(255,180,40,.6)}
+.hap-unlock .hap-rec-tag{background:rgba(255,160,20,.85);color:#000}
+/* Improve – green */
+.hap-improve{border-color:rgba(0,232,122,.3);color:var(--green)}
+.hap-improve:hover:not(:disabled){box-shadow:0 0 18px rgba(0,232,122,.3);border-color:rgba(0,232,122,.55)}
+.hap-improve .hap-rec-tag{background:rgba(0,232,122,.85);color:#000}
+/* Fusion – cyan */
+.hap-fusion{border-color:rgba(0,210,255,.3);color:#5ae8ff}
+.hap-fusion:hover:not(:disabled){box-shadow:0 0 18px rgba(0,210,255,.3);border-color:rgba(0,210,255,.55)}
+.hap-fusion .hap-rec-tag{background:rgba(0,210,255,.85);color:#000}
+/* Recommended pulse */
+.hap-btn.hap-recommended{animation:hapPulse 2s ease-in-out infinite}
+@keyframes hapPulse{0%,100%{box-shadow:0 0 8px rgba(255,255,255,.05)}50%{box-shadow:0 0 22px rgba(255,255,255,.18)}}
 .a-chip.premium-preview .a-chip-em{filter:blur(3px);opacity:.75}
 .a-chip.premium-preview .a-chip-nm{opacity:.65}
 .a-chip-stats-preview{font-family:var(--fm);font-size:.42rem;color:var(--text-dim);opacity:.55;letter-spacing:.02em}
@@ -1284,9 +1315,12 @@ body::before{
   font-family:var(--fd);font-size:clamp(1.1rem,3.5vw,1.4rem);font-weight:700;
   color:var(--text-bright);letter-spacing:.06em;margin-bottom:14px
 }
-.cq-timer{height:5px;background:rgba(255,255,255,.08);border-radius:3px;margin-bottom:18px;overflow:hidden}
-.cq-timer-fill{height:100%;background:var(--green);border-radius:3px;width:100%}
+.cq-timer-row{display:flex;align-items:center;gap:10px;margin-bottom:18px}
+.cq-timer{flex:1;height:6px;background:rgba(255,255,255,.08);border-radius:3px;overflow:hidden}
+.cq-timer-fill{height:100%;background:var(--green);border-radius:3px;width:100%;transition:width 15s linear}
 .cq-timer-fill.cq-urgent{background:var(--red)}
+.cq-countdown{font-family:var(--fm);font-weight:700;color:var(--green);min-width:28px;text-align:center;transition:font-size .3s ease,color .3s ease}
+.cq-countdown.cq-urgent{color:var(--red)}
 .cq-opts{display:flex;flex-direction:column;gap:10px}
 .cq-opt{
   width:100%;padding:16px 18px;border-radius:10px;
@@ -1438,6 +1472,36 @@ body::before{
         <p style="font-family:var(--fm);font-size:.62rem;color:var(--text-dim);margin-top:10px;line-height:1.5">Hub saves your spot. Forge picks your animals, Fuse builds stats, then Battle runs the arena.</p>
       </div>
     </div>
+    <!-- Action panel -->
+    <div class="hub-action-panel" id="hub-action-panel">
+      <div class="hap-title">Choose Your Next Move</div>
+      <div class="hap-grid" id="hap-grid">
+        <button class="hap-btn hap-train" id="hap-train" type="button" onclick="hubActionTrain()">
+          <span class="hap-rec-tag hidden" id="hap-rec-train">Recommended</span>
+          <span class="hap-icon">🧠</span>
+          <span class="hap-label" id="hap-train-label">Train Your Hybrid</span>
+          <span class="hap-sub" id="hap-train-sub">Quiz for XP &amp; stat boost</span>
+        </button>
+        <button class="hap-btn hap-unlock" id="hap-unlock" type="button" onclick="hubActionUnlock()">
+          <span class="hap-rec-tag hidden" id="hap-rec-unlock">Recommended</span>
+          <span class="hap-icon">🔓</span>
+          <span class="hap-label" id="hap-unlock-label">Unlock New Creature</span>
+          <span class="hap-sub" id="hap-unlock-sub">Expand your roster</span>
+        </button>
+        <button class="hap-btn hap-improve" id="hap-improve" type="button" onclick="hubActionImprove()">
+          <span class="hap-rec-tag hidden" id="hap-rec-improve">Recommended</span>
+          <span class="hap-icon">🔄</span>
+          <span class="hap-label" id="hap-improve-label">Re-roll Stats</span>
+          <span class="hap-sub" id="hap-improve-sub">Shuffle hybrid stats</span>
+        </button>
+        <button class="hap-btn hap-fusion" id="hap-fusion" type="button" onclick="hubActionNewFusion()">
+          <span class="hap-rec-tag hidden" id="hap-rec-fusion">Recommended</span>
+          <span class="hap-icon">⚗️</span>
+          <span class="hap-label" id="hap-fusion-label">Try New Fusion</span>
+          <span class="hap-sub" id="hap-fusion-sub">Reset &amp; experiment</span>
+        </button>
+      </div>
+    </div>
     <div class="hub-progress-panel" id="hub-progress-panel" aria-live="polite"></div>
     <div class="card hub-rewards-card" id="hub-rewards-card">
       <div class="hub-card-title">Rewards &amp; boosts</div>
@@ -1572,7 +1636,10 @@ body::before{
     <div class="cq-card">
       <div class="cq-stat-icon" id="cq-stat-icon" aria-hidden="true">⚡</div>
       <div class="cq-header">Which is TRUE?</div>
-      <div class="cq-timer"><div class="cq-timer-fill" id="cq-timer-fill"></div></div>
+      <div class="cq-timer-row">
+        <div class="cq-timer"><div class="cq-timer-fill" id="cq-timer-fill"></div></div>
+        <div class="cq-countdown" id="cq-countdown">15</div>
+      </div>
       <div class="cq-opts">
         <button class="cq-opt" id="cq-opt-0" type="button" onclick="answerClashQuiz(0)"></button>
         <button class="cq-opt" id="cq-opt-1" type="button" onclick="answerClashQuiz(1)"></button>

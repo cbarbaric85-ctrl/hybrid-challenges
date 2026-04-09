@@ -28,7 +28,7 @@ import {
   getAvailableAnimals,
   MAX_LEVEL,
 } from '../game/progression.js';
-import { powerScore } from '../game/hybrid.js';
+import { powerScore, buildPlayerHybrid, buildEnemyHybrid } from '../game/hybrid.js';
 import { STAT_LABELS_SIMPLE } from '../game/battle.js';
 import { saveUserProgress, persistGameProgress } from '../persistence/save.js';
 import { backfillLeaderboardIfMissing } from '../persistence/leaderboard.js';
@@ -321,6 +321,7 @@ function renderHub() {
 
   renderHubProgressionPanel();
   renderHubDailyChallenge();
+  renderActionPanel();
   renderHubAnimalGrid();
 }
 
@@ -384,6 +385,149 @@ function renderHubAnimalGrid() {
   }
 }
 
+/* ── Action Panel: "Choose Your Next Move" ── */
+
+function getFirstQuizEligibleId(p) {
+  for (const id of [...APEX_IDS, ...DINO_IDS, ...LEGENDARY_IDS, ...MYTHICAL_IDS]) {
+    if (isQuizEligible(id, p)) return id;
+  }
+  return null;
+}
+
+function getRecommendedAction(p) {
+  if (state.lastBattleResult === 'loss') return 'TRAIN';
+
+  const unlockTarget = getFirstQuizEligibleId(p);
+  if (unlockTarget) return 'UNLOCK';
+
+  if (state.playerHybrid && state.enemyHybrid) {
+    if (state.playerHybrid.power < state.enemyHybrid.power) return 'IMPROVE';
+  } else if (state.playerHybrid) {
+    const levelIdx = Math.min(p.level - 1, LEVELS.length - 1);
+    const eDef = LEVELS[levelIdx];
+    if (eDef) {
+      const eH = buildEnemyHybrid(eDef);
+      if (state.playerHybrid.power < eH.power) return 'IMPROVE';
+    }
+  }
+
+  return 'FIGHT';
+}
+
+function renderActionPanel() {
+  const panel = document.getElementById('hub-action-panel');
+  if (!panel || !state.progress) return;
+  const p = state.progress;
+
+  if (p.level > MAX_LEVEL) {
+    panel.classList.add('hidden');
+    return;
+  }
+  panel.classList.remove('hidden');
+
+  const rec = getRecommendedAction(p);
+
+  const trainBtn = document.getElementById('hap-train');
+  const unlockBtn = document.getElementById('hap-unlock');
+  const improveBtn = document.getElementById('hap-improve');
+  const fusionBtn = document.getElementById('hap-fusion');
+
+  const hasHybrid = !!state.playerHybrid;
+  const unlockTarget = getFirstQuizEligibleId(p);
+
+  // Train — available if any quiz-eligible creature exists (reuses unlock quiz)
+  // or hybrid exists (re-enter forge for quiz boost)
+  trainBtn.disabled = !unlockTarget && !hasHybrid;
+  const trainSub = document.getElementById('hap-train-sub');
+  if (trainSub) trainSub.textContent = unlockTarget
+    ? `Quiz for XP & stat boost`
+    : hasHybrid ? 'Re-enter forge for quiz' : 'Unlock a creature first';
+
+  // Unlock — available if a quiz-eligible creature exists
+  const unlockLabel = document.getElementById('hap-unlock-label');
+  const unlockSub = document.getElementById('hap-unlock-sub');
+  if (unlockTarget) {
+    const a = ANIMALS[unlockTarget];
+    const tierMap = { [STAGE_APEX]: 'Apex', [STAGE_DINO]: 'Dinosaur', [STAGE_LEGENDARY]: 'Legendary', [STAGE_MYTHICAL]: 'Mythical' };
+    const tier = tierMap[a?.stage] || 'New';
+    if (unlockLabel) unlockLabel.textContent = `Unlock ${tier} Creature`;
+    if (unlockSub) unlockSub.textContent = `${a?.emoji || ''} ${a?.name || 'Unknown'} — take the quiz`;
+    unlockBtn.disabled = false;
+  } else {
+    if (unlockLabel) unlockLabel.textContent = 'Unlock New Creature';
+    const nextGate = !apexLevelGateMet(p) ? 'Beat Level 5 first'
+      : !dinoLevelGateMet(p) ? 'Beat Level 8 first'
+      : !legendaryLevelGateMet(p) ? 'Beat Level 12 first'
+      : !mythicalLevelGateMet(p) ? 'Beat Level 16 first'
+      : 'All creatures unlocked!';
+    if (unlockSub) unlockSub.textContent = nextGate;
+    unlockBtn.disabled = true;
+  }
+
+  // Improve — available if hybrid exists
+  improveBtn.disabled = !hasHybrid;
+  const improveSub = document.getElementById('hap-improve-sub');
+  if (improveSub) improveSub.textContent = hasHybrid
+    ? 'Shuffle hybrid stats' : 'Forge a hybrid first';
+
+  // Fusion — always available
+  fusionBtn.disabled = false;
+
+  // Recommended highlight
+  const btnMap = { TRAIN: trainBtn, UNLOCK: unlockBtn, IMPROVE: improveBtn, FIGHT: null };
+  const recMap = { TRAIN: 'hap-rec-train', UNLOCK: 'hap-rec-unlock', IMPROVE: 'hap-rec-improve', FUSION: 'hap-rec-fusion' };
+  [trainBtn, unlockBtn, improveBtn, fusionBtn].forEach(b => b?.classList.remove('hap-recommended'));
+  for (const id of Object.values(recMap)) {
+    document.getElementById(id)?.classList.add('hidden');
+  }
+
+  const recBtn = btnMap[rec];
+  const recTagId = recMap[rec];
+  if (recBtn && !recBtn.disabled) {
+    recBtn.classList.add('hap-recommended');
+    const tag = document.getElementById(recTagId);
+    if (tag) tag.classList.remove('hidden');
+  }
+}
+
+function hubActionTrain() {
+  const p = state.progress;
+  if (!p) return;
+  const target = getFirstQuizEligibleId(p);
+  if (target) {
+    state.quizReturnScreen = 'hub';
+    window.openQuiz(target);
+  } else {
+    showScreen('builder');
+  }
+}
+
+function hubActionUnlock() {
+  const p = state.progress;
+  if (!p) return;
+  const target = getFirstQuizEligibleId(p);
+  if (!target) return;
+  state.quizReturnScreen = 'hub';
+  window.openQuiz(target);
+}
+
+function hubActionImprove() {
+  if (!state.playerHybrid || !state.selectedAnimals.length) {
+    flashHubRewardMsg('Forge a hybrid first, then re-roll here.');
+    return;
+  }
+  state.playerHybrid = buildPlayerHybrid(state.selectedAnimals);
+  persistGameProgress().catch(e => console.error('[hub] reroll save failed', e));
+  flashHubRewardMsg(`Stats re-rolled! New power: ${state.playerHybrid.power} ⚡`);
+  renderHub();
+}
+
+function hubActionNewFusion() {
+  state.selectedAnimals = [];
+  state.playerHybrid = null;
+  showScreen('builder');
+}
+
 export {
   getCommanderXpSegment,
   findNextTokenRecruitTarget,
@@ -394,4 +538,10 @@ export {
   renderHubDailyChallenge,
   renderHub,
   renderHubAnimalGrid,
+  getRecommendedAction,
+  renderActionPanel,
+  hubActionTrain,
+  hubActionUnlock,
+  hubActionImprove,
+  hubActionNewFusion,
 };

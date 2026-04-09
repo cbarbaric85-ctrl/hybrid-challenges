@@ -224,6 +224,7 @@ function hideBossAbilityFlash() {
 const CLASH_STAT_ICONS = { spd: '⚡', agi: '🏃', int: '🧠', str: '💪' };
 let _cqCallback = null;
 let _cqTimer = null;
+let _cqCountdownInterval = null;
 let _cqCorrectIdx = -1;
 let _cqAnswered = false;
 let _cqStat = null;
@@ -252,15 +253,35 @@ function showClashQuiz(stat, callback) {
   if (opt1) { opt1.textContent = truthFirst ? q.lie : q.truth; opt1.disabled = false; opt1.className = 'cq-opt'; }
   if (fb) fb.className = 'cq-feedback hidden';
 
+  const countdownEl = document.getElementById('cq-countdown');
   if (timerFill) {
     timerFill.style.transition = 'none';
     timerFill.style.width = '100%';
     timerFill.classList.remove('cq-urgent');
     void timerFill.offsetWidth;
-    timerFill.style.transition = 'width 5s linear';
+    timerFill.style.transition = 'width 15s linear';
     timerFill.style.width = '0%';
-    setTimeout(() => timerFill?.classList.add('cq-urgent'), 3500);
   }
+  if (countdownEl) {
+    countdownEl.textContent = '15';
+    countdownEl.style.fontSize = '1.1rem';
+    countdownEl.classList.remove('cq-urgent');
+  }
+
+  let _secsLeft = 15;
+  _cqCountdownInterval = setInterval(() => {
+    _secsLeft--;
+    if (_secsLeft < 0) _secsLeft = 0;
+    if (countdownEl) {
+      countdownEl.textContent = String(_secsLeft);
+      const scale = 0.55 + (_secsLeft / 15) * 0.55;
+      countdownEl.style.fontSize = `${scale.toFixed(2)}rem`;
+      if (_secsLeft <= 5) {
+        countdownEl.classList.add('cq-urgent');
+        timerFill?.classList.add('cq-urgent');
+      }
+    }
+  }, 1000);
 
   el.classList.remove('hidden');
   el.style.animation = 'none';
@@ -269,13 +290,14 @@ function showClashQuiz(stat, callback) {
 
   _cqTimer = setTimeout(() => {
     if (!_cqAnswered) answerClashQuiz(-1);
-  }, 5000);
+  }, 15000);
 }
 
 function answerClashQuiz(optIdx) {
   if (_cqAnswered || !_cqCallback) return;
   _cqAnswered = true;
   clearTimeout(_cqTimer);
+  clearInterval(_cqCountdownInterval);
 
   const correct = optIdx === _cqCorrectIdx;
   const timedOut = optIdx === -1;
@@ -332,6 +354,8 @@ function answerClashQuiz(optIdx) {
 }
 
 function hideClashQuiz() {
+  clearTimeout(_cqTimer);
+  clearInterval(_cqCountdownInterval);
   const el = document.getElementById('clash-quiz');
   if (el) el.classList.add('hidden');
 }
@@ -1238,6 +1262,7 @@ async function finishBattle(result) {
   document.getElementById('fighter-player')?.classList.remove('f-side-win', 'f-side-lose');
   document.getElementById('fighter-enemy')?.classList.remove('f-side-win', 'f-side-lose');
   console.log('[battle] resolved', { won, score: `${result.pWins}-${result.eWins}`, flowGen });
+  state.lastBattleResult = won ? 'win' : 'loss';
   const p = state.progress;
   ensureDailyChallengeRolled(p);
   if (won) touchDailyStreakIfNeeded(p);
@@ -1303,16 +1328,16 @@ async function finishBattle(result) {
   if (won) {
     setTimeout(() => {
       if (flowGen !== state.battleFlowGen) return;
-      hideBattleResultOverlay();
+      cleanupBattleVisuals();
       state.battle = null;
       console.log('[battle] return to victory / level-complete flow');
       showLevelComplete().catch(e => console.error('[battle] showLevelComplete failed', e));
-    }, 3800);
+    }, 2200);
   } else {
     setTimeout(() => {
       if (flowGen !== state.battleFlowGen) return;
       clearDefeatAutoReturn();
-      hideBattleResultOverlay();
+      cleanupBattleVisuals();
       state.battle = null;
       document.getElementById('def-sub').textContent =
         `You lost ${result.pWins}–${result.eWins}. Rebuild in the Forge and jump back in.`;
@@ -1336,8 +1361,8 @@ async function finishBattle(result) {
           console.log('[flow] defeat return to hub');
           window.showHub();
         }
-      }, 9000));
-    }, 3800);
+      }, 6000));
+    }, 2200);
   }
   } catch (fatalErr) {
     console.error('[battle] finishBattle crashed — forcing transition', fatalErr);
@@ -1507,7 +1532,7 @@ async function showLevelComplete() {
       setLevelCompleteAutoNavTimer(null);
       const lc = document.getElementById('screen-level-complete');
       if (lc && lc.classList.contains('active')) window.showHub();
-    }, 9000));
+    }, 4500));
   }
 
   showScreen('level-complete');

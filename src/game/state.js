@@ -10,6 +10,8 @@ let state = {
   quizReturnScreen: 'builder', // where to go after quiz
   /** Bumped on each startBattle(); stale finishBattle timers ignore transitions. */
   battleFlowGen: 0,
+  /** 'win' | 'loss' | null — set after each battle for hub recommendation */
+  lastBattleResult: null,
 };
 
 const UNLOCK_QUIZ_SESSION_LEN = 3;
