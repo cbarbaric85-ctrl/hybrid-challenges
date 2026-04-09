@@ -4,6 +4,7 @@ import {
 } from '../data/animals.js';
 import { LEVEL_REWARDS, LEVELS } from '../data/levels.js';
 import { getArena } from '../data/arenas.js';
+import { rollWeather } from '../data/weather.js';
 import {
   state,
   XP_PER_BATTLE_WIN,
@@ -40,6 +41,7 @@ import { showScreen, escapeHtml } from './screens.js';
 import { localDateString } from '../game/utils.js';
 
 const ARENA_CLASSES = ['arena-ocean','arena-jungle','arena-sky','arena-volcanic','arena-underworld','arena-celestial'];
+const WEATHER_CLASSES = ['weather-rain','weather-storm','weather-fog','weather-heatwave','weather-wind'];
 const CAP_ANIM_CLASS = { spd: 'cap-anim-spd', agi: 'cap-anim-agi', int: 'cap-anim-int', str: 'cap-anim-str' };
 const STAT_RESULT_EMOJI = { spd: '⚡', agi: '✦', int: '🧠', str: '💥' };
 
@@ -120,6 +122,99 @@ function applyCapabilityAnim(stat) {
   }, 500);
 }
 
+// ═══════════════════════════════════════════════════════════════════
+// WEATHER OVERLAY
+// ═══════════════════════════════════════════════════════════════════
+
+function setWeatherOverlay(weather) {
+  const screen = document.getElementById('screen-battle');
+  const overlay = document.getElementById('weather-overlay');
+  const banner = document.getElementById('weather-effect-banner');
+  if (!screen) return;
+  WEATHER_CLASSES.forEach(c => screen.classList.remove(c));
+  if (!weather) {
+    if (overlay) overlay.classList.add('hidden');
+    if (banner) banner.classList.add('hidden');
+    return;
+  }
+  screen.classList.add(weather.cssClass);
+  if (overlay) overlay.classList.remove('hidden');
+  if (banner) {
+    banner.textContent = weather.banner;
+    banner.classList.remove('hidden');
+  }
+}
+
+function clearWeatherOverlay() {
+  setWeatherOverlay(null);
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// BOSS SYSTEM
+// ═══════════════════════════════════════════════════════════════════
+
+function setBossMode(isBoss) {
+  const screen = document.getElementById('screen-battle');
+  const banner = document.getElementById('boss-effect-banner');
+  if (!screen) return;
+  if (isBoss) {
+    screen.classList.add('boss-active');
+    if (banner) {
+      banner.textContent = '👑 Boss Battle!';
+      banner.classList.remove('hidden');
+    }
+  } else {
+    screen.classList.remove('boss-active');
+    if (banner) banner.classList.add('hidden');
+  }
+}
+
+function clearBossMode() {
+  const screen = document.getElementById('screen-battle');
+  if (screen) screen.classList.remove('boss-active');
+  const banner = document.getElementById('boss-effect-banner');
+  if (banner) banner.classList.add('hidden');
+  hideBossAbilityFlash();
+}
+
+function runBossIntro(levelDef, done) {
+  const overlay = document.getElementById('boss-intro-overlay');
+  const titleEl = document.getElementById('boss-intro-title');
+  const tagEl = document.getElementById('boss-intro-tagline');
+  if (!overlay || !levelDef.bossTitle) { done(); return; }
+
+  titleEl.textContent = levelDef.bossTitle;
+  tagEl.textContent = levelDef.bossTagline || '';
+  overlay.classList.remove('hidden', 'boss-shake');
+  overlay.style.animation = 'none';
+  void overlay.offsetWidth;
+  overlay.style.animation = '';
+
+  setTimeout(() => {
+    overlay.classList.add('boss-shake');
+  }, 1200);
+
+  setTimeout(() => {
+    overlay.classList.add('hidden');
+    done();
+  }, 2400);
+}
+
+function showBossAbilityFlash(bossAbility) {
+  const el = document.getElementById('boss-ability-flash');
+  if (!el || !bossAbility) return;
+  el.textContent = `${bossAbility.emoji} ${state.enemyHybrid?.name || 'Boss'} unleashes ${bossAbility.name}!`;
+  el.classList.remove('hidden');
+  el.style.animation = 'none';
+  void el.offsetWidth;
+  el.style.animation = '';
+}
+
+function hideBossAbilityFlash() {
+  const el = document.getElementById('boss-ability-flash');
+  if (el) el.classList.add('hidden');
+}
+
 function startBattle() {
   if (!state.playerHybrid) return;
   clearDefeatAutoReturn();
@@ -128,9 +223,16 @@ function startBattle() {
   const levelDef = LEVELS[Math.min(p.level - 1, LEVELS.length - 1)];
   state.enemyHybrid = buildEnemyHybrid(levelDef);
   const questions = buildPreBattleQuizForAnimals(state.playerHybrid.animals);
+  const isBoss = !!levelDef.isBoss;
+  const weather = rollWeather(isBoss);
   state.battle = {
     levelDef,
     arenaId: levelDef.arena || 'ocean',
+    isBoss,
+    weatherId: weather?.id || null,
+    weather,
+    bossAbility: levelDef.bossAbility || null,
+    bossAbilityFired: false,
     rounds: [],
     pWins: 0,
     eWins: 0,
@@ -145,6 +247,8 @@ function startBattle() {
     },
   };
   setArenaTheme(state.battle.arenaId);
+  setWeatherOverlay(weather);
+  setBossMode(isBoss);
   renderBattleScreen();
   showScreen('battle');
   setTimeout(() => scrollToBattlePreQuiz(), 120);
@@ -326,6 +430,7 @@ function renderBattleScreen() {
   document.getElementById('battle-topbar-info').textContent = `Mission L${def.id} — ${def.name}`;
   hideRoundAnnounce();
   hideRoundResultFlash();
+  hideBossAbilityFlash();
 
   const disp = getBattleDisplayPlayerHybrid();
   const bpEm = document.getElementById('bp-em');
@@ -727,13 +832,25 @@ function beginBattle() {
   b.phase = 'fighting';
   document.getElementById('b-actions').innerHTML = '';
   const boosts = mergeStatBoosts(b.quizBoosts || EMPTY_STAT_BOOST(), getStreakBattleBoost(state.progress));
-  runBattleCountdown(() => {
-    scrollToBattleFocus();
-    showBattleRoundStrip();
-    const result = runFullBattle(state.playerHybrid, state.enemyHybrid, boosts, b.arenaId);
-    state.battle.result = result;
-    animateBattle(result, 0);
-  });
+
+  const doCountdownAndFight = () => {
+    runBattleCountdown(() => {
+      scrollToBattleFocus();
+      showBattleRoundStrip();
+      const result = runFullBattle(
+        state.playerHybrid, state.enemyHybrid, boosts,
+        b.arenaId, b.weatherId, b.bossAbility
+      );
+      state.battle.result = result;
+      animateBattle(result, 0);
+    });
+  };
+
+  if (b.isBoss && b.levelDef) {
+    runBossIntro(b.levelDef, doCountdownAndFight);
+  } else {
+    doCountdownAndFight();
+  }
 }
 
 function addLog(html, delay, opts) {
@@ -755,6 +872,7 @@ function animateBattle(result, roundIdx) {
   if (roundIdx >= result.rounds.length) {
     hideRoundAnnounce();
     hideRoundResultFlash();
+    hideBossAbilityFlash();
     setTimeout(() => finishBattle(result), 720);
     return;
   }
@@ -776,6 +894,18 @@ function animateBattle(result, roundIdx) {
     document.getElementById('clash-eval')?.classList.remove('clash-winner-n');
     document.getElementById('clash-box')?.classList.remove('clash-clash-moment');
   };
+
+  // 0. Boss ability flash (fires once, on round 3)
+  const b = state.battle;
+  if (b && b.isBoss && b.bossAbility && roundIdx === 2 && !b.bossAbilityFired) {
+    b.bossAbilityFired = true;
+    setTimeout(() => {
+      showBossAbilityFlash(b.bossAbility);
+    }, baseDelay > 0 ? baseDelay - 400 : 0);
+    setTimeout(() => {
+      hideBossAbilityFlash();
+    }, baseDelay + 400);
+  }
 
   // 1. Cinematic round announce
   setTimeout(() => {
@@ -1054,6 +1184,7 @@ async function finishBattle(result) {
   } catch (fatalErr) {
     console.error('[battle] finishBattle crashed — forcing transition', fatalErr);
     hideBattleResultOverlay();
+    cleanupBattleVisuals();
     state.battle = null;
     if (won) {
       showLevelComplete().catch(e => {
@@ -1233,11 +1364,17 @@ function buildMiniStats(a) {
     <div class="stat-val">${a[s]}</div></div>`).join('')}</div>`;
 }
 
+function cleanupBattleVisuals() {
+  clearArenaTheme();
+  clearWeatherOverlay();
+  clearBossMode();
+}
+
 function goNextLevel() {
   clearLevelCompleteAutoNav();
   clearDefeatAutoReturn();
   hideBattleResultOverlay();
-  clearArenaTheme();
+  cleanupBattleVisuals();
   state.battle = null;
   state.playerHybrid = null;
   state.selectedAnimals = [];
@@ -1248,7 +1385,7 @@ function retryLevel() {
   clearLevelCompleteAutoNav();
   clearDefeatAutoReturn();
   hideBattleResultOverlay();
-  clearArenaTheme();
+  cleanupBattleVisuals();
   state.battle = null;
   state.playerHybrid = null;
   state.selectedAnimals = [];

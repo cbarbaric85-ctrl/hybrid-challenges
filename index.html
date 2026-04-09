@@ -1124,6 +1124,142 @@ body::before{
 .cap-anim-str{animation:capStrength .35s ease}
 @keyframes capStrength{0%{transform:scale(1)}30%{transform:scale(1.06) translateY(-2px)}60%{transform:scale(.97)}100%{transform:scale(1)}}
 
+/* ─── BOSS INTRO OVERLAY ─── */
+.boss-intro-overlay{
+  position:fixed;inset:0;z-index:190;display:flex;align-items:center;justify-content:center;flex-direction:column;
+  background:rgba(0,0,0,.92);backdrop-filter:blur(8px);text-align:center;padding:20px;
+  animation:bossIntroFadeIn .5s ease both
+}
+.boss-intro-overlay.hidden{display:none!important}
+@keyframes bossIntroFadeIn{from{opacity:0}to{opacity:1}}
+.boss-intro-crown{font-size:clamp(2.5rem,10vw,4rem);margin-bottom:10px;animation:bossCrownPulse 1.2s ease-in-out infinite}
+@keyframes bossCrownPulse{0%,100%{transform:scale(1);filter:drop-shadow(0 0 12px rgba(255,215,0,.4))}50%{transform:scale(1.08);filter:drop-shadow(0 0 24px rgba(255,215,0,.7))}}
+.boss-intro-title{
+  font-family:var(--fd);font-size:clamp(1.6rem,6vw,2.8rem);font-weight:800;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--text-bright);text-shadow:0 0 30px rgba(255,215,0,.3);
+  margin-bottom:8px;animation:bossNameSlam .6s cubic-bezier(.2,1.3,.3,1) .2s both
+}
+@keyframes bossNameSlam{from{opacity:0;transform:scale(.7) translateY(20px)}to{opacity:1;transform:scale(1) translateY(0)}}
+.boss-intro-tagline{
+  font-family:var(--fb);font-size:clamp(.82rem,2.5vw,1.05rem);color:var(--text-dim);font-style:italic;
+  max-width:32ch;line-height:1.45;animation:bossTagFade .5s ease .5s both
+}
+@keyframes bossTagFade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.boss-intro-overlay.boss-shake{animation:bossShake .4s ease}
+@keyframes bossShake{0%,100%{transform:translateX(0)}20%{transform:translateX(-6px)}40%{transform:translateX(6px)}60%{transform:translateX(-4px)}80%{transform:translateX(3px)}}
+
+/* ─── BOSS ARENA TRANSFORMATIONS ─── */
+#screen-battle.boss-active .arena-bg::before{animation-duration:3s!important}
+#screen-battle.boss-active .arena-bg::after{animation-duration:4s!important}
+#screen-battle.boss-active.arena-ocean .arena-bg{background:linear-gradient(175deg,#020e1e 0%,#04203d 40%,#073560 70%,#021a30 100%)}
+#screen-battle.boss-active.arena-ocean .arena-bg::before{background:radial-gradient(ellipse 90% 70% at 30% 70%,rgba(0,100,220,.18) 0%,transparent 60%)}
+#screen-battle.boss-active.arena-volcanic .arena-bg{background:linear-gradient(175deg,#120505 0%,#200808 35%,#350e0e 60%,#100404 100%)}
+#screen-battle.boss-active.arena-volcanic .arena-bg::before{background:radial-gradient(ellipse 70% 60% at 50% 80%,rgba(255,40,0,.18) 0%,transparent 55%)}
+#screen-battle.boss-active.arena-underworld .arena-bg{background:linear-gradient(175deg,#08030e 0%,#10061a 35%,#1a0c30 60%,#0a0512 100%)}
+#screen-battle.boss-active.arena-underworld .arena-bg::before{background:radial-gradient(ellipse 80% 60% at 50% 50%,rgba(120,40,220,.14) 0%,transparent 55%);animation:mistFlicker 2s steps(4) infinite!important}
+@keyframes mistFlicker{0%,100%{opacity:.7}25%{opacity:.9}50%{opacity:.6}75%{opacity:1}}
+#screen-battle.boss-active.arena-celestial .arena-bg{background:linear-gradient(175deg,#020510 0%,#060c22 35%,#0c1438 60%,#040818 100%)}
+#screen-battle.boss-active.arena-celestial .arena-bg::before{animation-duration:1.5s!important}
+#screen-battle.boss-active.arena-celestial .arena-bg::after{background:radial-gradient(ellipse 60% 50% at 50% 40%,rgba(0,200,255,.12) 0%,transparent 55%)}
+#screen-battle.boss-active .fighter-row.e-side{border-color:rgba(255,215,0,.5);box-shadow:0 0 16px rgba(255,215,0,.15)}
+#screen-battle.boss-active .fighter-row.e-side .f-lbl{color:#ffd700}
+
+/* ─── BOSS ABILITY FLASH ─── */
+.boss-ability-flash{
+  text-align:center;padding:10px 14px;margin:6px 0;border-radius:6px;
+  background:rgba(255,215,0,.1);border:1px solid rgba(255,215,0,.4);
+  font-family:var(--fd);font-size:.92rem;font-weight:700;color:#ffd700;letter-spacing:.05em;
+  animation:bossAbilityIn .5s cubic-bezier(.2,1.3,.3,1) both;position:relative;z-index:2
+}
+.boss-ability-flash.hidden{display:none!important}
+@keyframes bossAbilityIn{from{opacity:0;transform:translateY(8px) scale(.95)}to{opacity:1;transform:translateY(0) scale(1)}}
+
+/* ─── WEATHER OVERLAYS ─── */
+.weather-overlay{position:absolute;inset:0;z-index:0;pointer-events:none;overflow:hidden}
+.weather-overlay.hidden{display:none!important}
+
+.weather-rain .weather-overlay::before{
+  content:'';position:absolute;inset:0;
+  background:repeating-linear-gradient(
+    100deg,
+    transparent,transparent 4px,
+    rgba(120,180,255,.06) 4px,rgba(120,180,255,.06) 5px
+  );
+  background-size:10px 100%;
+  animation:rainFall .8s linear infinite
+}
+.weather-rain .weather-overlay::after{
+  content:'';position:absolute;inset:0;background:rgba(60,120,180,.04)
+}
+@keyframes rainFall{from{transform:translateY(-20px)}to{transform:translateY(20px)}}
+
+.weather-storm .weather-overlay::before{
+  content:'';position:absolute;inset:0;
+  background:repeating-linear-gradient(
+    95deg,
+    transparent,transparent 3px,
+    rgba(180,200,255,.08) 3px,rgba(180,200,255,.08) 4px
+  );
+  background-size:8px 100%;
+  animation:stormRain .5s linear infinite
+}
+.weather-storm .weather-overlay::after{
+  content:'';position:absolute;inset:0;
+  animation:lightningFlash 4s ease-in-out infinite
+}
+@keyframes stormRain{from{transform:translateY(-15px)}to{transform:translateY(15px)}}
+@keyframes lightningFlash{0%,88%,92%,96%,100%{background:transparent}89%{background:rgba(200,220,255,.08)}93%{background:rgba(200,220,255,.05)}}
+
+.weather-fog .weather-overlay::before{
+  content:'';position:absolute;inset:0;
+  background:radial-gradient(ellipse 100% 60% at 50% 60%,rgba(180,190,200,.1) 0%,transparent 70%);
+  animation:fogDrift 8s ease-in-out infinite
+}
+.weather-fog .weather-overlay::after{
+  content:'';position:absolute;inset:0;
+  background:radial-gradient(ellipse 80% 50% at 30% 40%,rgba(160,170,180,.06) 0%,transparent 60%);
+  animation:fogDrift 12s ease-in-out infinite reverse
+}
+@keyframes fogDrift{0%,100%{opacity:.6;transform:translateX(0)}50%{opacity:1;transform:translateX(10px)}}
+
+.weather-heatwave .weather-overlay::before{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(180deg,rgba(255,140,0,.03) 0%,transparent 40%,rgba(255,60,0,.04) 100%);
+  animation:heatShimmer 2s ease-in-out infinite
+}
+@keyframes heatShimmer{0%,100%{opacity:.7;transform:scaleY(1)}50%{opacity:1;transform:scaleY(1.005)}}
+
+.weather-wind .weather-overlay::before{
+  content:'';position:absolute;inset:0;
+  background:repeating-linear-gradient(
+    170deg,
+    transparent,transparent 12px,
+    rgba(200,220,240,.04) 12px,rgba(200,220,240,.04) 13px
+  );
+  animation:windStreak 1.5s linear infinite
+}
+@keyframes windStreak{from{transform:translateX(-20px) translateY(-10px)}to{transform:translateX(20px) translateY(10px)}}
+
+/* ─── WEATHER BANNER ─── */
+.weather-effect-banner{
+  text-align:center;padding:6px 12px;font-family:var(--fd);font-size:.78rem;font-weight:600;
+  letter-spacing:.04em;border-radius:6px;margin-bottom:4px;
+  background:rgba(100,140,200,.08);border:1px solid rgba(140,180,220,.25);color:rgba(180,210,240,.9);
+  animation:arenaBannerIn .6s cubic-bezier(.2,1.2,.3,1) .15s both;
+  position:relative;z-index:1
+}
+.weather-effect-banner.hidden{display:none!important}
+
+/* ─── BOSS BANNER ─── */
+.boss-effect-banner{
+  text-align:center;padding:6px 12px;font-family:var(--fd);font-size:.78rem;font-weight:700;
+  letter-spacing:.06em;border-radius:6px;margin-bottom:4px;
+  background:rgba(255,215,0,.08);border:1px solid rgba(255,215,0,.3);color:#ffd700;
+  animation:arenaBannerIn .6s cubic-bezier(.2,1.2,.3,1) .3s both;
+  position:relative;z-index:1
+}
+.boss-effect-banner.hidden{display:none!important}
+
 /* ─── CLASH BOX ARENA TINT ─── */
 .arena-ocean .clash-box{border-color:rgba(0,140,255,.25);box-shadow:0 0 40px rgba(0,140,255,.08),0 12px 40px rgba(0,0,0,.35)}
 .arena-jungle .clash-box{border-color:rgba(0,180,80,.25);box-shadow:0 0 40px rgba(0,180,80,.08),0 12px 40px rgba(0,0,0,.35)}
@@ -1372,6 +1508,12 @@ body::before{
 <!-- ══════════════ BATTLE ══════════════ -->
 <section id="screen-battle" class="screen screen-fill">
   <div class="arena-bg" id="arena-bg" aria-hidden="true"></div>
+  <div class="weather-overlay hidden" id="weather-overlay" aria-hidden="true"></div>
+  <div id="boss-intro-overlay" class="boss-intro-overlay hidden" aria-live="polite">
+    <div class="boss-intro-crown" id="boss-intro-crown">👑</div>
+    <div class="boss-intro-title" id="boss-intro-title"></div>
+    <div class="boss-intro-tagline" id="boss-intro-tagline"></div>
+  </div>
   <div id="battle-countdown-overlay" class="battle-cd-overlay hidden" aria-hidden="true"></div>
   <div id="battle-result-overlay" class="battle-result-overlay hidden" aria-live="polite">
     <div class="battle-result-card" id="battle-result-card">
@@ -1397,6 +1539,8 @@ body::before{
       <div class="b-title" id="b-title">The Yard Scrapper</div>
     </div>
     <div class="arena-effect-banner hidden" id="arena-effect-banner" aria-live="polite"></div>
+    <div class="weather-effect-banner hidden" id="weather-effect-banner" aria-live="polite"></div>
+    <div class="boss-effect-banner hidden" id="boss-effect-banner" aria-live="polite"></div>
     <div id="battle-prephase" class="battle-prephase hidden" aria-live="polite">
       <div id="battle-pre-quiz"></div>
       <div id="battle-boost-summary" class="hidden"></div>
@@ -1469,6 +1613,7 @@ body::before{
           </div>
         </div>
       </div>
+      <div class="boss-ability-flash hidden" id="boss-ability-flash" aria-live="polite"></div>
       <div class="round-result-flash hidden" id="round-result-flash" aria-live="polite"></div>
     </div>
     <!-- BOTTOM: Round trail + actions -->

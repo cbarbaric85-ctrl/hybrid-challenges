@@ -1,6 +1,7 @@
 import { ANIMALS } from '../data/animals.js';
 import { QUIZZES, PRE_BATTLE_QUESTIONS } from '../data/quizzes.js';
 import { getArena } from '../data/arenas.js';
+import { getWeather } from '../data/weather.js';
 import { state, UNLOCK_QUIZ_SESSION_LEN } from './state.js';
 import { powerScore } from './hybrid.js';
 import { getActiveBattleBoosts } from './progression.js';
@@ -190,12 +191,40 @@ function applyArenaMods(hybrid, arenaId) {
   return { ...hybrid, stats, power: powerScore(stats) };
 }
 
-function runFullBattle(player, enemy, quizBoosts, arenaId) {
+function applyWeatherMods(hybrid, weatherId) {
+  if (!weatherId) return hybrid;
+  const w = getWeather(weatherId);
+  if (!w?.statMods) return hybrid;
+  const stats = { ...hybrid.stats };
+  for (const k of ['spd', 'agi', 'int', 'str']) {
+    stats[k] = Math.max(1, stats[k] + (w.statMods[k] || 0));
+  }
+  return { ...hybrid, stats, power: powerScore(stats) };
+}
+
+function applyBossBoost(hybrid, bossAbility) {
+  if (!bossAbility) return hybrid;
+  const stats = { ...hybrid.stats };
+  const k = bossAbility.stat;
+  if (k && stats[k] != null) {
+    stats[k] += bossAbility.bonus || 0;
+  }
+  return { ...hybrid, stats, power: powerScore(stats) };
+}
+
+/**
+ * Pipeline: Arena → Weather → Boss → Abilities → Rounds
+ * bossAbility only applies to the enemy.
+ */
+function runFullBattle(player, enemy, quizBoosts, arenaId, weatherId, bossAbility) {
   let pFighter = quizBoosts && Object.values(quizBoosts).some(n => n > 0)
     ? hybridWithTempBoost(player, quizBoosts)
     : player;
   pFighter = applyArenaMods(pFighter, arenaId);
-  const eFighter = applyArenaMods(enemy, arenaId);
+  pFighter = applyWeatherMods(pFighter, weatherId);
+  let eFighter = applyArenaMods(enemy, arenaId);
+  eFighter = applyWeatherMods(eFighter, weatherId);
+  eFighter = applyBossBoost(eFighter, bossAbility);
   const rounds = [];
   for (let i = 0; i < 5; i++) rounds.push(simulateRound(pFighter, eFighter));
   const pWins = rounds.filter(r => r.winner === 'player').length;
@@ -224,6 +253,8 @@ export {
   hybridWithTempBoost,
   getBattleDisplayPlayerHybrid,
   applyArenaMods,
+  applyWeatherMods,
+  applyBossBoost,
   roll,
   simulateRound,
   runFullBattle,
