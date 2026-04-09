@@ -3,6 +3,7 @@ import {
   BASE_IDS, APEX_IDS, DINO_IDS, LEGENDARY_IDS, MYTHICAL_IDS,
 } from '../data/animals.js';
 import { LEVEL_REWARDS, LEVELS } from '../data/levels.js';
+import { getArena } from '../data/arenas.js';
 import {
   state,
   XP_PER_BATTLE_WIN,
@@ -31,12 +32,93 @@ import {
   scrollToBattlePreQuiz, scrollToBattleFocus,
   scrollToBattleTrail, scrollToBattleStageArea,
   hybridWithTempBoost, getBattleDisplayPlayerHybrid,
-  roll, simulateRound, runFullBattle,
+  applyArenaMods, roll, simulateRound, runFullBattle,
 } from '../game/battle.js';
 import { saveUserProgress, persistGameProgress, recordQuizAnswers, computeQuizAccuracy } from '../persistence/save.js';
 import { syncLeaderboardEntry } from '../persistence/leaderboard.js';
 import { showScreen, escapeHtml } from './screens.js';
 import { localDateString } from '../game/utils.js';
+
+const ARENA_CLASSES = ['arena-ocean','arena-jungle','arena-sky','arena-volcanic','arena-underworld','arena-celestial'];
+const CAP_ANIM_CLASS = { spd: 'cap-anim-spd', agi: 'cap-anim-agi', int: 'cap-anim-int', str: 'cap-anim-str' };
+const STAT_RESULT_EMOJI = { spd: '⚡', agi: '✦', int: '🧠', str: '💥' };
+
+function setArenaTheme(arenaId) {
+  const screen = document.getElementById('screen-battle');
+  if (!screen) return;
+  ARENA_CLASSES.forEach(c => screen.classList.remove(c));
+  const arena = getArena(arenaId);
+  screen.classList.add(arena.cssClass);
+
+  const banner = document.getElementById('arena-effect-banner');
+  if (banner) {
+    banner.textContent = arena.banner;
+    banner.classList.remove('hidden');
+  }
+}
+
+function clearArenaTheme() {
+  const screen = document.getElementById('screen-battle');
+  if (!screen) return;
+  ARENA_CLASSES.forEach(c => screen.classList.remove(c));
+  const banner = document.getElementById('arena-effect-banner');
+  if (banner) banner.classList.add('hidden');
+}
+
+function showRoundAnnounce(roundNum, statKey, statLabel) {
+  const el = document.getElementById('round-announce');
+  const numEl = document.getElementById('round-announce-num');
+  const statEl = document.getElementById('round-announce-stat');
+  if (!el || !numEl || !statEl) return;
+  numEl.textContent = `Round ${roundNum} — ${statLabel} Clash`;
+  statEl.textContent = statLabel.toUpperCase();
+  statEl.className = `round-announce-stat ${statKey}`;
+  el.classList.remove('hidden');
+  el.style.animation = 'none';
+  void el.offsetWidth;
+  el.style.animation = '';
+}
+
+function hideRoundAnnounce() {
+  const el = document.getElementById('round-announce');
+  if (el) el.classList.add('hidden');
+}
+
+function showRoundResultFlash(winner, statLabel) {
+  const el = document.getElementById('round-result-flash');
+  if (!el) return;
+  const emoji = winner === 'player' ? '💥' : winner === 'enemy' ? '💀' : '⚡';
+  const text = winner === 'player' ? `${emoji} ${statLabel} Wins!`
+    : winner === 'enemy' ? `${emoji} ${statLabel} Lost!`
+    : `${emoji} ${statLabel} — Tie!`;
+  const cls = winner === 'player' ? 'win' : winner === 'enemy' ? 'loss' : 'tie';
+  el.textContent = text;
+  el.className = `round-result-flash ${cls}`;
+  el.style.animation = 'none';
+  void el.offsetWidth;
+  el.style.animation = '';
+}
+
+function hideRoundResultFlash() {
+  const el = document.getElementById('round-result-flash');
+  if (el) el.className = 'round-result-flash hidden';
+}
+
+function applyCapabilityAnim(stat) {
+  const fp = document.getElementById('fighter-player');
+  const fe = document.getElementById('fighter-enemy');
+  const cls = CAP_ANIM_CLASS[stat];
+  if (!cls) return;
+  [fp, fe].forEach(el => {
+    if (!el) return;
+    el.classList.remove(...Object.values(CAP_ANIM_CLASS));
+    void el.offsetWidth;
+    el.classList.add(cls);
+  });
+  setTimeout(() => {
+    [fp, fe].forEach(el => el?.classList.remove(cls));
+  }, 500);
+}
 
 function startBattle() {
   if (!state.playerHybrid) return;
@@ -48,6 +130,7 @@ function startBattle() {
   const questions = buildPreBattleQuizForAnimals(state.playerHybrid.animals);
   state.battle = {
     levelDef,
+    arenaId: levelDef.arena || 'ocean',
     rounds: [],
     pWins: 0,
     eWins: 0,
@@ -61,6 +144,7 @@ function startBattle() {
       lastCorrect: null,
     },
   };
+  setArenaTheme(state.battle.arenaId);
   renderBattleScreen();
   showScreen('battle');
   setTimeout(() => scrollToBattlePreQuiz(), 120);
@@ -207,13 +291,17 @@ function confirmPreBattleAndStartFight() {
   if (bLog) bLog.classList.remove('hidden');
 
   const disp = getBattleDisplayPlayerHybrid();
-  document.getElementById('bp-em').textContent = disp.emojis;
-  document.getElementById('bp-name').textContent = disp.name;
-  document.getElementById('bp-comp').textContent = disp.composition;
+  const em = document.getElementById('bp-em');
+  const nm = document.getElementById('bp-name');
+  const comp = document.getElementById('bp-comp');
+  const pw = document.getElementById('bp-power');
+  if (em) em.textContent = disp.emojis;
+  if (nm) nm.textContent = disp.name;
+  if (comp) comp.textContent = disp.composition;
   const qPts = sumBoostPoints(state.battle.quizBoosts || EMPTY_STAT_BOOST());
   const sPts = sumBoostPoints(getStreakBattleBoost(state.progress));
   const bonusLbl = [qPts ? `+${qPts} quiz` : '', sPts ? `+${sPts} streak` : ''].filter(Boolean).join(' · ');
-  document.getElementById('bp-power').innerHTML =
+  if (pw) pw.innerHTML =
     bonusLbl
       ? `Power: <strong>${disp.power}</strong> <span style="color:var(--green);font-size:.55rem">(${bonusLbl})</span>`
       : `Power: <strong>${disp.power}</strong>`;
@@ -232,29 +320,39 @@ function renderBattleScreen() {
   const bLog = document.querySelector('#screen-battle .b-log');
 
   const pill = document.getElementById('battle-level-pill');
-  if (pill) pill.textContent = `Level ${def.id} / 10`;
+  if (pill) pill.textContent = `Level ${def.id} / ${LEVELS.length}`;
   document.getElementById('b-lvl-tag').textContent = 'Best of 5 rounds · Stat clash';
   document.getElementById('b-title').textContent = def.name.toUpperCase();
   document.getElementById('battle-topbar-info').textContent = `Mission L${def.id} — ${def.name}`;
+  hideRoundAnnounce();
+  hideRoundResultFlash();
 
   const disp = getBattleDisplayPlayerHybrid();
-  document.getElementById('bp-em').textContent = disp.emojis;
-  document.getElementById('bp-name').textContent = disp.name;
-  document.getElementById('bp-comp').textContent = disp.composition;
+  const bpEm = document.getElementById('bp-em');
+  const bpName = document.getElementById('bp-name');
+  const bpComp = document.getElementById('bp-comp');
+  if (bpEm) bpEm.textContent = disp.emojis;
+  if (bpName) bpName.textContent = disp.name;
+  if (bpComp) bpComp.textContent = disp.composition;
   const qPts = sumBoostPoints(state.battle.quizBoosts || EMPTY_STAT_BOOST());
   const sPts =
     state.battle.phase !== 'pre_quiz' ? sumBoostPoints(getStreakBattleBoost(state.progress)) : 0;
   const bonusLbl = [qPts ? `+${qPts} quiz` : '', sPts ? `+${sPts} streak` : ''].filter(Boolean).join(' · ');
-  document.getElementById('bp-power').innerHTML =
+  const bpPower = document.getElementById('bp-power');
+  if (bpPower) bpPower.innerHTML =
     bonusLbl && state.battle.phase !== 'pre_quiz'
       ? `Power: <strong>${disp.power}</strong> <span style="color:var(--green);font-size:.55rem">(${bonusLbl})</span>`
       : `Power: <strong>${disp.power}</strong>`;
   renderFighterStats('bp-stats', disp.stats);
 
-  document.getElementById('be-em').textContent = e.emojis;
-  document.getElementById('be-name').textContent = e.name;
-  document.getElementById('be-comp').textContent = e.composition;
-  document.getElementById('be-power').innerHTML = `Power: <strong>${e.power}</strong>`;
+  const beEm = document.getElementById('be-em');
+  const beName = document.getElementById('be-name');
+  const beComp = document.getElementById('be-comp');
+  const bePower = document.getElementById('be-power');
+  if (beEm) beEm.textContent = e.emojis;
+  if (beName) beName.textContent = e.name;
+  if (beComp) beComp.textContent = e.composition;
+  if (bePower) bePower.innerHTML = `Power: <strong>${e.power}</strong>`;
   renderFighterStats('be-stats', e.stats);
 
   resetHearts();
@@ -302,7 +400,7 @@ function renderBattleScreen() {
 function renderFighterStats(containerId, stats) {
   const el = document.getElementById(containerId);
   if (!el) return;
-  el.innerHTML = `<div class="stat-pillars">${['spd', 'agi', 'int', 'str']
+  el.innerHTML = ['spd', 'agi', 'int', 'str']
     .map(
       s =>
         `<div class="stat-pillar battle-stat-pillar" data-stat="${s}">
@@ -311,7 +409,7 @@ function renderFighterStats(containerId, stats) {
           <div class="sp-lbl-row"><span class="sp-lbl">${s.toUpperCase()}</span><span class="sp-info" data-stat="${s}">i</span></div>
         </div>`
     )
-    .join('')}</div>`;
+    .join('');
 }
 
 function resetHearts() {
@@ -632,7 +730,7 @@ function beginBattle() {
   runBattleCountdown(() => {
     scrollToBattleFocus();
     showBattleRoundStrip();
-    const result = runFullBattle(state.playerHybrid, state.enemyHybrid, boosts);
+    const result = runFullBattle(state.playerHybrid, state.enemyHybrid, boosts, b.arenaId);
     state.battle.result = result;
     animateBattle(result, 0);
   });
@@ -655,12 +753,14 @@ function addLog(html, delay, opts) {
 
 function animateBattle(result, roundIdx) {
   if (roundIdx >= result.rounds.length) {
+    hideRoundAnnounce();
+    hideRoundResultFlash();
     setTimeout(() => finishBattle(result), 720);
     return;
   }
   const round = result.rounds[roundIdx];
   const roundNum = roundIdx + 1;
-  const roundSpan = 4200;
+  const roundSpan = 4800;
   const baseDelay = roundIdx * roundSpan;
   const statWord = STAT_LABELS_SIMPLE[round.stat];
   const statIcon = STAT_TRAIL_ICONS[round.stat] || '◆';
@@ -677,8 +777,17 @@ function animateBattle(result, roundIdx) {
     document.getElementById('clash-box')?.classList.remove('clash-clash-moment');
   };
 
+  // 1. Cinematic round announce
   setTimeout(() => {
+    hideRoundResultFlash();
+    showRoundAnnounce(roundNum, round.stat, statWord);
+    applyCapabilityAnim(round.stat);
     scrollToBattleFocus();
+  }, baseDelay);
+
+  // 2. Show clash box with stat
+  setTimeout(() => {
+    hideRoundAnnounce();
     setBattleRoundStripProgress(roundIdx);
     const box = document.getElementById('clash-box');
     clearClashRevealUI();
@@ -700,8 +809,9 @@ function animateBattle(result, roundIdx) {
     if (pval) pval.textContent = '?';
     if (eval_) eval_.textContent = '?';
     resetClashMeters();
-  }, baseDelay + 380);
+  }, baseDelay + 700);
 
+  // 3. Reveal player total
   setTimeout(() => {
     const pv = document.getElementById('clash-pval');
     if (pv) {
@@ -710,8 +820,9 @@ function animateBattle(result, roundIdx) {
       setTimeout(() => pv.classList.remove('pop'), 500);
     }
     setClashMetersPlayerPortion(round.pTotal, round.eTotal);
-  }, baseDelay + 1180);
+  }, baseDelay + 1500);
 
+  // 4. Reveal enemy total
   setTimeout(() => {
     const box = document.getElementById('clash-box');
     if (box) {
@@ -725,12 +836,14 @@ function animateBattle(result, roundIdx) {
       setTimeout(() => ev.classList.remove('pop'), 500);
     }
     setClashMetersEnemyPortion(round.pTotal, round.eTotal);
-  }, baseDelay + 1980);
+  }, baseDelay + 2300);
 
+  // 5. Suspense
   setTimeout(() => {
     document.getElementById('clash-stat-nm')?.classList.add('clash-suspense');
-  }, baseDelay + 2420);
+  }, baseDelay + 2700);
 
+  // 6. Verdict
   setTimeout(() => {
     const nm = document.getElementById('clash-stat-nm');
     nm?.classList.remove('clash-suspense');
@@ -790,24 +903,26 @@ function animateBattle(result, roundIdx) {
       pPillar?.classList.add('sp-clash-lose');
     }
 
+    showRoundResultFlash(round.winner, statWord);
+
     addLog(
       `<div class="round-trail-row ${rowCls}"><span class="rt-icon">${statIcon}</span><span class="rt-cat">${statWord}</span><span class="rt-badge ${badgeCls}">${badgeTxt}</span></div>`,
       0,
       { scrollFocus: true }
     );
     document.getElementById('r-counter').textContent = `${roundNum} / 5`;
-  }, baseDelay + 3040);
+  }, baseDelay + 3400);
 
+  // 7. Cleanup and next round
   setTimeout(() => {
     const box = document.getElementById('clash-box');
-    box.classList.add('hidden');
-    box.classList.remove('clash-active');
+    if (box) { box.classList.add('hidden'); box.classList.remove('clash-active'); }
     clearClashStatHighlight();
     resetClashMeters();
-    fp.classList.remove('f-side-win', 'f-side-lose');
-    fe.classList.remove('f-side-win', 'f-side-lose');
+    fp?.classList.remove('f-side-win', 'f-side-lose');
+    fe?.classList.remove('f-side-win', 'f-side-lose');
     animateBattle(result, roundIdx + 1);
-  }, baseDelay + 3980);
+  }, baseDelay + 4600);
 }
 
 
@@ -1122,6 +1237,7 @@ function goNextLevel() {
   clearLevelCompleteAutoNav();
   clearDefeatAutoReturn();
   hideBattleResultOverlay();
+  clearArenaTheme();
   state.battle = null;
   state.playerHybrid = null;
   state.selectedAnimals = [];
@@ -1132,6 +1248,7 @@ function retryLevel() {
   clearLevelCompleteAutoNav();
   clearDefeatAutoReturn();
   hideBattleResultOverlay();
+  clearArenaTheme();
   state.battle = null;
   state.playerHybrid = null;
   state.selectedAnimals = [];

@@ -1,5 +1,6 @@
 import { ANIMALS } from '../data/animals.js';
 import { QUIZZES, PRE_BATTLE_QUESTIONS } from '../data/quizzes.js';
+import { getArena } from '../data/arenas.js';
 import { state, UNLOCK_QUIZ_SESSION_LEN } from './state.js';
 import { powerScore } from './hybrid.js';
 import { getActiveBattleBoosts } from './progression.js';
@@ -178,12 +179,25 @@ function simulateRound(player, enemy) {
   };
 }
 
-function runFullBattle(player, enemy, quizBoosts) {
-  const pFighter = quizBoosts && Object.values(quizBoosts).some(n => n > 0)
+function applyArenaMods(hybrid, arenaId) {
+  if (!arenaId) return hybrid;
+  const arena = getArena(arenaId);
+  if (!arena?.statMods) return hybrid;
+  const stats = { ...hybrid.stats };
+  for (const k of ['spd', 'agi', 'int', 'str']) {
+    stats[k] = Math.max(1, stats[k] + (arena.statMods[k] || 0));
+  }
+  return { ...hybrid, stats, power: powerScore(stats) };
+}
+
+function runFullBattle(player, enemy, quizBoosts, arenaId) {
+  let pFighter = quizBoosts && Object.values(quizBoosts).some(n => n > 0)
     ? hybridWithTempBoost(player, quizBoosts)
     : player;
+  pFighter = applyArenaMods(pFighter, arenaId);
+  const eFighter = applyArenaMods(enemy, arenaId);
   const rounds = [];
-  for (let i = 0; i < 5; i++) rounds.push(simulateRound(pFighter, enemy));
+  for (let i = 0; i < 5; i++) rounds.push(simulateRound(pFighter, eFighter));
   const pWins = rounds.filter(r => r.winner === 'player').length;
   const eWins = rounds.filter(r => r.winner === 'enemy').length;
   return { rounds, pWins, eWins, winner: pWins >= 3 ? 'player' : 'enemy' };
@@ -209,6 +223,7 @@ export {
   scrollToBattleStageArea,
   hybridWithTempBoost,
   getBattleDisplayPlayerHybrid,
+  applyArenaMods,
   roll,
   simulateRound,
   runFullBattle,
