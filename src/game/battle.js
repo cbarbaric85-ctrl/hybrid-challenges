@@ -212,6 +212,27 @@ function applyBossBoost(hybrid, bossAbility) {
   return { ...hybrid, stats, power: powerScore(stats) };
 }
 
+/** Pick the stat category for a single round using weighted distribution. */
+function pickRoundStat() {
+  return STAT_WEIGHTS[Math.floor(Math.random() * STAT_WEIGHTS.length)];
+}
+
+/** Resolve one round with a known stat and optional player bonus (e.g. +2 from quiz). */
+function resolveRound(player, enemy, stat, playerBonus) {
+  const pBase = player.stats[stat];
+  const eBase = enemy.stats[stat];
+  const pRoll = roll(6);
+  const eRoll = roll(6) + (enemy.diceBonus || 0);
+  const pTotal = pBase + (playerBonus || 0) + pRoll;
+  const eTotal = eBase + eRoll;
+  return {
+    stat, statLabel: STAT_LABELS[stat],
+    pBase, pBonus: playerBonus || 0, pRoll, pTotal,
+    eBase, eRoll, eTotal,
+    winner: pTotal > eTotal ? 'player' : pTotal < eTotal ? 'enemy' : 'tie',
+  };
+}
+
 /**
  * Pipeline: Arena → Weather → Boss → Abilities → Rounds
  * bossAbility only applies to the enemy.
@@ -257,5 +278,7 @@ export {
   applyBossBoost,
   roll,
   simulateRound,
+  pickRoundStat,
+  resolveRound,
   runFullBattle,
 };

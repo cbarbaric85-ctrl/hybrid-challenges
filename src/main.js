@@ -18,6 +18,7 @@ import {
   startBattle, beginBattle,
   answerPreBattleQuestion, advancePreBattleQuiz,
   confirmPreBattleAndStartFight,
+  answerClashQuiz,
   goNextLevel, retryLevel, showGameComplete, newGame,
   buildMiniStats,
 } from './ui/battle-ui.js';
@@ -51,6 +52,7 @@ Object.assign(window, {
   answerPreBattleQuestion,
   advancePreBattleQuiz,
   confirmPreBattleAndStartFight,
+  answerClashQuiz,
   applyHybridDisplayName,
   hubSpendCoinTune,
   hubSpendTokenRecruit,

@@ -5,6 +5,7 @@ import {
 import { LEVEL_REWARDS, LEVELS } from '../data/levels.js';
 import { getArena } from '../data/arenas.js';
 import { rollWeather } from '../data/weather.js';
+import { getClashQuestion } from '../data/clash-quiz.js';
 import {
   state,
   XP_PER_BATTLE_WIN,
@@ -33,7 +34,8 @@ import {
   scrollToBattlePreQuiz, scrollToBattleFocus,
   scrollToBattleTrail, scrollToBattleStageArea,
   hybridWithTempBoost, getBattleDisplayPlayerHybrid,
-  applyArenaMods, roll, simulateRound, runFullBattle,
+  applyArenaMods, applyWeatherMods, applyBossBoost,
+  roll, simulateRound, pickRoundStat, resolveRound, runFullBattle,
 } from '../game/battle.js';
 import { saveUserProgress, persistGameProgress, recordQuizAnswers, computeQuizAccuracy } from '../persistence/save.js';
 import { syncLeaderboardEntry } from '../persistence/leaderboard.js';
@@ -213,6 +215,327 @@ function showBossAbilityFlash(bossAbility) {
 function hideBossAbilityFlash() {
   const el = document.getElementById('boss-ability-flash');
   if (el) el.classList.add('hidden');
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// CLASH QUIZ — "Truth vs Lie" mid-round quiz
+// ═══════════════════════════════════════════════════════════════════
+
+const CLASH_STAT_ICONS = { spd: '⚡', agi: '🏃', int: '🧠', str: '💪' };
+let _cqCallback = null;
+let _cqTimer = null;
+let _cqCorrectIdx = -1;
+let _cqAnswered = false;
+let _cqStat = null;
+
+function showClashQuiz(stat, callback) {
+  _cqCallback = callback;
+  _cqAnswered = false;
+  _cqStat = stat;
+
+  const q = getClashQuestion(stat);
+  if (!q) { callback(false); return; }
+
+  const truthFirst = Math.random() < 0.5;
+  _cqCorrectIdx = truthFirst ? 0 : 1;
+
+  const el = document.getElementById('clash-quiz');
+  const iconEl = document.getElementById('cq-stat-icon');
+  const opt0 = document.getElementById('cq-opt-0');
+  const opt1 = document.getElementById('cq-opt-1');
+  const timerFill = document.getElementById('cq-timer-fill');
+  const fb = document.getElementById('cq-feedback');
+  if (!el) { callback(false); return; }
+
+  if (iconEl) iconEl.textContent = CLASH_STAT_ICONS[stat] || '⚔';
+  if (opt0) { opt0.textContent = truthFirst ? q.truth : q.lie; opt0.disabled = false; opt0.className = 'cq-opt'; }
+  if (opt1) { opt1.textContent = truthFirst ? q.lie : q.truth; opt1.disabled = false; opt1.className = 'cq-opt'; }
+  if (fb) fb.className = 'cq-feedback hidden';
+
+  if (timerFill) {
+    timerFill.style.transition = 'none';
+    timerFill.style.width = '100%';
+    timerFill.classList.remove('cq-urgent');
+    void timerFill.offsetWidth;
+    timerFill.style.transition = 'width 3s linear';
+    timerFill.style.width = '0%';
+    setTimeout(() => timerFill?.classList.add('cq-urgent'), 2000);
+  }
+
+  el.classList.remove('hidden');
+  el.style.animation = 'none';
+  void el.offsetWidth;
+  el.style.animation = '';
+  scrollToBattleFocus();
+
+  _cqTimer = setTimeout(() => {
+    if (!_cqAnswered) answerClashQuiz(-1);
+  }, 3000);
+}
+
+function answerClashQuiz(optIdx) {
+  if (_cqAnswered || !_cqCallback) return;
+  _cqAnswered = true;
+  clearTimeout(_cqTimer);
+
+  const correct = optIdx === _cqCorrectIdx;
+  const timedOut = optIdx === -1;
+  const opt0 = document.getElementById('cq-opt-0');
+  const opt1 = document.getElementById('cq-opt-1');
+  const fb = document.getElementById('cq-feedback');
+  const timerFill = document.getElementById('cq-timer-fill');
+
+  if (timerFill) {
+    const w = timerFill.getBoundingClientRect().width;
+    const pw = timerFill.parentElement?.getBoundingClientRect().width || 1;
+    timerFill.style.transition = 'none';
+    timerFill.style.width = pw > 0 ? `${(w / pw) * 100}%` : '0%';
+  }
+
+  if (opt0) opt0.disabled = true;
+  if (opt1) opt1.disabled = true;
+  if (_cqCorrectIdx === 0) opt0?.classList.add('cq-correct');
+  else opt1?.classList.add('cq-correct');
+  if (!timedOut && !correct) {
+    if (optIdx === 0) opt0?.classList.add('cq-wrong');
+    else opt1?.classList.add('cq-wrong');
+  }
+
+  const icon = CLASH_STAT_ICONS[_cqStat] || '⚔';
+  const statWord = STAT_LABELS_SIMPLE[_cqStat] || '';
+  if (fb) {
+    fb.classList.remove('hidden', 'cq-fb-correct', 'cq-fb-wrong');
+    if (correct) {
+      fb.textContent = `Correct! ${icon} +2 ${statWord}!`;
+      fb.classList.add('cq-fb-correct');
+    } else if (timedOut) {
+      fb.textContent = "Time's up!";
+      fb.classList.add('cq-fb-wrong');
+    } else {
+      fb.textContent = 'Not quite!';
+      fb.classList.add('cq-fb-wrong');
+    }
+    fb.style.animation = 'none';
+    void fb.offsetWidth;
+    fb.style.animation = '';
+  }
+
+  if (state.progress) {
+    recordQuizAnswers(state.progress, 1, correct ? 1 : 0);
+  }
+
+  const cb = _cqCallback;
+  _cqCallback = null;
+  setTimeout(() => {
+    hideClashQuiz();
+    cb(correct);
+  }, 600);
+}
+
+function hideClashQuiz() {
+  const el = document.getElementById('clash-quiz');
+  if (el) el.classList.add('hidden');
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// INTERACTIVE ROUND SYSTEM
+// ═══════════════════════════════════════════════════════════════════
+
+function playInteractiveRound(roundIdx) {
+  const b = state.battle;
+  if (!b) return;
+
+  if (roundIdx >= 5) {
+    const result = {
+      rounds: b.roundResults,
+      pWins: b.interactivePWins,
+      eWins: b.interactiveEWins,
+      winner: b.interactivePWins >= 3 ? 'player' : 'enemy',
+    };
+    b.result = result;
+    hideRoundAnnounce();
+    hideRoundResultFlash();
+    hideBossAbilityFlash();
+    hideClashQuiz();
+    setTimeout(() => finishBattle(result), 720);
+    return;
+  }
+
+  const stat = pickRoundStat();
+  const statWord = STAT_LABELS_SIMPLE[stat];
+  const roundNum = roundIdx + 1;
+
+  if (b.isBoss && b.bossAbility && roundIdx === 2 && !b.bossAbilityFired) {
+    b.bossAbilityFired = true;
+    showBossAbilityFlash(b.bossAbility);
+    setTimeout(() => hideBossAbilityFlash(), 1000);
+  }
+
+  hideRoundResultFlash();
+  showRoundAnnounce(roundNum, stat, statWord);
+  applyCapabilityAnim(stat);
+  scrollToBattleFocus();
+  setBattleRoundStripProgress(roundIdx);
+
+  setTimeout(() => {
+    showClashQuiz(stat, (correct) => {
+      const round = resolveRound(b.pFighter, b.eFighter, stat, correct ? 2 : 0);
+      b.roundResults.push(round);
+      if (round.winner === 'player') b.interactivePWins++;
+      else if (round.winner === 'enemy') b.interactiveEWins++;
+
+      animateRoundResult(round, roundIdx, () => {
+        playInteractiveRound(roundIdx + 1);
+      });
+    });
+  }, 600);
+}
+
+function animateRoundResult(round, roundIdx, done) {
+  const roundNum = roundIdx + 1;
+  const statWord = STAT_LABELS_SIMPLE[round.stat];
+  const statIcon = STAT_TRAIL_ICONS[round.stat] || '◆';
+  const fp = document.getElementById('fighter-player');
+  const fe = document.getElementById('fighter-enemy');
+  fp?.classList.remove('f-side-win', 'f-side-lose');
+  fe?.classList.remove('f-side-win', 'f-side-lose');
+
+  const clearClashRevealUI = () => {
+    const inner = document.querySelector('#clash-box .clash-inner');
+    inner?.classList.remove('clash-reveal-p', 'clash-reveal-e');
+    document.getElementById('clash-pval')?.classList.remove('clash-winner-n');
+    document.getElementById('clash-eval')?.classList.remove('clash-winner-n');
+    document.getElementById('clash-box')?.classList.remove('clash-clash-moment');
+  };
+
+  hideRoundAnnounce();
+  clearClashRevealUI();
+  const box = document.getElementById('clash-box');
+  if (box) {
+    box.classList.remove('hidden');
+    box.classList.add('clash-active', 'clash-peak');
+    setTimeout(() => box.classList.remove('clash-peak'), 500);
+  }
+  setClashStatHighlight(round.stat);
+  const tag = document.querySelector('#clash-box .clash-tagline');
+  if (tag) tag.textContent = `Category · ${statWord}`;
+  const nm = document.getElementById('clash-stat-nm');
+  if (nm) {
+    nm.textContent = statWord.toUpperCase();
+    nm.className = `clash-stat-nm ${round.stat}`;
+  }
+  const pval = document.getElementById('clash-pval');
+  const eval_ = document.getElementById('clash-eval');
+  if (pval) pval.textContent = '?';
+  if (eval_) eval_.textContent = '?';
+  resetClashMeters();
+  scrollToBattleFocus();
+
+  // T+400: Player bar fills, value revealed
+  setTimeout(() => {
+    if (pval) {
+      pval.textContent = round.pTotal;
+      pval.classList.add('pop');
+      setTimeout(() => pval.classList.remove('pop'), 500);
+    }
+    setClashMetersPlayerPortion(round.pTotal, round.eTotal);
+  }, 400);
+
+  // T+900: Rival bar fills, value revealed + clash moment
+  setTimeout(() => {
+    if (box) {
+      box.classList.add('clash-clash-moment');
+      setTimeout(() => box.classList.remove('clash-clash-moment'), 400);
+    }
+    const stage = document.getElementById('battle-zone-focus');
+    if (stage) {
+      stage.classList.add('clash-screen-shake');
+      setTimeout(() => stage.classList.remove('clash-screen-shake'), 300);
+    }
+    if (eval_) {
+      eval_.textContent = round.eTotal;
+      eval_.classList.add('pop');
+      setTimeout(() => eval_.classList.remove('pop'), 500);
+    }
+    setClashMetersEnemyPortion(round.pTotal, round.eTotal);
+  }, 900);
+
+  // T+1500: Verdict
+  setTimeout(() => {
+    const pip = document.getElementById(`rpip-${roundIdx}`);
+    let rowCls = 'rt-tie';
+    let badgeCls = 'tie';
+    let badgeTxt = 'T';
+    if (round.winner === 'player') {
+      if (pip) pip.className = 'r-pip pw';
+      fp?.classList.add('f-side-win', 'flash-win');
+      fe?.classList.add('f-side-lose', 'flash-lose');
+      setTimeout(() => {
+        fp?.classList.remove('flash-win');
+        fe?.classList.remove('flash-lose');
+        const heartEl = document.getElementById(`be-h-${roundIdx}`);
+        if (heartEl) heartEl.classList.add('lost');
+      }, 600);
+      rowCls = 'rt-win';
+      badgeCls = 'win';
+      badgeTxt = 'W';
+    } else if (round.winner === 'enemy') {
+      if (pip) pip.className = 'r-pip ew';
+      fe?.classList.add('f-side-win', 'flash-win');
+      fp?.classList.add('f-side-lose', 'flash-lose');
+      setTimeout(() => {
+        fe?.classList.remove('flash-win');
+        fp?.classList.remove('flash-lose');
+        const heartEl = document.getElementById(`bp-h-${roundIdx}`);
+        if (heartEl) heartEl.classList.add('lost');
+      }, 600);
+      rowCls = 'rt-loss';
+      badgeCls = 'loss';
+      badgeTxt = 'L';
+    } else {
+      if (pip) pip.className = 'r-pip tie';
+    }
+
+    const inner = document.querySelector('#clash-box .clash-inner');
+    if (round.winner === 'player') {
+      inner?.classList.add('clash-reveal-p');
+      document.getElementById('clash-pval')?.classList.add('clash-winner-n');
+    } else if (round.winner === 'enemy') {
+      inner?.classList.add('clash-reveal-e');
+      document.getElementById('clash-eval')?.classList.add('clash-winner-n');
+    }
+    if (round.winner === 'player') setClashMeterWinHighlight('player');
+    else if (round.winner === 'enemy') setClashMeterWinHighlight('enemy');
+    else clearClashMeterWinHighlight();
+
+    const pPillar = document.querySelector(`#bp-stats .battle-stat-pillar[data-stat="${round.stat}"]`);
+    const ePillar = document.querySelector(`#be-stats .battle-stat-pillar[data-stat="${round.stat}"]`);
+    if (round.winner === 'player') {
+      pPillar?.classList.add('sp-clash-win');
+      ePillar?.classList.add('sp-clash-lose');
+    } else if (round.winner === 'enemy') {
+      ePillar?.classList.add('sp-clash-win');
+      pPillar?.classList.add('sp-clash-lose');
+    }
+
+    showRoundResultFlash(round.winner, statWord);
+    addLog(
+      `<div class="round-trail-row ${rowCls}"><span class="rt-icon">${statIcon}</span><span class="rt-cat">${statWord}</span><span class="rt-badge ${badgeCls}">${badgeTxt}</span></div>`,
+      0,
+      { scrollFocus: true }
+    );
+    document.getElementById('r-counter').textContent = `${roundNum} / 5`;
+  }, 1500);
+
+  // T+2600: Cleanup → next
+  setTimeout(() => {
+    if (box) { box.classList.add('hidden'); box.classList.remove('clash-active'); }
+    clearClashStatHighlight();
+    resetClashMeters();
+    fp?.classList.remove('f-side-win', 'f-side-lose');
+    fe?.classList.remove('f-side-win', 'f-side-lose');
+    done();
+  }, 2600);
 }
 
 function startBattle() {
@@ -431,6 +754,7 @@ function renderBattleScreen() {
   hideRoundAnnounce();
   hideRoundResultFlash();
   hideBossAbilityFlash();
+  hideClashQuiz();
 
   const disp = getBattleDisplayPlayerHybrid();
   const bpEm = document.getElementById('bp-em');
@@ -833,16 +1157,26 @@ function beginBattle() {
   document.getElementById('b-actions').innerHTML = '';
   const boosts = mergeStatBoosts(b.quizBoosts || EMPTY_STAT_BOOST(), getStreakBattleBoost(state.progress));
 
+  let pFighter = boosts && Object.values(boosts).some(n => n > 0)
+    ? hybridWithTempBoost(state.playerHybrid, boosts)
+    : state.playerHybrid;
+  pFighter = applyArenaMods(pFighter, b.arenaId);
+  pFighter = applyWeatherMods(pFighter, b.weatherId);
+  let eFighter = applyArenaMods(state.enemyHybrid, b.arenaId);
+  eFighter = applyWeatherMods(eFighter, b.weatherId);
+  eFighter = applyBossBoost(eFighter, b.bossAbility);
+
+  b.pFighter = pFighter;
+  b.eFighter = eFighter;
+  b.roundResults = [];
+  b.interactivePWins = 0;
+  b.interactiveEWins = 0;
+
   const doCountdownAndFight = () => {
     runBattleCountdown(() => {
       scrollToBattleFocus();
       showBattleRoundStrip();
-      const result = runFullBattle(
-        state.playerHybrid, state.enemyHybrid, boosts,
-        b.arenaId, b.weatherId, b.bossAbility
-      );
-      state.battle.result = result;
-      animateBattle(result, 0);
+      playInteractiveRound(0);
     });
   };
 
@@ -868,6 +1202,7 @@ function addLog(html, delay, opts) {
   }, delay);
 }
 
+/** @deprecated — kept as fallback; interactive rounds use playInteractiveRound */
 function animateBattle(result, roundIdx) {
   if (roundIdx >= result.rounds.length) {
     hideRoundAnnounce();
@@ -876,183 +1211,7 @@ function animateBattle(result, roundIdx) {
     setTimeout(() => finishBattle(result), 720);
     return;
   }
-  const round = result.rounds[roundIdx];
-  const roundNum = roundIdx + 1;
-  const roundSpan = 4800;
-  const baseDelay = roundIdx * roundSpan;
-  const statWord = STAT_LABELS_SIMPLE[round.stat];
-  const statIcon = STAT_TRAIL_ICONS[round.stat] || '◆';
-  const fp = document.getElementById('fighter-player');
-  const fe = document.getElementById('fighter-enemy');
-  fp?.classList.remove('f-side-win', 'f-side-lose');
-  fe?.classList.remove('f-side-win', 'f-side-lose');
-
-  const clearClashRevealUI = () => {
-    const inner = document.querySelector('#clash-box .clash-inner');
-    inner?.classList.remove('clash-reveal-p', 'clash-reveal-e');
-    document.getElementById('clash-pval')?.classList.remove('clash-winner-n');
-    document.getElementById('clash-eval')?.classList.remove('clash-winner-n');
-    document.getElementById('clash-box')?.classList.remove('clash-clash-moment');
-  };
-
-  // 0. Boss ability flash (fires once, on round 3)
-  const b = state.battle;
-  if (b && b.isBoss && b.bossAbility && roundIdx === 2 && !b.bossAbilityFired) {
-    b.bossAbilityFired = true;
-    setTimeout(() => {
-      showBossAbilityFlash(b.bossAbility);
-    }, baseDelay > 0 ? baseDelay - 400 : 0);
-    setTimeout(() => {
-      hideBossAbilityFlash();
-    }, baseDelay + 400);
-  }
-
-  // 1. Cinematic round announce
-  setTimeout(() => {
-    hideRoundResultFlash();
-    showRoundAnnounce(roundNum, round.stat, statWord);
-    applyCapabilityAnim(round.stat);
-    scrollToBattleFocus();
-  }, baseDelay);
-
-  // 2. Show clash box with stat
-  setTimeout(() => {
-    hideRoundAnnounce();
-    setBattleRoundStripProgress(roundIdx);
-    const box = document.getElementById('clash-box');
-    clearClashRevealUI();
-    if (box) {
-      box.classList.remove('hidden');
-      box.classList.add('clash-active', 'clash-peak');
-      setTimeout(() => box.classList.remove('clash-peak'), 880);
-    }
-    setClashStatHighlight(round.stat);
-    const tag = document.querySelector('#clash-box .clash-tagline');
-    if (tag) tag.textContent = `Category · ${statWord}`;
-    const nm = document.getElementById('clash-stat-nm');
-    if (nm) {
-      nm.textContent = statWord.toUpperCase();
-      nm.className = `clash-stat-nm ${round.stat}`;
-    }
-    const pval = document.getElementById('clash-pval');
-    const eval_ = document.getElementById('clash-eval');
-    if (pval) pval.textContent = '?';
-    if (eval_) eval_.textContent = '?';
-    resetClashMeters();
-  }, baseDelay + 700);
-
-  // 3. Reveal player total
-  setTimeout(() => {
-    const pv = document.getElementById('clash-pval');
-    if (pv) {
-      pv.textContent = round.pTotal;
-      pv.classList.add('pop');
-      setTimeout(() => pv.classList.remove('pop'), 500);
-    }
-    setClashMetersPlayerPortion(round.pTotal, round.eTotal);
-  }, baseDelay + 1500);
-
-  // 4. Reveal enemy total
-  setTimeout(() => {
-    const box = document.getElementById('clash-box');
-    if (box) {
-      box.classList.add('clash-clash-moment');
-      setTimeout(() => box.classList.remove('clash-clash-moment'), 580);
-    }
-    const ev = document.getElementById('clash-eval');
-    if (ev) {
-      ev.textContent = round.eTotal;
-      ev.classList.add('pop');
-      setTimeout(() => ev.classList.remove('pop'), 500);
-    }
-    setClashMetersEnemyPortion(round.pTotal, round.eTotal);
-  }, baseDelay + 2300);
-
-  // 5. Suspense
-  setTimeout(() => {
-    document.getElementById('clash-stat-nm')?.classList.add('clash-suspense');
-  }, baseDelay + 2700);
-
-  // 6. Verdict
-  setTimeout(() => {
-    const nm = document.getElementById('clash-stat-nm');
-    nm?.classList.remove('clash-suspense');
-    const pip = document.getElementById(`rpip-${roundIdx}`);
-    let rowCls = 'rt-tie';
-    let badgeCls = 'tie';
-    let badgeTxt = 'T';
-    if (round.winner === 'player') {
-      if (pip) pip.className = 'r-pip pw';
-      fp?.classList.add('f-side-win', 'flash-win');
-      fe?.classList.add('f-side-lose', 'flash-lose');
-      setTimeout(() => {
-        fp?.classList.remove('flash-win');
-        fe?.classList.remove('flash-lose');
-        const heartEl = document.getElementById(`be-h-${roundIdx}`);
-        if (heartEl) heartEl.classList.add('lost');
-      }, 900);
-      rowCls = 'rt-win';
-      badgeCls = 'win';
-      badgeTxt = 'W';
-    } else if (round.winner === 'enemy') {
-      if (pip) pip.className = 'r-pip ew';
-      fe?.classList.add('f-side-win', 'flash-win');
-      fp?.classList.add('f-side-lose', 'flash-lose');
-      setTimeout(() => {
-        fe?.classList.remove('flash-win');
-        fp?.classList.remove('flash-lose');
-        const heartEl = document.getElementById(`bp-h-${roundIdx}`);
-        if (heartEl) heartEl.classList.add('lost');
-      }, 900);
-      rowCls = 'rt-loss';
-      badgeCls = 'loss';
-      badgeTxt = 'L';
-    } else {
-      if (pip) pip.className = 'r-pip tie';
-    }
-
-    const inner = document.querySelector('#clash-box .clash-inner');
-    if (round.winner === 'player') {
-      inner?.classList.add('clash-reveal-p');
-      document.getElementById('clash-pval')?.classList.add('clash-winner-n');
-    } else if (round.winner === 'enemy') {
-      inner?.classList.add('clash-reveal-e');
-      document.getElementById('clash-eval')?.classList.add('clash-winner-n');
-    }
-    if (round.winner === 'player') setClashMeterWinHighlight('player');
-    else if (round.winner === 'enemy') setClashMeterWinHighlight('enemy');
-    else clearClashMeterWinHighlight();
-
-    const pPillar = document.querySelector(`#bp-stats .battle-stat-pillar[data-stat="${round.stat}"]`);
-    const ePillar = document.querySelector(`#be-stats .battle-stat-pillar[data-stat="${round.stat}"]`);
-    if (round.winner === 'player') {
-      pPillar?.classList.add('sp-clash-win');
-      ePillar?.classList.add('sp-clash-lose');
-    } else if (round.winner === 'enemy') {
-      ePillar?.classList.add('sp-clash-win');
-      pPillar?.classList.add('sp-clash-lose');
-    }
-
-    showRoundResultFlash(round.winner, statWord);
-
-    addLog(
-      `<div class="round-trail-row ${rowCls}"><span class="rt-icon">${statIcon}</span><span class="rt-cat">${statWord}</span><span class="rt-badge ${badgeCls}">${badgeTxt}</span></div>`,
-      0,
-      { scrollFocus: true }
-    );
-    document.getElementById('r-counter').textContent = `${roundNum} / 5`;
-  }, baseDelay + 3400);
-
-  // 7. Cleanup and next round
-  setTimeout(() => {
-    const box = document.getElementById('clash-box');
-    if (box) { box.classList.add('hidden'); box.classList.remove('clash-active'); }
-    clearClashStatHighlight();
-    resetClashMeters();
-    fp?.classList.remove('f-side-win', 'f-side-lose');
-    fe?.classList.remove('f-side-win', 'f-side-lose');
-    animateBattle(result, roundIdx + 1);
-  }, baseDelay + 4600);
+  playInteractiveRound(roundIdx);
 }
 
 
@@ -1368,6 +1527,7 @@ function cleanupBattleVisuals() {
   clearArenaTheme();
   clearWeatherOverlay();
   clearBossMode();
+  hideClashQuiz();
 }
 
 function goNextLevel() {
@@ -1461,6 +1621,7 @@ export {
   hideBattleResultOverlay,
   beginBattle,
   addLog,
+  answerClashQuiz,
   animateBattle,
   updateStreakOnLevelComplete,
   scrollDefeatIntoView,
