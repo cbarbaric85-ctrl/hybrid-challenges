@@ -599,6 +599,88 @@ export const QUIZZES = {
       {q:'Anubis is one of the oldest gods in…',opts:['Greek myth','Norse myth','Egyptian mythology','Roman myth'],correct:2,fact:'Anubis dates back over 5,000 years.'},
     ]
   },
+
+  // ── EGYPTIAN GUARDIANS (3 story questions each) ──
+  anubis_guardian: {
+    intro: 'Anubis Guardian — jackal sentinel of the Duat. Which tales are true?',
+    questions: [
+      { q: 'Which real animal is Anubis’s head usually based on?', opts: ['House cat', 'Jackal or wild dog', 'Camel', 'Crocodile'], correct: 1, fact: 'Ancient artists blended jackals — animals seen near tombs — with a human body.' },
+      { q: 'In myth, Anubis helped judges by weighing a person’s heart against…', opts: ['A gold bar', 'The feather of Ma’at (truth)', 'A brick', 'A cloud'], correct: 1, fact: 'Balance meant your heart was light with truth — heavy hearts had trouble in the afterlife.' },
+      { q: 'Anubis was linked with tombs because jackals often…', opts: ['Only liked snow', 'Roamed near desert burial places', 'Lived underwater', 'Ignored humans'], correct: 1, fact: 'People noticed jackals near cemeteries and spun sacred stories to explain it.' },
+    ],
+  },
+  pharaoh_king: {
+    intro: 'Pharaoh King — ruler between gods and people. Prove you know the crown!',
+    questions: [
+      { q: 'Ancient Egyptians saw the pharaoh as…', opts: ['A random farmer', 'A living link to the gods', 'Only a soldier', 'Invisible'], correct: 1, fact: 'Pharaohs led rituals, laws, and huge building projects — power and faith fused.' },
+      { q: 'The striped headcloth called the nemes is most famous on…', opts: ['Tutankhamun’s golden mask', 'A modern bike helmet', 'Greek statues', 'Viking ships'], correct: 0, fact: 'King Tut’s mask shows the nemes — instant “movie Egypt” in museums.' },
+      { q: 'Why did pharaohs sponsor giant temples?', opts: ['To hide snacks', 'To honor gods and show Egypt’s strength', 'To sell ice cream', 'To avoid the sun'], correct: 1, fact: 'Temples were schools, treasuries, and stage sets for cosmic order — politics met myth.' },
+    ],
+  },
+  sun_priest: {
+    intro: 'Sun Priest — keeper of dawn and dusk. Follow the light!',
+    questions: [
+      { q: 'Ra’s sun boat was said to sail through…', opts: ['Only a bathtub', 'The sky by day and the underworld by night', 'A shopping mall', 'Frozen tundra'], correct: 1, fact: 'Night travel explained how the sun “returned” each morning — myth as clockwork.' },
+      { q: 'Priests timed festivals to things like…', opts: ['Nile floods and star patterns', 'Random dice only', 'Loud yawns', 'Cloud shapes'], correct: 0, fact: 'The Nile’s rise meant planting season — religion and survival shared a calendar.' },
+      { q: 'The scarab beetle symbol often stood for…', opts: ['Giving up', 'Rebirth and the rolling sun', 'Sleeping forever', 'Swimming only'], correct: 1, fact: 'Beetles rolling dung balls looked like tiny sun-pushers — nature inspired symbols.' },
+    ],
+  },
+  scarab_warrior: {
+    intro: 'Scarab Warrior — rebirth in armored form. Buzz through the quiz!',
+    questions: [
+      { q: 'Scarabs reminded Egyptians of renewal because beetles…', opts: ['Never moved', 'Buried eggs in balls that “came back” as new beetles', 'Only lived in ice', 'Hated plants'], correct: 1, fact: 'Life emerging from buried balls looked like magic recycling.' },
+      { q: 'Warriors and scarabs both show up on…', opts: ['Only modern phones', 'Ancient carvings and amulets', 'Moon rocks', 'Pizza boxes'], correct: 1, fact: 'Amulets carried story-power — portable courage for scary journeys.' },
+      { q: 'A “heart scarab” amulet sometimes had a spell to…', opts: ['Make hearts noisy', 'Calm the heart at judgment', 'Turn hearts into jelly', 'Hide lunch'], correct: 1, fact: 'Words carved on stone were believed to whisper courage at the scales.' },
+    ],
+  },
+  sandstorm_sentinel: {
+    intro: 'Sandstorm Sentinel — the desert’s watchful whirlwind.',
+    questions: [
+      { q: 'Khamsin winds can blast Egypt with…', opts: ['Only snow', 'Hot sand-filled air for days', 'Fish', 'Quiet music'], correct: 1, fact: 'Seasonal sandstorms shaped travel, farming stress, and spooky desert tales.' },
+      { q: 'Desert sentries in stories often test heroes by…', opts: ['Offering free cake', 'Hiding paths until riddles are solved', 'Ignoring them', 'Sleeping instantly'], correct: 1, fact: 'Harsh land made cleverness as valuable as muscle.' },
+      { q: 'Oases were lifelines because they offered…', opts: ['Wi-Fi trees', 'Water, shade, and trade stops', 'Only rocks', 'Nothing'], correct: 1, fact: 'Green islands in sand meant maps, myths, and markets lined up.' },
+    ],
+  },
+  horus_champion: {
+    intro: 'Horus Champion — the falcon of kings. Take wing!',
+    questions: [
+      { q: 'Horus is usually shown with the head of a…', opts: ['Shark', 'Falcon', 'Bear', 'Tree'], correct: 1, fact: 'Sky-high hunters became symbols of sharp sight and royal protection.' },
+      { q: 'The Eye of Horus symbol was tied to…', opts: ['Losing socks', 'Healing and protection', 'Cooking soup', 'Time travel'], correct: 1, fact: 'Myth said his eye was hurt then healed — a comeback story carved in stone.' },
+      { q: 'Pharaohs wore Horus imagery to say they were…', opts: ['Unrelated to gods', 'Protected rulers on earth', 'Only tourists', 'Underwater kings'], correct: 1, fact: 'Art repeated the message: the king’s job was cosmic order, not just taxes.' },
+    ],
+  },
+  obelisk_titan: {
+    intro: 'Obelisk Titan — needle of stone touching the sun.',
+    questions: [
+      { q: 'Obelisks were often carved from…', opts: ['Jello', 'Single pieces of granite', 'Paper', 'Clouds'], correct: 1, fact: 'Moving a monolith without cranes was a flex of engineering and willpower.' },
+      { q: 'The pyramid shape points upward partly to echo…', opts: ['Sunbeams and sacred mountains', 'Only dinner plates', 'Nothing', 'Random luck'], correct: 0, fact: 'Stone reaching skyward said “we’re talking to the divine.”' },
+      { q: 'Hieroglyphs on obelisks bragged about…', opts: ['Nothing at all', 'Pharaoh wins and temple gifts', 'Alien TV shows', 'Sleep schedules'], correct: 1, fact: 'Public stone ads ran for thousands of years — weather-proof propaganda.' },
+    ],
+  },
+  tomb_defender: {
+    intro: 'Tomb Defender — curses optional, courage required.',
+    questions: [
+      { q: 'Tombs hid traps and false passages to…', opts: ['Welcome thieves', 'Stop robbers after treasure', 'Sell tickets', 'Grow trees'], correct: 1, fact: 'Ancient security systems used architecture instead of alarms.' },
+      { q: 'Canopic jars sometimes held…', opts: ['Lunch meat', 'Preserved organs for the afterlife', 'Beach sand only', 'Music'], correct: 1, fact: 'Mummification was a checklist — every part had a job in the journey beyond.' },
+      { q: 'The Book of the Dead is really…', opts: ['A cookbook', 'A collection of spells for the afterlife journey', 'A sports league', 'A map of Mars'], correct: 1, fact: 'Copies were personalized — your scroll was your GPS through Duat traffic.' },
+    ],
+  },
+  desert_spirit: {
+    intro: 'Desert Spirit — mirage or messenger? You decide.',
+    questions: [
+      { q: 'A mirage happens because…', opts: ['Sand is magic', 'Light bends through hot air near the ground', 'The moon prints pictures', 'Wind hates eyes'], correct: 1, fact: 'Your brain guesses wrong when light paths twist — “water” can be sky in disguise.' },
+      { q: 'Desert travelers followed stars to…', opts: ['Ignore direction', 'Keep north-south lines at night', 'Paint houses', 'Count birds'], correct: 1, fact: 'Clear skies turned constellations into compasses.' },
+      { q: 'Spirits in desert tales often test travelers’…', opts: ['Shoe size only', 'Kindness and cleverness', 'Ability to nap', 'Hair color'], correct: 1, fact: 'Stories teach: survive the sand with heart and brains.' },
+    ],
+  },
+  ra_avenger: {
+    intro: 'Ra’s Avenger — noon sun justice, blazing bright.',
+    questions: [
+      { q: 'Ra was most tied to…', opts: ['The moon only', 'The sun crossing the sky', 'Underwater hockey', 'Winter only'], correct: 1, fact: 'Solar boats and eyes fill Egyptian art — day and night were a relay race.' },
+      { q: 'The sun god fought chaos serpent Apep mostly at…', opts: ['Breakfast buffets', 'Night while Ra’s boat crossed the underworld', 'School recess', 'Mars'], correct: 1, fact: 'Dawn meant Ra won again — cosmic reboot every morning.' },
+      { q: 'Solar disks in art hint that Ra brought…', opts: ['Darkness forever', 'Light, order, and life energy', 'Only shadows', 'Nothing'], correct: 1, fact: 'Light wasn’t just nice — it was the fuel of ma’at (balance).' },
+    ],
+  },
 };
 
 /** Surprising fact MCQs — one pool per roster animal; boostStat tags which stat gets +1 when correct. */

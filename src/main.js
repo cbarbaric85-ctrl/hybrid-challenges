@@ -8,6 +8,9 @@ import {
   hubActionTrain, hubActionUnlock, hubActionImprove, hubActionNewFusion,
 } from './ui/hub.js';
 import {
+  renderFactionSelect, pickFactionAndContinue, openFactionSelectFromHub,
+} from './ui/faction-ui.js';
+import {
   showBuilder, showHub, forgeHybrid,
   applyHybridDisplayName, renderBuilder,
   startQuizQuestions, answerQuestion, nextQuizQuestion,
@@ -31,6 +34,9 @@ Object.assign(window, {
   handleAuth,
   logout,
   renderHub,
+  renderFactionSelect,
+  pickFactionAndContinue,
+  openFactionSelectFromHub,
   renderBuilder,
   renderLeaderboard,
   showBuilder,

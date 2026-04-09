@@ -68,7 +68,7 @@ function defaultProgress() {
     streakCount: 0,
     lastPlayedDate: null,
     progressSchemaVersion: 1,
-    stageAccess: { base: true, apex: true, dinosaur: true, legendary: true, mythical: true },
+    stageAccess: { base: true, apex: true, dinosaur: true, legendary: true, mythical: true, egyptian: true },
     coins: 0,
     unlockTokens: 0,
     dailyChallengeDayKey: null,
@@ -78,6 +78,11 @@ function defaultProgress() {
     totalQuizCorrect: 0,
     /** Meta XP — wins only; drives Hub progress bar (not campaign level). */
     commanderXp: 0,
+    /** @type {string|null} Faction id from data/factions.js */
+    faction: null,
+    factionXP: 0,
+    /** @type {string[]} Unlocked faction ids (future expansion / switching) */
+    factionUnlocked: [],
   };
 }
 
@@ -87,6 +92,7 @@ const MONETIZE_PLACEHOLDER = {
   dinosaurStageOwned: true,
   legendaryStageOwned: true,
   mythicalStageOwned: true,
+  egyptianStageOwned: true,
 };
 
 export {

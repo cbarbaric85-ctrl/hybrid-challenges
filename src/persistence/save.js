@@ -15,7 +15,12 @@ function normalizeProgress(p) {
   if (!p.quizUnlocked) p.quizUnlocked = [];
   if (p.highestLevelReached == null) p.highestLevelReached = 0;
   if (p.streakCount == null) p.streakCount = 0;
-  if (!p.stageAccess) p.stageAccess = { base: true, apex: true, dinosaur: true };
+  if (!p.stageAccess) p.stageAccess = { base: true, apex: true, dinosaur: true, legendary: true, mythical: true, egyptian: true };
+  else {
+    if (p.stageAccess.legendary == null) p.stageAccess.legendary = true;
+    if (p.stageAccess.mythical == null) p.stageAccess.mythical = true;
+    if (p.stageAccess.egyptian == null) p.stageAccess.egyptian = true;
+  }
   if (p.progressSchemaVersion == null) p.progressSchemaVersion = 0;
   if (p.coins == null) p.coins = 0;
   if (p.unlockTokens == null) p.unlockTokens = 0;
@@ -24,6 +29,9 @@ function normalizeProgress(p) {
   if (p.totalQuizQuestions == null) p.totalQuizQuestions = 0;
   if (p.totalQuizCorrect == null) p.totalQuizCorrect = 0;
   if (p.commanderXp == null) p.commanderXp = 0;
+  if (p.factionXP == null) p.factionXP = 0;
+  if (!Array.isArray(p.factionUnlocked)) p.factionUnlocked = [];
+  if (p.faction != null && typeof p.faction !== 'string') p.faction = null;
   return p;
 }
 
@@ -96,10 +104,16 @@ function firestoreDataToProgress(data) {
     totalQuizQuestions: data.totalQuizQuestions ?? 0,
     totalQuizCorrect: data.totalQuizCorrect ?? 0,
     commanderXp: data.commanderXp ?? 0,
+    faction: typeof data.faction === 'string' ? data.faction : null,
+    factionXP: data.factionXP ?? 0,
+    factionUnlocked: Array.isArray(data.factionUnlocked) ? [...data.factionUnlocked] : [],
     stageAccess: {
       base: data.stageAccess?.base !== false,
       apex: data.stageAccess?.apex !== false,
       dinosaur: data.stageAccess?.dinosaur !== false,
+      legendary: data.stageAccess?.legendary !== false,
+      mythical: data.stageAccess?.mythical !== false,
+      egyptian: data.stageAccess?.egyptian !== false,
     },
   };
   normalizeProgress(p);
@@ -175,6 +189,9 @@ async function saveUserProgress(progress) {
       totalQuizQuestions: p.totalQuizQuestions ?? 0,
       totalQuizCorrect: p.totalQuizCorrect ?? 0,
       commanderXp: p.commanderXp ?? 0,
+      faction: p.faction ?? null,
+      factionXP: p.factionXP ?? 0,
+      factionUnlocked: [...(p.factionUnlocked || [])],
       stageAccess: { ...(p.stageAccess || { base: true, apex: true, dinosaur: true }) },
       updatedAt: serverTimestamp(),
     },

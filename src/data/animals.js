@@ -5,8 +5,12 @@ export const STAGE_APEX = 'apex';
 export const STAGE_DINO = 'dinosaur';
 export const STAGE_LEGENDARY = 'legendary';
 export const STAGE_MYTHICAL = 'mythical';
+/** Egyptian Guardians — unlock roster after all Mythical God quizzes; missions from Level 21+. */
+export const STAGE_EGYPTIAN = 'egyptian';
 
-export const STAGE_RANK = { [STAGE_BASE]: 1, [STAGE_APEX]: 2, [STAGE_DINO]: 3, [STAGE_LEGENDARY]: 4, [STAGE_MYTHICAL]: 5 };
+export const STAGE_RANK = {
+  [STAGE_BASE]: 1, [STAGE_APEX]: 2, [STAGE_DINO]: 3, [STAGE_LEGENDARY]: 4, [STAGE_MYTHICAL]: 5, [STAGE_EGYPTIAN]: 6,
+};
 
 /**
  * Tier-grouped animal registry. Add new animals inside the correct tier block.
@@ -95,6 +99,62 @@ export const TIER_REGISTRY = {
       anubis:   {id:'anubis',   name:'Anubis',    icon:'⚖️', emoji:'⚖️', spd:18, agi:18, int:22, str:20, stage:STAGE_MYTHICAL, bio:'Guardian of the dead. Weigher of hearts.'},
     },
   },
+  egyptian: {
+    label: 'Egyptian Guardian',
+    stage: STAGE_EGYPTIAN,
+    intro: 'Sacred guardians of the Duat — wisdom of the desert, speed of the storm.',
+    animals: {
+      anubis_guardian: {
+        id: 'anubis_guardian', name: 'Anubis Guardian', icon: '🐺', emoji: '🐺', spd: 19, agi: 21, int: 24, str: 18, stage: STAGE_EGYPTIAN,
+        bio: 'Jackal-headed sentinel — Soul Guard may deny a lost round once (with Egyptian allegiance).',
+      },
+      pharaoh_king: {
+        id: 'pharaoh_king', name: 'Pharaoh King', icon: '👑', emoji: '👑', spd: 18, agi: 20, int: 23, str: 19, stage: STAGE_EGYPTIAN,
+        bio: 'Living god-king — royal decree empowers every stat.',
+        battleAbility: { type: 'royal_command' },
+      },
+      sun_priest: {
+        id: 'sun_priest', name: 'Sun Priest', icon: '☀️', emoji: '☀️', spd: 19, agi: 21, int: 24, str: 17, stage: STAGE_EGYPTIAN,
+        bio: 'Keeper of the solar barque — clarity in the brightest clash.',
+        battleAbility: { type: 'stat_bonus', stat: 'int', amount: 1, flash: '☀️ Sun sigil sharpens your mind!' },
+      },
+      scarab_warrior: {
+        id: 'scarab_warrior', name: 'Scarab Warrior', icon: '🪲', emoji: '🪲', spd: 20, agi: 22, int: 21, str: 17, stage: STAGE_EGYPTIAN,
+        bio: 'Rebirth in motion — every setback feeds the next strike.',
+        battleAbility: { type: 'bonus_after_loss', amount: 1, flash: '🪲 Scarab rebirth — you rally!' },
+      },
+      sandstorm_sentinel: {
+        id: 'sandstorm_sentinel', name: 'Sandstorm Sentinel', icon: '🌪️', emoji: '🌪️', spd: 21, agi: 24, int: 20, str: 17, stage: STAGE_EGYPTIAN,
+        bio: 'Veils the horizon — strikes from whirling dust.',
+        battleAbility: { type: 'stat_bonus', stat: 'agi', amount: 1, flash: '🌪️ Sandstorm swiftness!' },
+      },
+      horus_champion: {
+        id: 'horus_champion', name: 'Horus Champion', icon: '🦅', emoji: '🦅', spd: 22, agi: 21, int: 23, str: 18, stage: STAGE_EGYPTIAN,
+        bio: 'Sky falcon of kings — sees every opening above.',
+        battleAbility: { type: 'stat_pair_bonus', stats: ['int', 'spd'], amount: 1, flash: '🦅 Horus sees the line — sky sharp!' },
+      },
+      obelisk_titan: {
+        id: 'obelisk_titan', name: 'Obelisk Titan', icon: '🗿', emoji: '🗿', spd: 17, agi: 19, int: 22, str: 22, stage: STAGE_EGYPTIAN,
+        bio: 'Carved colossus — the desert’s immovable will.',
+        battleAbility: { type: 'stat_bonus', stat: 'str', amount: 1, flash: '🗿 Obelisk strength holds!' },
+      },
+      tomb_defender: {
+        id: 'tomb_defender', name: 'Tomb Defender', icon: '⚰️', emoji: '⚰️', spd: 18, agi: 23, int: 23, str: 18, stage: STAGE_EGYPTIAN,
+        bio: 'Curse the trespasser — wards mind and step alike.',
+        battleAbility: { type: 'stat_pair_bonus', stats: ['agi', 'int'], amount: 1, flash: '⚰️ Tomb wards flash!' },
+      },
+      desert_spirit: {
+        id: 'desert_spirit', name: 'Desert Spirit', icon: '✨', emoji: '✨', spd: 21, agi: 22, int: 22, str: 17, stage: STAGE_EGYPTIAN,
+        bio: 'Mirage made real — flickers where foes aim.',
+        battleAbility: { type: 'stat_bonus', stat: 'spd', amount: 1, flash: '✨ Desert wind carries you!' },
+      },
+      ra_avenger: {
+        id: 'ra_avenger', name: 'Ra’s Avenger', icon: '🔆', emoji: '🔆', spd: 21, agi: 20, int: 25, str: 18, stage: STAGE_EGYPTIAN,
+        bio: 'Solar barque’s champion — judgment at noon.',
+        battleAbility: { type: 'stat_bonus', stat: 'int', amount: 1, flash: '🔆 Ra’s light strikes true!' },
+      },
+    },
+  },
 };
 
 /** Flat animal lookup derived from TIER_REGISTRY — backward-compatible. */
@@ -124,6 +184,9 @@ export const SYLLABLES = {
   kraken:'Krak', cerberus:'Cerb', pegasus:'Pegs', basilisk:'Bazl', chimera:'Kymr',
   zeus:'Zeu', poseidon:'Psdn', hades:'Had', athena:'Athn', ares:'Ars',
   apollo:'Apol', artemis:'Artm', thor:'Thor', loki:'Lok', anubis:'Anb',
+  anubis_guardian:'AnbG', pharaoh_king:'Phar', sun_priest:'SunP', scarab_warrior:'Scar',
+  sandstorm_sentinel:'Sand', horus_champion:'Horu', obelisk_titan:'Obel', tomb_defender:'Tomb',
+  desert_spirit:'Dsp', ra_avenger:'RaAv',
   cat:'Kat', dog:'Dog', elephant:'Elph', hippo:'Hip', hyena:'Hyen', panther:'Pan',
 };
 
@@ -132,5 +195,6 @@ export const APEX_IDS = Object.keys(TIER_REGISTRY.apex.animals);
 export const DINO_IDS = Object.keys(TIER_REGISTRY.dino.animals);
 export const LEGENDARY_IDS = Object.keys(TIER_REGISTRY.legendary.animals);
 export const MYTHICAL_IDS = Object.keys(TIER_REGISTRY.mythical.animals);
+export const EGYPTIAN_IDS = Object.keys(TIER_REGISTRY.egyptian.animals);
 
 export const STARTER_BASE_IDS = ['wolf', 'bear', 'eagle'];

@@ -1,4 +1,4 @@
-import { ANIMALS } from '../data/animals.js';
+import { ANIMALS, STAT_MAX } from '../data/animals.js';
 import { QUIZZES, PRE_BATTLE_QUESTIONS } from '../data/quizzes.js';
 import { getArena } from '../data/arenas.js';
 import { getWeather } from '../data/weather.js';
@@ -212,6 +212,40 @@ function applyBossBoost(hybrid, bossAbility) {
   return { ...hybrid, stats, power: powerScore(stats) };
 }
 
+/** Pharaoh King (+1 all stats, capped) when forged into the team. */
+function applyRoyalCommandBoost(fighter, hybrid) {
+  if (!fighter?.stats || !hybrid?.animals?.length) return fighter;
+  const hasRoyal = hybrid.animals.some(id => ANIMALS[id]?.battleAbility?.type === 'royal_command');
+  if (!hasRoyal) return fighter;
+  const stats = { ...fighter.stats };
+  for (const k of ['spd', 'agi', 'int', 'str']) {
+    stats[k] = Math.min(STAT_MAX, stats[k] + 1);
+  }
+  return { ...fighter, stats, power: powerScore(stats) };
+}
+
+/** Per-round bonuses from Egyptian Guardian battleAbility hooks. */
+function hybridAbilityRoundBonus(hybrid, stat, playerLostLastRound) {
+  let bonus = 0;
+  const messages = [];
+  if (!hybrid?.animals) return { bonus, messages };
+  for (const id of hybrid.animals) {
+    const ba = ANIMALS[id]?.battleAbility;
+    if (!ba || ba.type === 'royal_command') continue;
+    if (ba.type === 'stat_bonus' && ba.stat === stat) {
+      bonus += ba.amount || 0;
+      if (ba.flash) messages.push(ba.flash);
+    } else if (ba.type === 'stat_pair_bonus' && ba.stats?.includes(stat)) {
+      bonus += ba.amount || 0;
+      if (ba.flash) messages.push(ba.flash);
+    } else if (ba.type === 'bonus_after_loss' && playerLostLastRound) {
+      bonus += ba.amount || 0;
+      if (ba.flash) messages.push(ba.flash);
+    }
+  }
+  return { bonus, messages };
+}
+
 /** Pick the stat category for a single round using weighted distribution. */
 function pickRoundStat() {
   return STAT_WEIGHTS[Math.floor(Math.random() * STAT_WEIGHTS.length)];
@@ -276,6 +310,8 @@ export {
   applyArenaMods,
   applyWeatherMods,
   applyBossBoost,
+  applyRoyalCommandBoost,
+  hybridAbilityRoundBonus,
   roll,
   simulateRound,
   pickRoundStat,

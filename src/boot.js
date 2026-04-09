@@ -12,6 +12,7 @@ import {
   writeLeaderboardBootstrapDoc, syncLeaderboardEntry,
 } from './persistence/leaderboard.js';
 import { hybridFromSaved } from './game/hybrid.js';
+import { needsFactionSelection } from './data/factions.js';
 import { showScreen } from './ui/screens.js';
 
 // BOOT
@@ -31,6 +32,7 @@ onAuthStateChanged(auth, async user => {
   if (!user) {
     clearDefeatAutoReturn();
     clearLevelCompleteAutoNav();
+    document.documentElement.removeAttribute('data-player-faction');
     state.profile = null;
     state.progress = null;
     state.playerHybrid = null;
@@ -67,7 +69,7 @@ onAuthStateChanged(auth, async user => {
           lastPlayedDate: null,
           leaderboardOptIn: true,
           progressSchemaVersion: 1,
-          stageAccess: { base: true, apex: true, dinosaur: true },
+          stageAccess: { base: true, apex: true, dinosaur: true, legendary: true, mythical: true, egyptian: true },
           coins: 0,
           unlockTokens: 0,
           dailyChallengeDayKey: null,
@@ -76,6 +78,9 @@ onAuthStateChanged(auth, async user => {
           totalQuizQuestions: 0,
           totalQuizCorrect: 0,
           commanderXp: 0,
+          faction: null,
+          factionXP: 0,
+          factionUnlocked: [],
           createdAt: serverTimestamp(),
           updatedAt: serverTimestamp(),
         },
@@ -124,7 +129,8 @@ onAuthStateChanged(auth, async user => {
     }
 
     console.log('[auth] session ready', user.uid);
-    showScreen('hub');
+    if (needsFactionSelection(state.progress)) showScreen('faction-select');
+    else showScreen('hub');
   } catch (bootErr) {
     console.error('[auth] onAuthStateChanged fatal error — falling back to auth screen', {
       uid: user?.uid,

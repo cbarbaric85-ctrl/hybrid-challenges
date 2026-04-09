@@ -1,6 +1,6 @@
 import {
-  STAT_MAX, STAGE_BASE, STAGE_APEX, STAGE_DINO, STAGE_LEGENDARY, STAGE_MYTHICAL,
-  ANIMALS, ALL_ANIMALS, BASE_IDS, APEX_IDS, DINO_IDS, LEGENDARY_IDS, MYTHICAL_IDS,
+  STAT_MAX, STAGE_BASE, STAGE_APEX, STAGE_DINO, STAGE_LEGENDARY, STAGE_MYTHICAL, STAGE_EGYPTIAN,
+  ANIMALS, ALL_ANIMALS, BASE_IDS, APEX_IDS, DINO_IDS, LEGENDARY_IDS, MYTHICAL_IDS, EGYPTIAN_IDS,
 } from '../data/animals.js';
 import { LEVELS } from '../data/levels.js';
 import {
@@ -9,7 +9,7 @@ import {
 } from '../game/state.js';
 import {
   countBaseUnlocked, countApexUnlocked, countDinoUnlocked,
-  countLegendaryUnlocked, countMythicalUnlocked,
+  countLegendaryUnlocked, countMythicalUnlocked, countEgyptianUnlocked, egyptianTierQuizOpen,
   apexLevelGateMet, dinoLevelGateMet,
   legendaryLevelGateMet, mythicalLevelGateMet,
   getPlayerStageLabel, getProgressionNextLines,
@@ -19,7 +19,7 @@ import {
   RETENTION_SOFT_MONETISE_COPY, getSoftMonetisationHintLines,
   getRetentionShopTeasers,
   getNextBaseAnimalId, getNextApexAnimalId, getNextDinoAnimalId,
-  getNextLegendaryAnimalId, getNextMythicalAnimalId,
+  getNextLegendaryAnimalId, getNextMythicalAnimalId, getNextEgyptianAnimalId,
   formatMiniStatPreview,
   getStreakBattleBoost, sumBoostPoints,
   unlockGateLinesForAnimal,
@@ -34,6 +34,8 @@ import { saveUserProgress, persistGameProgress } from '../persistence/save.js';
 import { backfillLeaderboardIfMissing } from '../persistence/leaderboard.js';
 import { showScreen, escapeHtml } from './screens.js';
 import { localDateString, localYesterdayString } from '../game/utils.js';
+import { needsFactionSelection, getFaction } from '../data/factions.js';
+import { applyFactionThemeToRoot } from './faction-ui.js';
 
 
 function getCommanderXpSegment(xp) {
@@ -51,6 +53,8 @@ function findNextTokenRecruitTarget(p) {
   if (na) return { id: na, mode: 'quiz' };
   const nd = getNextDinoAnimalId(p);
   if (nd) return { id: nd, mode: 'quiz' };
+  const ne = getNextEgyptianAnimalId(p);
+  if (ne) return { id: ne, mode: 'quiz' };
   return null;
 }
 
@@ -120,15 +124,18 @@ function renderHubProgressionPanel() {
   const dU = countDinoUnlocked(p);
   const lU = countLegendaryUnlocked(p);
   const mU = countMythicalUnlocked(p);
+  const eU = countEgyptianUnlocked(p);
   const stage = getPlayerStageLabel(p);
   const apexOpen = apexLevelGateMet(p);
   const dinoOpen = dinoLevelGateMet(p);
   const legendOpen = legendaryLevelGateMet(p);
   const mythOpen = mythicalLevelGateMet(p);
+  const egyptOpen = egyptianTierQuizOpen(p);
   const apexLine = apexOpen ? `${aU} / ${APEX_IDS.length} unlocked` : 'Locked — beat Level 5 first';
   const dinoLine = dinoOpen ? `${dU} / ${DINO_IDS.length} unlocked` : 'Locked — beat Level 8 first';
   const legendLine = legendOpen ? `${lU} / ${LEGENDARY_IDS.length} unlocked` : 'Locked — beat Level 12 first';
   const mythLine = mythOpen ? `${mU} / ${MYTHICAL_IDS.length} unlocked` : 'Locked — beat Level 16 first';
+  const egyptLine = egyptOpen ? `${eU} / ${EGYPTIAN_IDS.length} unlocked` : 'Locked — recruit all Mythical Gods first';
   const nextLines = getProgressionNextLines(p);
   el.innerHTML = `
     <div class="hub-progress-hdr">Progression</div>
@@ -142,12 +149,14 @@ function renderHubProgressionPanel() {
       <li><span class="hps-emoji">🦖</span> <span class="hps-name">Dinosaurs</span> <span class="hps-count">${dinoLine}</span></li>
       <li><span class="hps-emoji">🐲</span> <span class="hps-name">Legendary Beasts</span> <span class="hps-count">${legendLine}</span></li>
       <li><span class="hps-emoji">⚡</span> <span class="hps-name">Mythical Gods</span> <span class="hps-count">${mythLine}</span></li>
+      <li><span class="hps-emoji">⚱️</span> <span class="hps-name">Egyptian Guardians</span> <span class="hps-count">${egyptLine}</span></li>
     </ul>
     <div class="hub-progress-gates">
       <div class="hpg-row"><span class="${apexOpen ? 'hpg-ok' : 'hpg-no'}">${apexOpen ? '✓' : '○'}</span> Apex level gate (Level 6+)</div>
       <div class="hpg-row"><span class="${dinoOpen ? 'hpg-ok' : 'hpg-no'}">${dinoOpen ? '✓' : '○'}</span> Dino level gate (Level 9+)</div>
       <div class="hpg-row"><span class="${legendOpen ? 'hpg-ok' : 'hpg-no'}">${legendOpen ? '✓' : '○'}</span> Legendary level gate (Level 13+)</div>
       <div class="hpg-row"><span class="${mythOpen ? 'hpg-ok' : 'hpg-no'}">${mythOpen ? '✓' : '○'}</span> Mythical level gate (Level 17+)</div>
+      <div class="hpg-row"><span class="${egyptOpen ? 'hpg-ok' : 'hpg-no'}">${egyptOpen ? '✓' : '○'}</span> Egyptian tier (all Mythical quizzes)</div>
     </div>
     <div class="hub-progress-next">${nextLines.join('<br>')}</div>
     ${
@@ -177,12 +186,31 @@ function renderHubDailyChallenge() {
 
 function renderHub() {
   const p = state.progress;
+  if (!p) return;
+  if (needsFactionSelection(p)) {
+    showScreen('faction-select');
+    return;
+  }
+  applyFactionThemeToRoot();
   if (touchDailyStreakIfNeeded(p)) persistGameProgress().catch(e => console.error('[hub] streak save failed', e));
   backfillLeaderboardIfMissing().catch(e => console.error('[hub] lb backfill failed', e));
   const levelIdx = Math.min(p.level - 1, LEVELS.length - 1);
   const level = LEVELS[levelIdx];
 
   document.getElementById('hub-username').textContent = state.profile?.username || '—';
+  const facBadge = document.getElementById('hub-faction-badge');
+  const facBtn = document.getElementById('hub-btn-faction');
+  const fac = getFaction(p.faction);
+  if (facBadge) {
+    if (fac) {
+      facBadge.textContent = `${fac.icon} ${fac.name} · ${p.factionXP | 0} FXP`;
+      facBadge.classList.remove('hidden');
+    } else {
+      facBadge.textContent = '';
+      facBadge.classList.add('hidden');
+    }
+  }
+  if (facBtn) facBtn.classList.toggle('hidden', !fac || !mythicalLevelGateMet(p));
   document.getElementById('hub-wins').textContent = p.totalWins;
   document.getElementById('hub-losses').textContent = p.totalLosses;
   const streakEl = document.getElementById('hub-streak');
@@ -202,14 +230,16 @@ function renderHub() {
   const dinoCount = DINO_IDS.filter(id => p.quizUnlocked.includes(id)).length;
   const legCount = LEGENDARY_IDS.filter(id => p.quizUnlocked.includes(id)).length;
   const mythCount = MYTHICAL_IDS.filter(id => p.quizUnlocked.includes(id)).length;
+  const egyptCount = EGYPTIAN_IDS.filter(id => p.quizUnlocked.includes(id)).length;
   const baseU = countBaseUnlocked(p);
   let tierTxt = `B ${baseU}/10`;
   if (apexLevelGateMet(p)) tierTxt += ` · A ${apexCount}/10`;
   if (dinoLevelGateMet(p)) tierTxt += ` · D ${dinoCount}/10`;
   if (legendaryLevelGateMet(p)) tierTxt += ` · L ${legCount}/10`;
   if (mythicalLevelGateMet(p)) tierTxt += ` · M ${mythCount}/10`;
+  if (egyptianTierQuizOpen(p)) tierTxt += ` · Eg ${egyptCount}/10`;
   document.getElementById('hsb-tiers').textContent = tierTxt;
-  const tierColor = mythCount > 0 ? 'mythical' : legCount > 0 ? 'legendary' : dinoCount > 0 ? 'dino' : apexCount > 0 ? 'purple' : '';
+  const tierColor = egyptCount > 0 ? 'egyptian' : mythCount > 0 ? 'mythical' : legCount > 0 ? 'legendary' : dinoCount > 0 ? 'dino' : apexCount > 0 ? 'purple' : '';
   document.getElementById('hsb-tiers').className = 'hsb-val ' + tierColor;
 
   // Current hybrid
@@ -252,7 +282,9 @@ function renderHub() {
   if (level && level.isFinal) ba.innerHTML += '<span class="lv-badge badge-final">⚠ FINAL BOSS</span>';
   else if (level && level.isBoss) ba.innerHTML += '<span class="lv-badge badge-final">⚠ BOSS BATTLE</span>';
   else if (level && level.isHard) ba.innerHTML += '<span class="lv-badge badge-hard">DANGER ZONE</span>';
-  if (mythCount > 0) ba.innerHTML += '<span class="lv-badge badge-mythical">⚡ MYTHICAL ACTIVE</span>';
+  if (p.level > MAX_LEVEL) ba.innerHTML += '<span class="lv-badge badge-egyptian">⚱️ DUAT CONQUEROR</span>';
+  else if (egyptCount > 0) ba.innerHTML += '<span class="lv-badge badge-egyptian">⚱️ EGYPTIAN ACTIVE</span>';
+  else if (mythCount > 0) ba.innerHTML += '<span class="lv-badge badge-mythical">⚡ MYTHICAL ACTIVE</span>';
   else if (legCount > 0) ba.innerHTML += '<span class="lv-badge badge-legendary">🐲 LEGENDARY ACTIVE</span>';
   else if (dinoCount > 0) ba.innerHTML += '<span class="lv-badge badge-dino">🦖 DINO ACTIVE</span>';
   else if (apexCount > 0) ba.innerHTML += '<span class="lv-badge badge-apex">◈ APEX UNLOCKED</span>';
@@ -298,7 +330,8 @@ function renderHub() {
       '<strong>Apex</strong> — beat Level 5, then pass each Apex quiz.<br>' +
       '<strong>Dinos</strong> — beat Level 8, then pass each Dino quiz.<br>' +
       '<strong>Legendary</strong> — beat Level 12 to unlock Legendary Beast quizzes.<br>' +
-      '<strong>Mythical</strong> — beat Level 16 to unlock Mythical God quizzes.'; //
+      '<strong>Mythical</strong> — beat Level 16 to unlock Mythical God quizzes.<br>' +
+      '<strong>Egyptian Guardians</strong> — recruit every Mythical God, then quiz; desert missions Levels 21–25.'; //
       '<strong>Dinos</strong> — beat Level 8, then pass each Dino quiz. Locked rows show ✓/○ for what’s done.';
   }
 
@@ -337,7 +370,13 @@ function renderHubAnimalGrid() {
     const isLL = isLevelLocked(id, p);
 
     const chip = document.createElement('div');
-    const stageChipMap = { [STAGE_MYTHICAL]: 'mythical-chip', [STAGE_LEGENDARY]: 'legendary-chip', [STAGE_DINO]: 'dino-chip', [STAGE_APEX]: 'apex-chip' };
+    const stageChipMap = {
+      [STAGE_EGYPTIAN]: 'egyptian-chip',
+      [STAGE_MYTHICAL]: 'mythical-chip',
+      [STAGE_LEGENDARY]: 'legendary-chip',
+      [STAGE_DINO]: 'dino-chip',
+      [STAGE_APEX]: 'apex-chip',
+    };
     const tierCls = stageChipMap[a.stage] || '';
     let cls = 'a-chip ' + tierCls;
     if (isAvail) cls += ' available';
@@ -345,8 +384,20 @@ function renderHubAnimalGrid() {
     else if (isLL) cls += ' locked';
     chip.className = cls;
 
-    const tierLblMap = { [STAGE_MYTHICAL]: 'MYTHICAL', [STAGE_LEGENDARY]: 'LEGEND', [STAGE_DINO]: 'DINO', [STAGE_APEX]: 'APEX' };
-    const tierClsMap = { [STAGE_MYTHICAL]: 't6', [STAGE_LEGENDARY]: 't5', [STAGE_DINO]: 't4', [STAGE_APEX]: 't3' };
+    const tierLblMap = {
+      [STAGE_EGYPTIAN]: 'EGYPT',
+      [STAGE_MYTHICAL]: 'MYTHICAL',
+      [STAGE_LEGENDARY]: 'LEGEND',
+      [STAGE_DINO]: 'DINO',
+      [STAGE_APEX]: 'APEX',
+    };
+    const tierClsMap = {
+      [STAGE_EGYPTIAN]: 't7',
+      [STAGE_MYTHICAL]: 't6',
+      [STAGE_LEGENDARY]: 't5',
+      [STAGE_DINO]: 't4',
+      [STAGE_APEX]: 't3',
+    };
     const tierLbl = tierLblMap[a.stage] || 'BASE';
     const tierClass = tierClsMap[a.stage] || '';
     const isPremium = a.stage !== STAGE_BASE;
@@ -387,7 +438,7 @@ function renderHubAnimalGrid() {
 /* ── Action Panel: "Choose Your Next Move" ── */
 
 function getFirstQuizEligibleId(p) {
-  for (const id of [...APEX_IDS, ...DINO_IDS, ...LEGENDARY_IDS, ...MYTHICAL_IDS]) {
+  for (const id of [...APEX_IDS, ...DINO_IDS, ...LEGENDARY_IDS, ...MYTHICAL_IDS, ...EGYPTIAN_IDS]) {
     if (isQuizEligible(id, p)) return id;
   }
   return null;
@@ -447,7 +498,13 @@ function renderActionPanel() {
   const unlockSub = document.getElementById('hap-unlock-sub');
   if (unlockTarget) {
     const a = ANIMALS[unlockTarget];
-    const tierMap = { [STAGE_APEX]: 'Apex', [STAGE_DINO]: 'Dinosaur', [STAGE_LEGENDARY]: 'Legendary', [STAGE_MYTHICAL]: 'Mythical' };
+    const tierMap = {
+      [STAGE_APEX]: 'Apex',
+      [STAGE_DINO]: 'Dinosaur',
+      [STAGE_LEGENDARY]: 'Legendary',
+      [STAGE_MYTHICAL]: 'Mythical',
+      [STAGE_EGYPTIAN]: 'Egyptian',
+    };
     const tier = tierMap[a?.stage] || 'New';
     if (unlockLabel) unlockLabel.textContent = `Unlock ${tier} Creature`;
     if (unlockSub) unlockSub.textContent = `${a?.emoji || ''} ${a?.name || 'Unknown'} — take the quiz`;

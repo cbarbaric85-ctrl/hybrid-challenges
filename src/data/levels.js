@@ -20,6 +20,11 @@ export const LEVEL_REWARDS = {
   18: null,
   19: null,
   20: null,
+  21: null,
+  22: null,
+  23: null,
+  24: null,
+  25: null,
 };
 
 export const LEVELS = [
@@ -47,5 +52,12 @@ export const LEVELS = [
   {id:17, name:'Trickster\'s Gambit', desc:'Chaos meets thunder. The gods themselves clash.',               animals:['loki','thor','ares'],           diceBonus:3,useMax:true, isHard:true, arena:'sky'},
   {id:18, name:'Realm Warden',        desc:'Death and wisdom, the underworld and strategy intertwined.',   animals:['hades','athena','anubis'],      diceBonus:4,useMax:true, isHard:true, arena:'underworld'},
   {id:19, name:'Trident of Doom',     desc:'Ocean\'s wrath and sky\'s fury combined. Nowhere is safe.',    animals:['poseidon','zeus','thor'],        diceBonus:4,useMax:true, isHard:true, arena:'ocean'},
-  {id:20, name:'PANTHEON SUPREME',    desc:'All gods united. The final trial. Prove you are worthy.',      animals:['zeus','poseidon','hades'],       diceBonus:5,useMax:true, isHard:true, isBoss:true, isFinal:true, arena:'celestial', bossTitle:'PANTHEON SUPREME', bossTagline:'The heavens split open. Gods descend.', bossAbility:{name:'Divine Wrath',emoji:'⚡',stat:'int',bonus:2}},
+  {id:20, name:'PANTHEON SUPREME',    desc:'All gods united. The gods’ last stand — beyond lies the Duat.', animals:['zeus','poseidon','hades'],       diceBonus:5,useMax:true, isHard:true, isBoss:true, isFinal:false, arena:'celestial', bossTitle:'PANTHEON SUPREME', bossTagline:'The heavens split open. Gods descend.', bossAbility:{name:'Divine Wrath',emoji:'⚡',stat:'int',bonus:2}},
+
+  // ── EGYPTIAN GUARDIANS ARC (Levels 21–25) ──
+  {id:21, name:'Dunes of Judgment',   desc:'Sun, sand, and spirits — the Duat’s edge awakens.',            animals:['desert_spirit','sun_priest','sandstorm_sentinel'], diceBonus:3,useMax:true, isHard:true, arena:'desert'},
+  {id:22, name:'Scarab March',        desc:'Scarabs, tombs, and stone sentinels rise from the heat.',      animals:['scarab_warrior','tomb_defender','obelisk_titan'], diceBonus:3,useMax:true, isHard:true, arena:'desert'},
+  {id:23, name:'Falcon’s Crown',      desc:'Horus circles above; Ra’s light blinds the slow.',            animals:['horus_champion','ra_avenger','anubis_guardian'], diceBonus:4,useMax:true, isHard:true, arena:'desert'},
+  {id:24, name:'Throne of Kemet',     desc:'The Pharaoh’s court marches — every grain obeys.',            animals:['pharaoh_king','sun_priest','scarab_warrior'], diceBonus:4,useMax:true, isHard:true, arena:'desert'},
+  {id:25, name:'DUAT OVERLORD',       desc:'The jackal and the crown — final trial of the guardians.',     animals:['pharaoh_king','anubis_guardian'], diceBonus:5,useMax:true, isHard:true, isBoss:true, isFinal:true, arena:'desert', bossTitle:'👑 DUAT OVERLORD', bossTagline:'The sands part for the living god.', bossAbility:{name:'Royal Decree',emoji:'👑',stat:'int',bonus:3}},
 ];

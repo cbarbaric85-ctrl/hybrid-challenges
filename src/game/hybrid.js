@@ -21,6 +21,7 @@ function powerScore(stats) {
 function hybridTierClass(selectedIds) {
   const ranks = selectedIds.map(id => STAGE_RANK[ANIMALS[id]?.stage] || 1);
   const maxR = Math.max(...ranks, 1);
+  if (maxR >= 6) return 'egyptian';
   if (maxR >= 5) return 'mythical';
   if (maxR >= 4) return 'legendary';
   if (maxR >= 3) return 'dino';

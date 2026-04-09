@@ -4,6 +4,7 @@ function showScreen(name, sub) {
   if (el) el.classList.add('active');
   if (name === 'auth') window.setupAuth?.(sub || 'login');
   if (name === 'hub') window.renderHub?.();
+  if (name === 'faction-select') window.renderFactionSelect?.();
   if (name === 'builder') window.renderBuilder?.();
   if (name === 'leaderboard') void window.renderLeaderboard?.();
   requestAnimationFrame(() => {
@@ -29,6 +30,10 @@ function showScreen(name, sub) {
     if (name === 'battle') {
       const bb = document.querySelector('#screen-battle .battle-body');
       if (bb) bb.scrollTop = 0;
+    }
+    if (name === 'faction-select') {
+      const fs = document.getElementById('screen-faction-select');
+      if (fs && fs.scrollHeight > fs.clientHeight) fs.scrollTop = 0;
     }
     if (name === 'level-complete' || name === 'defeat' || name === 'game-complete' || name === 'landing' || name === 'auth') {
       const sec = document.getElementById(`screen-${name}`);

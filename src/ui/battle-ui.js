@@ -1,11 +1,12 @@
 import {
   STAT_MAX, ANIMALS, ALL_ANIMALS,
-  BASE_IDS, APEX_IDS, DINO_IDS, LEGENDARY_IDS, MYTHICAL_IDS,
+  BASE_IDS, APEX_IDS, DINO_IDS, LEGENDARY_IDS, MYTHICAL_IDS, EGYPTIAN_IDS,
 } from '../data/animals.js';
 import { LEVEL_REWARDS, LEVELS } from '../data/levels.js';
 import { getArena } from '../data/arenas.js';
 import { rollWeather } from '../data/weather.js';
 import { getClashQuestion } from '../data/clash-quiz.js';
+import { getFactionRoundBonus, trySanctuaryRevive } from '../data/factions.js';
 import {
   state,
   XP_PER_BATTLE_WIN,
@@ -20,7 +21,7 @@ import {
   countBaseUnlocked, countApexUnlocked, countDinoUnlocked,
   isLevelLocked, getPlayerStageLabel,
   BASE_UNLOCK_LEVEL, getStreakBattleBoost,
-  pickDailyChallenge, getProgressionNextLines,
+  pickDailyChallenge, getProgressionNextLines, egyptianTierQuizOpen,
 } from '../game/progression.js';
 import {
   powerScore, hybridTierClass, buildPlayerHybrid, buildEnemyHybrid,
@@ -35,6 +36,7 @@ import {
   scrollToBattleTrail, scrollToBattleStageArea,
   hybridWithTempBoost, getBattleDisplayPlayerHybrid,
   applyArenaMods, applyWeatherMods, applyBossBoost,
+  applyRoyalCommandBoost, hybridAbilityRoundBonus,
   roll, simulateRound, pickRoundStat, resolveRound, runFullBattle,
 } from '../game/battle.js';
 import { saveUserProgress, persistGameProgress, recordQuizAnswers, computeQuizAccuracy } from '../persistence/save.js';
@@ -42,7 +44,31 @@ import { syncLeaderboardEntry } from '../persistence/leaderboard.js';
 import { showScreen, escapeHtml } from './screens.js';
 import { localDateString } from '../game/utils.js';
 
-const ARENA_CLASSES = ['arena-ocean','arena-jungle','arena-sky','arena-volcanic','arena-underworld','arena-celestial'];
+const ARENA_CLASSES = ['arena-ocean','arena-jungle','arena-sky','arena-volcanic','arena-underworld','arena-celestial','arena-desert'];
+
+let _factionHintTimer = null;
+function showFactionBattleHints(messages) {
+  const el = document.getElementById('battle-faction-hint');
+  if (!el || !messages?.length) return;
+  if (_factionHintTimer) clearTimeout(_factionHintTimer);
+  el.textContent = messages.join(' ');
+  el.classList.remove('hidden');
+  _factionHintTimer = setTimeout(() => {
+    el.classList.add('hidden');
+    el.textContent = '';
+    _factionHintTimer = null;
+  }, 1400);
+}
+
+function hideFactionBattleHint() {
+  if (_factionHintTimer) clearTimeout(_factionHintTimer);
+  _factionHintTimer = null;
+  const el = document.getElementById('battle-faction-hint');
+  if (el) {
+    el.classList.add('hidden');
+    el.textContent = '';
+  }
+}
 const WEATHER_CLASSES = ['weather-rain','weather-storm','weather-fog','weather-heatwave','weather-wind'];
 const CAP_ANIM_CLASS = { spd: 'cap-anim-spd', agi: 'cap-anim-agi', int: 'cap-anim-int', str: 'cap-anim-str' };
 const STAT_RESULT_EMOJI = { spd: '⚡', agi: '✦', int: '🧠', str: '💥' };
@@ -402,10 +428,26 @@ function playInteractiveRound(roundIdx) {
 
   setTimeout(() => {
     showClashQuiz(stat, (correct) => {
-      const round = resolveRound(b.pFighter, b.eFighter, stat, correct ? 2 : 0);
+      const fid = state.progress?.faction || null;
+      const quizPts = correct ? 2 : 0;
+      const { bonus: fBonus, messages: fMsgs } = getFactionRoundBonus({
+        factionId: fid,
+        stat,
+        roundIdx,
+        playerLostLastRound: !!b.playerLostLastRound,
+      });
+      const hyb = hybridAbilityRoundBonus(state.playerHybrid, stat, !!b.playerLostLastRound);
+      let round = resolveRound(b.pFighter, b.eFighter, stat, quizPts + fBonus + hyb.bonus);
+      round.factionMessages = [...fMsgs, ...hyb.messages];
+      round = trySanctuaryRevive(round, b, {
+        factionId: fid,
+        animalIds: state.playerHybrid?.animals || [],
+      });
       b.roundResults.push(round);
       if (round.winner === 'player') b.interactivePWins++;
       else if (round.winner === 'enemy') b.interactiveEWins++;
+      b.playerLostLastRound = round.winner === 'enemy';
+      showFactionBattleHints(round.factionMessages || []);
 
       animateRoundResult(round, roundIdx, () => {
         playInteractiveRound(roundIdx + 1);
@@ -778,6 +820,7 @@ function renderBattleScreen() {
   hideRoundResultFlash();
   hideBossAbilityFlash();
   hideClashQuiz();
+  hideFactionBattleHint();
 
   const disp = getBattleDisplayPlayerHybrid();
   const bpEm = document.getElementById('bp-em');
@@ -1188,12 +1231,15 @@ function beginBattle() {
   let eFighter = applyArenaMods(state.enemyHybrid, b.arenaId);
   eFighter = applyWeatherMods(eFighter, b.weatherId);
   eFighter = applyBossBoost(eFighter, b.bossAbility);
+  pFighter = applyRoyalCommandBoost(pFighter, state.playerHybrid);
 
   b.pFighter = pFighter;
   b.eFighter = eFighter;
   b.roundResults = [];
   b.interactivePWins = 0;
   b.interactiveEWins = 0;
+  b.sanctuaryReviveUsed = false;
+  b.playerLostLastRound = false;
 
   const doCountdownAndFight = () => {
     runBattleCountdown(() => {
@@ -1275,6 +1321,7 @@ async function finishBattle(result) {
   if (won) {
     xpGained = XP_PER_BATTLE_WIN;
     p.commanderXp = (p.commanderXp || 0) + xpGained;
+    if (p.faction) p.factionXP = (p.factionXP || 0) + 2;
     p.totalWins++;
     p.dailyWinsToday = (p.dailyWinsToday || 0) + 1;
     coinsGained = 5;
@@ -1391,6 +1438,7 @@ async function showLevelComplete() {
   const isDinoUnlock = currentLevel === 8;
   const isLegendaryUnlock = currentLevel === 12;
   const isMythicalUnlock = currentLevel === 16;
+  const isEgyptianArcHint = currentLevel === 20;
   const isFinalLevel = currentLevel === LEVELS.length;
   const isBossLevel = LEVELS[currentLevel - 1]?.isBoss;
   const reward = LEVEL_REWARDS[currentLevel];
@@ -1508,6 +1556,30 @@ async function showLevelComplete() {
     }
   }
 
+  const egyptBox = document.getElementById('egyptian-box');
+  if (egyptBox) {
+    if (isEgyptianArcHint) {
+      egyptBox.classList.remove('hidden');
+      const gate = egyptianTierQuizOpen(p);
+      egyptBox.innerHTML = `
+        <div class="egyptian-bonus-title">⚱️ The Duat Opens — Egyptian Guardians!</div>
+        <p style="font-size:.82rem;color:var(--text-dim);margin-bottom:10px">
+          ${gate
+            ? '<strong>All Mythical Gods recruited!</strong> Egyptian Guardian quizzes are live in the Forge — desert missions run from <strong>Level 21</strong> to <strong>25</strong>.'
+            : 'You pierced the Pantheon! Finish recruiting <strong>every Mythical God</strong> in the Forge to unlock <strong>Egyptian Guardians</strong>, then take on Levels <strong>21–25</strong> in the sands.'}
+        </p>
+        <div class="apex-chips" style="gap:14px">
+          ${EGYPTIAN_IDS.map(id => {
+            const a = ANIMALS[id];
+            return `<div class="apex-chip"><span>${a.emoji}</span><span style="color:var(--egyptian)">${a.name}</span></div>`;
+          }).join('')}
+        </div>
+        <p style="font-size:.7rem;color:var(--text-dim);margin-top:10px;font-family:var(--fm)">Forge → ⚱️ Egyptian Guardians · Arena: Desert · Boss: Duat Overlord</p>`;
+    } else {
+      egyptBox.classList.add('hidden');
+    }
+  }
+
   // Actions
   const acts = document.getElementById('lc-actions');
   if (isFinalLevel) {
@@ -1552,6 +1624,7 @@ function cleanupBattleVisuals() {
   clearWeatherOverlay();
   clearBossMode();
   hideClashQuiz();
+  hideFactionBattleHint();
 }
 
 function goNextLevel() {

@@ -52,6 +52,14 @@ export const ARENAS = {
     statMods: { spd: 1, agi: 0, int: 1, str: 0 },
     cssClass: 'arena-celestial',
   },
+  desert: {
+    id: 'desert',
+    name: 'Desert Arena',
+    emoji: '🏜️',
+    banner: '🏜️ Desert heat favors mind & reflexes — speed softens slightly.',
+    statMods: { spd: -1, agi: 1, int: 1, str: 0 },
+    cssClass: 'arena-desert',
+  },
 };
 
 export function getArena(arenaId) {
