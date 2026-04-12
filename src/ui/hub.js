@@ -220,6 +220,13 @@ function renderHub() {
     }
   }
   if (facBtn) facBtn.classList.toggle('hidden', !fac || !mythicalLevelGateMet(p));
+  const fcChange = document.getElementById('hub-faction-change');
+  const fcChangeName = document.getElementById('hub-faction-change-name');
+  if (fcChange) {
+    const showFcChange = !!fac && mythicalLevelGateMet(p);
+    fcChange.classList.toggle('hidden', !showFcChange);
+    if (fcChangeName) fcChangeName.textContent = fac ? fac.name : '';
+  }
   document.getElementById('hub-wins').textContent = p.totalWins;
   document.getElementById('hub-losses').textContent = p.totalLosses;
   const streakEl = document.getElementById('hub-streak');
@@ -476,7 +483,7 @@ function getRecommendedAction(p) {
     if (unlockTarget) return 'TRAIN';
     if (tokCan) return 'TOKEN_UNLOCK';
     if (hasHybrid && mysteryOk) return 'MYSTERY';
-    return 'FIGHT';
+    return 'BATTLE';
   }
 
   if (unlockTarget) return 'TRAIN';
@@ -494,7 +501,7 @@ function getRecommendedAction(p) {
 
   if (tokCan && !unlockTarget) return 'TOKEN_UNLOCK';
 
-  return 'FIGHT';
+  return 'BATTLE';
 }
 
 function renderActionPanel() {
@@ -513,14 +520,21 @@ function renderActionPanel() {
 
   const rec = getRecommendedAction(p);
 
+  const battleBtn = document.getElementById('hap-battle');
   const trainBtn = document.getElementById('hap-train');
   const tokenBtn = document.getElementById('hap-token');
   const mysteryBtn = document.getElementById('hap-mystery');
-  const fusionBtn = document.getElementById('hap-fusion');
+  const trainCell = document.getElementById('hap-cell-train');
 
   const unlockTarget = getFirstQuizEligibleId(p);
   const tokTgt = findNextTokenRecruitTarget(p);
   const tokCan = (p.unlockTokens || 0) >= TOKEN_RECRUIT_COST && !!tokTgt;
+
+  if (battleBtn) battleBtn.disabled = false;
+  const battleSub = document.getElementById('hap-battle-sub');
+  if (battleSub) {
+    battleSub.textContent = state.playerHybrid ? 'Enter the arena' : 'Forge a hybrid first';
+  }
 
   const trainLabel = document.getElementById('hap-train-label');
   const trainSub = document.getElementById('hap-train-sub');
@@ -564,38 +578,40 @@ function renderActionPanel() {
     if (tokenBtn) tokenBtn.disabled = !tokCan;
   } else {
     if (tokenLabel) tokenLabel.textContent = 'Unlock';
-    if (tokenSub) tokenSub.textContent = 'Roster complete';
+    const knightsDone = countKnightsUnlocked(p) >= KNIGHT_IDS.length;
+    if (tokenSub) {
+      tokenSub.textContent = knightsDone ? 'All creatures unlocked 🎉' : 'More creatures coming soon…';
+    }
     if (tokenBtn) tokenBtn.disabled = true;
   }
 
   const canMystery = !!state.profile?.uid && canClaimMysteryRewardToday(p);
   if (mysteryBtn) mysteryBtn.disabled = !canMystery;
+  mysteryBtn?.classList.toggle('hap-mystery--waiting', !canMystery && !!state.profile?.uid);
   const mysterySub = document.getElementById('hap-mystery-sub');
   if (mysterySub) {
     if (!state.profile?.uid) mysterySub.textContent = 'Sign in to play';
     else if (canMystery) mysterySub.textContent = 'Once per day';
     else {
       const ms = msUntilLocalMidnight();
-      mysterySub.textContent = `Next in ${formatCountdownShort(ms)}`;
+      mysterySub.textContent = `⏳ Ready in ${formatCountdownShort(ms)}`;
     }
   }
 
-  if (fusionBtn) fusionBtn.disabled = false;
-
   const btnMap = {
+    BATTLE: battleBtn,
     TRAIN: trainBtn,
     TOKEN_UNLOCK: tokenBtn,
     MYSTERY: mysteryBtn,
-    FUSION: fusionBtn,
-    FIGHT: null,
   };
   const recMap = {
+    BATTLE: 'hap-rec-battle',
     TRAIN: 'hap-rec-train',
     TOKEN_UNLOCK: 'hap-rec-token',
     MYSTERY: 'hap-rec-mystery',
-    FUSION: 'hap-rec-fusion',
   };
-  [trainBtn, tokenBtn, mysteryBtn, fusionBtn].forEach(b => b?.classList.remove('hap-recommended'));
+  [battleBtn, trainBtn, tokenBtn, mysteryBtn].forEach(b => b?.classList.remove('hap-recommended'));
+  if (trainCell) trainCell.classList.remove('hap-cell--train-rec');
   for (const id of Object.values(recMap)) {
     document.getElementById(id)?.classList.add('hidden');
   }
@@ -607,10 +623,22 @@ function renderActionPanel() {
     const tag = document.getElementById(recTagId);
     if (tag) tag.classList.remove('hidden');
   }
+  if (rec === 'TRAIN' && trainBtn && !trainBtn.disabled && trainCell) {
+    trainCell.classList.add('hap-cell--train-rec');
+  }
 }
 
 function hubActionAllegiance() {
   openFactionSelectFromHub();
+}
+
+function hubActionBattle() {
+  if (!state.playerHybrid) {
+    flashHubRewardMsg('Forge a hybrid first — then tap Battle!');
+    showScreen('builder');
+    return;
+  }
+  window.startBattle();
 }
 
 function hubActionTrain() {
@@ -646,6 +674,7 @@ export {
   getRecommendedAction,
   renderActionPanel,
   hubActionAllegiance,
+  hubActionBattle,
   hubActionTrain,
   hubActionUnlock,
   hubActionMysteryReward,

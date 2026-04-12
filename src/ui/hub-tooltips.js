@@ -8,8 +8,8 @@ const TIPS = {
   xp: 'Win battles to level up your Spark and fill this bar.',
   reward: 'Pick 1 of 3 cups once per day.',
   train: 'Answer questions to earn boosts.',
-  unlock: 'Spend tokens to recruit the next creature fast.',
-  fusion: 'Reset and build a new hybrid in the Forge.',
+  unlock: 'Spend tokens to fast-unlock the next recruit on your path.',
+  battle: 'Fight the current level in the arena. Forge a hybrid first if you need a new one.',
 };
 
 let openId = null;
