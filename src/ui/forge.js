@@ -707,7 +707,8 @@ function showQuizResult(passed) {
   saveUserProgress(p).catch(e => console.error('[forge] quiz result save failed', e));
 
   const body = document.getElementById('quiz-body');
-  const fromHub = state.quizReturnScreen === 'hub';
+  const fromHub =
+    state.quizReturnScreen === 'hub' || state.quizReturnScreen === 'animals-levels';
 
   if (passed) {
     const hubNextHint = fromHub
@@ -770,10 +771,16 @@ function returnFromQuiz() {
   showScreen('builder');
 }
 function returnFromQuizHub() {
-  showHub();
+  clearLevelCompleteAutoNav();
+  clearDefeatAutoReturn();
+  document.getElementById('battle-result-overlay')?.classList.add('hidden');
+  document.getElementById('battle-countdown-overlay')?.classList.add('hidden');
+  if (state.quizReturnScreen === 'animals-levels') showScreen('animals-levels');
+  else showScreen('hub');
 }
 function exitQuiz() {
   if (state.quizReturnScreen === 'hub') showScreen('hub');
+  else if (state.quizReturnScreen === 'animals-levels') showScreen('animals-levels');
   else {
     state.selectedAnimals = state.playerHybrid ? [...state.playerHybrid.animals] : [];
     showScreen('builder');

@@ -4,6 +4,8 @@ function showScreen(name, sub) {
   if (el) el.classList.add('active');
   if (name === 'auth') window.setupAuth?.(sub || 'login');
   if (name === 'hub') window.renderHub?.();
+  if (name === 'profile') window.renderProfile?.();
+  if (name === 'animals-levels') window.renderAnimalsLevels?.();
   if (name === 'faction-select') window.renderFactionSelect?.();
   if (name === 'builder') window.renderBuilder?.();
   if (name === 'leaderboard') void window.renderLeaderboard?.();
@@ -16,6 +18,14 @@ function showScreen(name, sub) {
     if (name === 'leaderboard') {
       const lb = document.getElementById('leaderboard-body');
       if (lb) lb.scrollTop = 0;
+    }
+    if (name === 'profile') {
+      const pb = document.getElementById('profile-body');
+      if (pb) pb.scrollTop = 0;
+    }
+    if (name === 'animals-levels') {
+      const ab = document.getElementById('animals-levels-body');
+      if (ab) ab.scrollTop = 0;
     }
     if (name === 'builder') {
       const bl = document.querySelector('#screen-builder .builder-left');

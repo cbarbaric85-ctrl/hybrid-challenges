@@ -5,6 +5,7 @@ import { showScreen } from './ui/screens.js';
 import { switchTab, handleAuth, logout, setupAuth } from './ui/auth.js';
 import {
   renderHub, hubSpendCoinTune, hubSpendTokenRecruit,
+  renderProfile, renderAnimalsLevels, showProfile, showAnimalsLevels,
   hubActionAllegiance, hubActionBattle, hubActionTrain, hubActionUnlock, hubActionMysteryReward, hubActionNewFusion,
 } from './ui/hub.js';
 import { initMysteryRewardUi } from './ui/mystery-reward-ui.js';
@@ -36,6 +37,10 @@ Object.assign(window, {
   handleAuth,
   logout,
   renderHub,
+  renderProfile,
+  renderAnimalsLevels,
+  showProfile,
+  showAnimalsLevels,
   renderFactionSelect,
   pickFactionAndContinue,
   openFactionSelectFromHub,

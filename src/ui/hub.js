@@ -64,7 +64,7 @@ function findNextTokenRecruitTarget(p) {
 
 let hubRewardMsgTimer = null;
 function flashHubRewardMsg(msg) {
-  const el = document.getElementById('hub-reward-msg');
+  const el = document.getElementById('hub-reward-msg') || document.getElementById('al-reward-msg');
   if (!el) return;
   el.textContent = msg;
   el.classList.remove('hidden');
@@ -119,8 +119,8 @@ function hubSpendTokenRecruit() {
   renderHub();
 }
 
-function renderHubProgressionPanel() {
-  const el = document.getElementById('hub-progress-panel');
+function renderHubProgressionPanel(containerId = 'hub-progress-panel') {
+  const el = document.getElementById(containerId);
   if (!el || !state.progress) return;
   const p = state.progress;
   const bU = countBaseUnlocked(p);
@@ -176,8 +176,8 @@ function renderHubProgressionPanel() {
     <div class="hub-soft-gates">${[...getRetentionShopTeasers(), ...getSoftMonetisationHintLines(p)].map(s => `<div class="soft-gate-line">${s}</div>`).join('')}</div>`;
 }
 
-function renderHubDailyChallenge() {
-  const el = document.getElementById('hub-daily-challenge');
+function renderHubDailyChallenge(containerId = 'hub-daily-challenge') {
+  const el = document.getElementById(containerId);
   if (!el || !state.progress) return;
   const p = state.progress;
   ensureDailyChallengeRolled(p);
@@ -191,6 +191,182 @@ function renderHubDailyChallenge() {
     <div class="hub-dc-title">${ch.title}</div>
     <div class="hub-dc-desc">${ch.desc}</div>
     <div class="hub-dc-status">${sub}</div>`;
+}
+
+/** Mission + roster detail block (Animals & Levels page). */
+function fillMissionDetail(p, ids) {
+  const levelIdx = Math.min(p.level - 1, LEVELS.length - 1);
+  const level = LEVELS[levelIdx];
+  const apexCount = APEX_IDS.filter(id => p.quizUnlocked.includes(id)).length;
+  const dinoCount = DINO_IDS.filter(id => p.quizUnlocked.includes(id)).length;
+  const legCount = LEGENDARY_IDS.filter(id => p.quizUnlocked.includes(id)).length;
+  const mythCount = MYTHICAL_IDS.filter(id => p.quizUnlocked.includes(id)).length;
+  const egyptCount = EGYPTIAN_IDS.filter(id => p.quizUnlocked.includes(id)).length;
+  const knightCount = KNIGHT_IDS.filter(id => p.quizUnlocked.includes(id)).length;
+  const baseU = countBaseUnlocked(p);
+  let tierTxt = `B ${baseU}/10`;
+  if (apexLevelGateMet(p)) tierTxt += ` · A ${apexCount}/10`;
+  if (dinoLevelGateMet(p)) tierTxt += ` · D ${dinoCount}/10`;
+  if (legendaryLevelGateMet(p)) tierTxt += ` · L ${legCount}/10`;
+  if (mythicalLevelGateMet(p)) tierTxt += ` · M ${mythCount}/10`;
+  if (egyptianTierQuizOpen(p)) tierTxt += ` · Eg ${egyptCount}/10`;
+  if (knightTierQuizOpen(p)) tierTxt += ` · K ${knightCount}/10`;
+
+  const nameEl = document.getElementById(ids.levelName);
+  const descEl = document.getElementById(ids.levelDesc);
+  if (nameEl) nameEl.textContent = p.level > MAX_LEVEL ? 'Game Complete!' : `Level ${p.level} — ${level.name}`;
+  if (descEl) descEl.textContent = p.level > MAX_LEVEL ? 'You conquered all levels.' : level.desc;
+
+  const ba = document.getElementById(ids.badgeArea);
+  if (ba) {
+    ba.innerHTML = '';
+    if (level && level.isFinal) ba.innerHTML += '<span class="lv-badge badge-final">⚠ FINAL BOSS</span>';
+    else if (level && level.isBoss) ba.innerHTML += '<span class="lv-badge badge-final">⚠ BOSS BATTLE</span>';
+    else if (level && level.isHard) ba.innerHTML += '<span class="lv-badge badge-hard">DANGER ZONE</span>';
+    if (p.level > MAX_LEVEL) ba.innerHTML += '<span class="lv-badge badge-knights">🛡️ REALM CONQUEROR</span>';
+    else if (knightCount > 0) ba.innerHTML += '<span class="lv-badge badge-knights">🛡️ KNIGHTS ACTIVE</span>';
+    else if (egyptCount > 0) ba.innerHTML += '<span class="lv-badge badge-egyptian">⚱️ EGYPTIAN ACTIVE</span>';
+    else if (mythCount > 0) ba.innerHTML += '<span class="lv-badge badge-mythical">⚡ MYTHICAL ACTIVE</span>';
+    else if (legCount > 0) ba.innerHTML += '<span class="lv-badge badge-legendary">🐲 LEGENDARY ACTIVE</span>';
+    else if (dinoCount > 0) ba.innerHTML += '<span class="lv-badge badge-dino">🦖 DINO ACTIVE</span>';
+    else if (apexCount > 0) ba.innerHTML += '<span class="lv-badge badge-apex">◈ APEX UNLOCKED</span>';
+  }
+
+  const pips = document.getElementById(ids.pips);
+  if (pips) {
+    pips.innerHTML = '';
+    for (let i = 1; i <= MAX_LEVEL; i++) {
+      const pip = document.createElement('div');
+      pip.className = 'lv-pip' + (i < p.level ? ' done' : i === p.level ? ' current' : '');
+      pips.appendChild(pip);
+    }
+  }
+
+  if (level) {
+    const comps = level.animals.map(id => ALL_ANIMALS[id]).filter(Boolean);
+    const ep = document.getElementById(ids.enemyPreview);
+    if (ep) ep.innerHTML = `Enemy: <span>${comps.map(a => a.emoji + ' ' + a.name).join(' + ')}</span>`;
+  }
+
+  const tierSummaryEl = document.getElementById(ids.tierSummary);
+  if (tierSummaryEl) {
+    tierSummaryEl.textContent = `Roster progress: ${tierTxt}`;
+    const tierColor = knightCount > 0 ? 'knights' : egyptCount > 0 ? 'egyptian' : mythCount > 0 ? 'mythical' : legCount > 0 ? 'legendary' : dinoCount > 0 ? 'dino' : apexCount > 0 ? 'purple' : '';
+    tierSummaryEl.className = 'hub-mission-tier-summary' + (tierColor ? ` hub-tier-${tierColor}` : '');
+  }
+
+  const hd = document.getElementById(ids.hybridDisplay);
+  if (hd) {
+    if (state.playerHybrid) {
+      const h = state.playerHybrid;
+      hd.innerHTML = `
+      <div style="font-size:1.9rem;margin-bottom:4px">${h.emojis}</div>
+      <div style="font-family:var(--fd);font-size:1rem;font-weight:700;color:var(--text-bright);margin-bottom:2px">${h.name}</div>
+      <div style="font-size:.6rem;font-family:var(--fm);color:var(--text-dim);margin-bottom:8px">${h.composition}</div>
+      <div class="hub-power-row" style="justify-content:center;gap:16px">
+        <div style="text-align:center">
+          <div class="hub-power-score">${h.power}</div>
+          <div class="hub-power-lbl">Power Score</div>
+        </div>
+      </div>`;
+    } else {
+      hd.innerHTML = `<div style="padding:8px 0;color:var(--text-dim);font-size:.72rem">No hybrid forged yet.<br>Go to the Forge to build one.</div>`;
+    }
+  }
+
+  const rosterHint = document.getElementById(ids.rosterHint);
+  if (rosterHint) {
+    rosterHint.innerHTML =
+      '<strong>Base</strong> — win levels to recruit the full roster (3 starters, then 7 more).<br>' +
+      '<strong>Apex</strong> — beat Level 5, then pass each Apex quiz.<br>' +
+      '<strong>Dinos</strong> — beat Level 8, then pass each Dino quiz.<br>' +
+      '<strong>Legendary</strong> — beat Level 12 to unlock Legendary Beast quizzes.<br>' +
+      '<strong>Mythical</strong> — beat Level 16 to unlock Mythical God quizzes.<br>' +
+      '<strong>Egyptian Guardians</strong> — recruit every Mythical God, then quiz; desert missions Levels 21–25.<br>' +
+      '<strong>Knights of the Realm</strong> — recruit every Egyptian Guardian, then quiz; castle missions Levels 26–30.<br>' +
+      'Locked rows show ✓/○ for what’s done.';
+  }
+}
+
+const ANIMALS_LEVEL_IDS = {
+  levelName: 'al-level-name',
+  levelDesc: 'al-level-desc',
+  badgeArea: 'al-badge-area',
+  pips: 'al-lv-progress-pips',
+  enemyPreview: 'al-enemy-preview',
+  tierSummary: 'al-mission-tier-summary',
+  hybridDisplay: 'al-hybrid-display',
+  rosterHint: 'al-roster-hint',
+};
+
+function renderProfile() {
+  const p = state.progress;
+  if (!p || !document.getElementById('profile-streak')) return;
+  applyFactionThemeToRoot();
+
+  const streakEl = document.getElementById('profile-streak');
+  if (streakEl) streakEl.textContent = `🔥 ${p.streakCount || 0}d`;
+  const coinsEl = document.getElementById('profile-coins');
+  if (coinsEl) coinsEl.textContent = String(p.coins ?? 0);
+  const tokEl = document.getElementById('profile-tokens');
+  if (tokEl) tokEl.textContent = String(p.unlockTokens ?? 0);
+  const powEl = document.getElementById('profile-power');
+  if (powEl) {
+    powEl.textContent = state.playerHybrid ? `${state.playerHybrid.power} ⚡` : '—';
+  }
+  document.getElementById('profile-wins').textContent = p.totalWins;
+  document.getElementById('profile-losses').textContent = p.totalLosses;
+
+  const fac = getFaction(p.faction);
+  const facLine = document.getElementById('profile-faction-line');
+  if (facLine) {
+    facLine.textContent = fac ? `${fac.icon} ${fac.name} · ${p.factionXP | 0} FXP` : 'No faction yet';
+  }
+
+  const xpUi = getCommanderXpSegment(p.commanderXp || 0);
+  const xpFill = document.getElementById('profile-xp-bar-fill');
+  const xpMeta = document.getElementById('profile-xp-meta');
+  const xpSegLbl = document.getElementById('profile-xp-seg-lbl');
+  const xpMainLbl = document.getElementById('profile-xp-main-lbl');
+  const xpSparkHint = document.getElementById('profile-xp-spark-hint');
+  const xpTrack = document.getElementById('profile-xp-bar-track');
+  if (xpFill) xpFill.style.width = `${xpUi.pct}%`;
+  if (xpSegLbl) xpSegLbl.textContent = `Spark ${xpUi.tier}`;
+  if (xpMainLbl) xpMainLbl.textContent = `Level Progress: ${xpUi.inSeg} / ${xpUi.seg} XP`;
+  if (xpTrack) xpTrack.setAttribute('aria-valuenow', String(Math.round(xpUi.pct)));
+  if (xpMeta) xpMeta.textContent = 'Wins fill the bar. When it fills, you move up a Spark level.';
+  if (xpSparkHint) xpSparkHint.textContent = `Spark ${xpUi.tier} — keep winning to level up your commander.`;
+}
+
+function renderAnimalsLevels() {
+  const p = state.progress;
+  if (!p || !document.getElementById('al-animal-grid')) return;
+  applyFactionThemeToRoot();
+  const alWins = document.getElementById('al-wins');
+  const alLosses = document.getElementById('al-losses');
+  if (alWins) alWins.textContent = String(p.totalWins ?? 0);
+  if (alLosses) alLosses.textContent = String(p.totalLosses ?? 0);
+  fillMissionDetail(p, ANIMALS_LEVEL_IDS);
+  renderHubProgressionPanel('al-progress-panel');
+  renderHubDailyChallenge('al-daily-challenge');
+
+  const coinBtn = document.getElementById('al-btn-coin-tune');
+  const tokBtn = document.getElementById('al-btn-token-recruit');
+  const coinCan = (p.coins || 0) >= COIN_TUNING_COST && !!state.playerHybrid;
+  const tokTgt = findNextTokenRecruitTarget(p);
+  const tokCan = (p.unlockTokens || 0) >= TOKEN_RECRUIT_COST && !!tokTgt;
+  if (coinBtn) coinBtn.disabled = !coinCan;
+  if (tokBtn) tokBtn.disabled = !tokCan;
+
+  renderHubAnimalGrid('al-animal-grid', 'animals-levels');
+}
+
+function showProfile() {
+  showScreen('profile');
+}
+
+function showAnimalsLevels() {
+  showScreen('animals-levels');
 }
 
 function renderHub() {
@@ -227,137 +403,14 @@ function renderHub() {
     fcChange.classList.toggle('hidden', !showFcChange);
     if (fcChangeName) fcChangeName.textContent = fac ? fac.name : '';
   }
-  document.getElementById('hub-wins').textContent = p.totalWins;
-  document.getElementById('hub-losses').textContent = p.totalLosses;
-  const streakEl = document.getElementById('hub-streak');
-  if (streakEl) {
-    const n = p.streakCount || 0;
-    streakEl.textContent = `🔥 ${n}d`;
-  }
-  const coinsEl = document.getElementById('hsb-coins');
-  if (coinsEl) coinsEl.textContent = String(p.coins ?? 0);
-  const tokEl = document.getElementById('hsb-tokens');
-  if (tokEl) tokEl.textContent = String(p.unlockTokens ?? 0);
 
-  const apexCount = APEX_IDS.filter(id => p.quizUnlocked.includes(id)).length;
-  const dinoCount = DINO_IDS.filter(id => p.quizUnlocked.includes(id)).length;
-  const legCount = LEGENDARY_IDS.filter(id => p.quizUnlocked.includes(id)).length;
-  const mythCount = MYTHICAL_IDS.filter(id => p.quizUnlocked.includes(id)).length;
-  const egyptCount = EGYPTIAN_IDS.filter(id => p.quizUnlocked.includes(id)).length;
-  const knightCount = KNIGHT_IDS.filter(id => p.quizUnlocked.includes(id)).length;
-  const baseU = countBaseUnlocked(p);
-  let tierTxt = `B ${baseU}/10`;
-  if (apexLevelGateMet(p)) tierTxt += ` · A ${apexCount}/10`;
-  if (dinoLevelGateMet(p)) tierTxt += ` · D ${dinoCount}/10`;
-  if (legendaryLevelGateMet(p)) tierTxt += ` · L ${legCount}/10`;
-  if (mythicalLevelGateMet(p)) tierTxt += ` · M ${mythCount}/10`;
-  if (egyptianTierQuizOpen(p)) tierTxt += ` · Eg ${egyptCount}/10`;
-  if (knightTierQuizOpen(p)) tierTxt += ` · K ${knightCount}/10`;
-  const tierSummaryEl = document.getElementById('hub-mission-tier-summary');
-  if (tierSummaryEl) {
-    tierSummaryEl.textContent = `Roster progress: ${tierTxt}`;
-    const tierColor = knightCount > 0 ? 'knights' : egyptCount > 0 ? 'egyptian' : mythCount > 0 ? 'mythical' : legCount > 0 ? 'legendary' : dinoCount > 0 ? 'dino' : apexCount > 0 ? 'purple' : '';
-    tierSummaryEl.className = 'hub-mission-tier-summary' + (tierColor ? ` hub-tier-${tierColor}` : '');
-  }
-
-  if (state.playerHybrid) {
-    const h = state.playerHybrid;
-    document.getElementById('hsb-power').textContent = `${h.power} ⚡`;
-  } else {
-    document.getElementById('hsb-power').textContent = '—';
-  }
-
-  const xpUi = getCommanderXpSegment(p.commanderXp || 0);
-  const xpFill = document.getElementById('hub-xp-bar-fill');
-  const xpMeta = document.getElementById('hub-xp-meta');
-  const xpSegLbl = document.getElementById('hub-xp-seg-lbl');
-  const xpMainLbl = document.getElementById('hub-xp-main-lbl');
-  const xpSparkHint = document.getElementById('hub-xp-spark-hint');
-  const xpTrack = document.getElementById('hub-xp-bar-track');
-  if (xpFill) xpFill.style.width = `${xpUi.pct}%`;
-  if (xpSegLbl) xpSegLbl.textContent = `Spark ${xpUi.tier}`;
-  if (xpMainLbl) {
-    xpMainLbl.textContent = `Level Progress: ${xpUi.inSeg} / ${xpUi.seg} XP`;
-  }
-  if (xpTrack) xpTrack.setAttribute('aria-valuenow', String(Math.round(xpUi.pct)));
-  if (xpMeta) {
-    xpMeta.textContent = 'Wins fill the bar. When it fills, you move up a Spark level.';
-  }
-  if (xpSparkHint) {
-    xpSparkHint.textContent = `Spark ${xpUi.tier} — keep winning to level up your commander.`;
-  }
-
-  const coinBtn = document.getElementById('hub-btn-coin-tune');
-  const tokBtn = document.getElementById('hub-btn-token-recruit');
-  const coinCan = (p.coins || 0) >= COIN_TUNING_COST && !!state.playerHybrid;
-  const tokTgt = findNextTokenRecruitTarget(p);
-  const tokCan = (p.unlockTokens || 0) >= TOKEN_RECRUIT_COST && !!tokTgt;
-  if (coinBtn) coinBtn.disabled = !coinCan;
-  if (tokBtn) tokBtn.disabled = !tokCan;
-
-  // Level banner
-  document.getElementById('hub-level-name').textContent = p.level > MAX_LEVEL ? 'Game Complete!' : `Level ${p.level} — ${level.name}`;
-  document.getElementById('hub-level-desc').textContent = p.level > MAX_LEVEL ? 'You conquered all levels.' : level.desc;
-
-  // Badges
-  const ba = document.getElementById('hub-badge-area');
-  ba.innerHTML = '';
-  if (level && level.isFinal) ba.innerHTML += '<span class="lv-badge badge-final">⚠ FINAL BOSS</span>';
-  else if (level && level.isBoss) ba.innerHTML += '<span class="lv-badge badge-final">⚠ BOSS BATTLE</span>';
-  else if (level && level.isHard) ba.innerHTML += '<span class="lv-badge badge-hard">DANGER ZONE</span>';
-  if (p.level > MAX_LEVEL) ba.innerHTML += '<span class="lv-badge badge-knights">🛡️ REALM CONQUEROR</span>';
-  else if (knightCount > 0) ba.innerHTML += '<span class="lv-badge badge-knights">🛡️ KNIGHTS ACTIVE</span>';
-  else if (egyptCount > 0) ba.innerHTML += '<span class="lv-badge badge-egyptian">⚱️ EGYPTIAN ACTIVE</span>';
-  else if (mythCount > 0) ba.innerHTML += '<span class="lv-badge badge-mythical">⚡ MYTHICAL ACTIVE</span>';
-  else if (legCount > 0) ba.innerHTML += '<span class="lv-badge badge-legendary">🐲 LEGENDARY ACTIVE</span>';
-  else if (dinoCount > 0) ba.innerHTML += '<span class="lv-badge badge-dino">🦖 DINO ACTIVE</span>';
-  else if (apexCount > 0) ba.innerHTML += '<span class="lv-badge badge-apex">◈ APEX UNLOCKED</span>';
-
-  // Progress pips
-  const pips = document.getElementById('lv-progress-pips');
-  pips.innerHTML = '';
-  for (let i = 1; i <= MAX_LEVEL; i++) {
-    const pip = document.createElement('div');
-    pip.className = 'lv-pip' + (i < p.level ? ' done' : i === p.level ? ' current' : '');
-    pips.appendChild(pip);
-  }
-
-  // Enemy preview
-  if (level) {
-    const comps = level.animals.map(id => ALL_ANIMALS[id]).filter(Boolean);
-    document.getElementById('hub-enemy-preview').innerHTML =
-      `Enemy: <span>${comps.map(a => a.emoji + ' ' + a.name).join(' + ')}</span>`;
-  }
-
-  // Hybrid display card
-  const hd = document.getElementById('hub-hybrid-display');
-  if (state.playerHybrid) {
-    const h = state.playerHybrid;
-    hd.innerHTML = `
-      <div style="font-size:1.9rem;margin-bottom:4px">${h.emojis}</div>
-      <div style="font-family:var(--fd);font-size:1rem;font-weight:700;color:var(--text-bright);margin-bottom:2px">${h.name}</div>
-      <div style="font-size:.6rem;font-family:var(--fm);color:var(--text-dim);margin-bottom:8px">${h.composition}</div>
-      <div class="hub-power-row" style="justify-content:center;gap:16px">
-        <div style="text-align:center">
-          <div class="hub-power-score">${h.power}</div>
-          <div class="hub-power-lbl">Power Score</div>
-        </div>
-      </div>`;
-  } else {
-    hd.innerHTML = `<div style="padding:8px 0;color:var(--text-dim);font-size:.72rem">No hybrid forged yet.<br>Go to the Forge to build one.</div>`;
-  }
-
-  const rosterHint = document.getElementById('hub-roster-hint');
-  if (rosterHint) {
-    rosterHint.innerHTML =
-      '<strong>Base</strong> — win levels to recruit the full roster (3 starters, then 7 more).<br>' +
-      '<strong>Apex</strong> — beat Level 5, then pass each Apex quiz.<br>' +
-      '<strong>Dinos</strong> — beat Level 8, then pass each Dino quiz.<br>' +
-      '<strong>Legendary</strong> — beat Level 12 to unlock Legendary Beast quizzes.<br>' +
-      '<strong>Mythical</strong> — beat Level 16 to unlock Mythical God quizzes.<br>' +
-      '<strong>Egyptian Guardians</strong> — recruit every Mythical God, then quiz; desert missions Levels 21–25.<br>' +
-      '<strong>Knights of the Realm</strong> — recruit every Egyptian Guardian, then quiz; castle missions Levels 26–30.<br>' +
-      'Locked rows show ✓/○ for what’s done.';
+  const quick = document.getElementById('hub-quick-line');
+  if (quick && level) {
+    quick.innerHTML =
+      p.level > MAX_LEVEL
+        ? `<span class="hub-quick-mission-txt">Campaign complete</span>`
+        : `<span class="hub-quick-mission-txt">Level ${p.level} — ${level.name}</span>` +
+          ` <button type="button" class="btn btn-ghost btn-sm hub-quick-mission-btn" onclick="showAnimalsLevels()">Animals &amp; Levels</button>`;
   }
 
   const hintEl = document.getElementById('hub-primary-hint');
@@ -373,19 +426,19 @@ function renderHub() {
       t ||
       (p.level > MAX_LEVEL
         ? 'Campaign clear — climb the leaderboard or experiment in the Forge.'
-        : 'Forge a hybrid below, then fight this level.');
+        : 'Use Battle to fight, or open Animals & Levels for the full mission.');
   }
 
-  renderHubProgressionPanel();
-  renderHubDailyChallenge();
   renderActionPanel();
-  renderHubAnimalGrid();
+  renderProfile();
+  renderAnimalsLevels();
 }
 
-function renderHubAnimalGrid() {
+function renderHubAnimalGrid(gridId = 'hub-animal-grid', quizReturnTarget = 'hub') {
   const p = state.progress;
   const available = getAvailableAnimals(p);
-  const grid = document.getElementById('hub-animal-grid');
+  const grid = document.getElementById(gridId);
+  if (!grid) return;
   grid.innerHTML = '';
 
   for (const id of Object.keys(ANIMALS)) {
@@ -452,7 +505,7 @@ function renderHubAnimalGrid() {
     if (isQL) {
       chip.title = `Unlock ${a.name}: level done ✓ — tap to try the quiz.`;
       chip.onclick = () => {
-        state.quizReturnScreen = 'hub';
+        state.quizReturnScreen = quizReturnTarget;
         window.openQuiz(id);
       };
     } else if (isLL && gates) {
@@ -671,6 +724,10 @@ export {
   renderHubDailyChallenge,
   renderHub,
   renderHubAnimalGrid,
+  renderProfile,
+  renderAnimalsLevels,
+  showProfile,
+  showAnimalsLevels,
   getRecommendedAction,
   renderActionPanel,
   hubActionAllegiance,

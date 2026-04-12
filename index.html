@@ -244,7 +244,7 @@ html[data-player-faction="knights"] #screen-hub.screen.active{box-shadow:inset 0
 .btn-logout:hover{color:#fff!important;border-color:var(--red)!important;background:rgba(255,34,68,.32)!important;box-shadow:0 0 20px rgba(255,34,68,.2)}
 /* Full-height screens: header fixed, body scrolls */
 .screen-fill.active{height:100vh;height:100dvh;max-height:100vh;max-height:100dvh;overflow:hidden!important}
-.screen-fill.active > .hub-body,.screen-fill.active > .builder-layout,.screen-fill.active > .quiz-body,.screen-fill.active > .lb-page{min-height:0}
+.screen-fill.active > .hub-body,.screen-fill.active > .builder-layout,.screen-fill.active > .quiz-body,.screen-fill.active > .lb-page,.screen-fill.active > .profile-page,.screen-fill.active > .animals-levels-page{min-height:0}
 .hub-body.hub-scroll{flex:1;min-height:0;overflow-y:auto;-webkit-overflow-scrolling:touch;scroll-behavior:smooth}
 .hub-header-cluster{flex-shrink:0;background:var(--bg);border-bottom:1px solid rgba(28,58,92,.5);box-shadow:0 6px 28px rgba(0,0,0,.25)}
 .hub-header-cluster .hub-status-bar{border-bottom:none}
@@ -261,6 +261,18 @@ html[data-player-faction="knights"] #screen-hub.screen.active{box-shadow:inset 0
 
 /* ─── HUB ─── */
 #screen-hub{padding:0}
+#screen-profile,#screen-animals-levels{padding:0}
+.hub-action-cluster{width:100%;display:flex;flex-direction:column;gap:0}
+.hub-nav-stack{display:flex;flex-direction:column;gap:8px;padding:0 12px 12px;max-width:900px;width:100%;margin:0 auto}
+.hub-nav-row{display:flex;align-items:center;gap:10px;width:100%;padding:10px 12px;border-radius:8px;border:1px solid var(--border);background:rgba(0,0,0,.28);cursor:pointer;text-align:left;font-family:var(--fd);font-size:.68rem;font-weight:700;color:var(--text-bright);letter-spacing:.06em;text-transform:uppercase;-webkit-tap-highlight-color:transparent;transition:background .15s,border-color .15s}
+.hub-nav-row:hover,.hub-nav-row:focus-visible{border-color:rgba(61,158,255,.4);background:rgba(61,158,255,.08)}
+.hub-nav-ico{font-size:1.1rem;flex-shrink:0}
+.hub-nav-lbl{flex:1}
+.hub-quick-line{font-family:var(--fm);font-size:.68rem;color:var(--text-dim);text-align:center;padding:8px 12px 0;line-height:1.45;max-width:100%;word-break:break-word}
+.hub-quick-mission-btn{margin-left:6px;vertical-align:middle}
+.profile-page{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:12px 14px 18px;max-width:900px;width:100%;margin:0 auto}
+.animals-levels-page{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:12px 14px 18px;max-width:900px;width:100%;margin:0 auto}
+.profile-page .card,.animals-levels-page .card{padding:16px}
 .hub-body{padding:15px 16px 22px;max-width:900px;width:100%;margin:0 auto}
 .hub-cta-hint{font-family:var(--fm);font-size:.58rem;color:var(--green);letter-spacing:.12em;text-transform:uppercase;margin:0 0 12px;text-align:center;opacity:.9}
 .hub-cta-hint--below{margin-top:0;margin-bottom:14px}
@@ -1657,54 +1669,7 @@ html[data-player-faction="knights"] #screen-hub.screen.active{box-shadow:inset 0
         <button class="btn btn-logout" type="button" onclick="logout()">Sign out</button>
       </nav>
     </div>
-    <div class="hub-top-split">
-    <div class="hub-top-split__col hub-top-split__col--cmd">
-    <div class="hub-commander-panel" aria-label="Commander status">
-      <h2 class="hub-section-title">Commander Status</h2>
-      <div class="hub-cmd-grid">
-        <div class="hub-cmd-cell hub-cmd-cell--streak">
-          <div class="hub-cmd-hdr">
-            <div class="hsb-lbl">Streak</div>
-            <button type="button" class="hub-tip-btn" data-tip="streak" aria-label="About streak">ⓘ</button>
-          </div>
-          <div class="hsb-val green" id="hub-streak">🔥 0d</div>
-        </div>
-        <div class="hub-cmd-cell">
-          <div class="hub-cmd-hdr">
-            <div class="hsb-lbl">Coins</div>
-            <button type="button" class="hub-tip-btn" data-tip="coins" aria-label="About coins">ⓘ</button>
-          </div>
-          <div class="hsb-val orange" id="hsb-coins">0</div>
-        </div>
-        <div class="hub-cmd-cell">
-          <div class="hub-cmd-hdr">
-            <div class="hsb-lbl">Tokens</div>
-            <button type="button" class="hub-tip-btn" data-tip="tokens" aria-label="About tokens">ⓘ</button>
-          </div>
-          <div class="hsb-val" id="hsb-tokens">0</div>
-        </div>
-        <div class="hub-cmd-cell">
-          <div class="hub-cmd-hdr">
-            <div class="hsb-lbl">Power</div>
-            <button type="button" class="hub-tip-btn" data-tip="power" aria-label="About power">ⓘ</button>
-          </div>
-          <div class="hsb-val orange" id="hsb-power">—</div>
-        </div>
-      </div>
-      <div class="hub-xp-block">
-        <div class="hub-xp-hdr">
-          <span class="hub-xp-tip"><span class="hub-xp-main-lbl" id="hub-xp-main-lbl">Level Progress: 0 / 50 XP</span><button type="button" class="hub-tip-btn" data-tip="xp" aria-label="About XP" style="margin-left:6px">ⓘ</button></span>
-          <strong id="hub-xp-seg-lbl">Spark 1</strong>
-        </div>
-        <div class="hub-xp-bar-track" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="hub-xp-bar-track">
-          <div class="hub-xp-bar-fill" id="hub-xp-bar-fill"></div>
-        </div>
-        <div class="hub-xp-meta" id="hub-xp-meta"></div>
-        <div class="hub-xp-spark" id="hub-xp-spark-hint">Win battles to earn XP in this level.</div>
-      </div>
-    </div>
-    </div>
-    <div class="hub-top-split__col hub-top-split__col--actions" id="hub-action-col">
+    <div class="hub-action-cluster" id="hub-action-col">
     <div class="hub-action-panel" id="hub-action-panel">
       <div class="hap-title">Next Move</div>
       <div class="hap-grid" id="hap-grid">
@@ -1717,15 +1682,6 @@ html[data-player-faction="knights"] #screen-hub.screen.active{box-shadow:inset 0
             <span class="hap-sub" id="hap-battle-sub">Enter the arena</span>
           </button>
         </div>
-        <div class="hap-cell" id="hap-cell-mystery">
-          <button type="button" class="hub-tip-btn" data-tip="reward" aria-label="About reward">ⓘ</button>
-          <button class="hap-btn hap-mystery" id="hap-mystery" type="button" onclick="hubActionMysteryReward()">
-            <span class="hap-rec-tag hidden" id="hap-rec-mystery">Recommended</span>
-            <span class="hap-icon">🎁</span>
-            <span class="hap-label" id="hap-mystery-label">Reward</span>
-            <span class="hap-sub" id="hap-mystery-sub">Once per day</span>
-          </button>
-        </div>
         <div class="hap-cell" id="hap-cell-train">
           <button type="button" class="hub-tip-btn" data-tip="train" aria-label="About train">ⓘ</button>
           <button class="hap-btn hap-train" id="hap-train" type="button" onclick="hubActionTrain()">
@@ -1733,6 +1689,15 @@ html[data-player-faction="knights"] #screen-hub.screen.active{box-shadow:inset 0
             <span class="hap-icon">🧠</span>
             <span class="hap-label" id="hap-train-label">Train</span>
             <span class="hap-sub" id="hap-train-sub">Answer questions to earn boosts</span>
+          </button>
+        </div>
+        <div class="hap-cell" id="hap-cell-mystery">
+          <button type="button" class="hub-tip-btn" data-tip="reward" aria-label="About reward">ⓘ</button>
+          <button class="hap-btn hap-mystery" id="hap-mystery" type="button" onclick="hubActionMysteryReward()">
+            <span class="hap-rec-tag hidden" id="hap-rec-mystery">Recommended</span>
+            <span class="hap-icon">🎁</span>
+            <span class="hap-label" id="hap-mystery-label">Reward</span>
+            <span class="hap-sub" id="hap-mystery-sub">Once per day</span>
           </button>
         </div>
         <div class="hap-cell" id="hap-cell-token">
@@ -1745,6 +1710,8 @@ html[data-player-faction="knights"] #screen-hub.screen.active{box-shadow:inset 0
           </button>
         </div>
       </div>
+    </div>
+    <div class="hub-nav-stack">
       <button type="button" class="hub-faction-change hidden" id="hub-faction-change" onclick="openFactionSelectFromHub()" aria-label="Change faction">
         <span class="hub-fc-icon" aria-hidden="true">⚙️</span>
         <span class="hub-fc-text">
@@ -1752,65 +1719,14 @@ html[data-player-faction="knights"] #screen-hub.screen.active{box-shadow:inset 0
           <span class="hub-fc-sub" id="hub-faction-change-name">—</span>
         </span>
       </button>
-    </div>
+      <button type="button" class="hub-nav-row" onclick="showScreen('profile')"><span class="hub-nav-ico" aria-hidden="true">👤</span><span class="hub-nav-lbl">View My Profile</span></button>
+      <button type="button" class="hub-nav-row" onclick="showAnimalsLevels()"><span class="hub-nav-ico" aria-hidden="true">🐾</span><span class="hub-nav-lbl">Animals &amp; Levels</span></button>
     </div>
     </div>
   </div>
   <div class="hub-body hub-scroll">
-    <div class="hub-mission-section">
-      <h2 class="hub-section-title">Current Mission</h2>
-      <div class="level-banner" id="level-banner">
-        <div class="lv-info" style="flex:1;min-width:0">
-          <div id="hub-badge-area"></div>
-          <h2 id="hub-level-name">Level 1</h2>
-          <p id="hub-level-desc">A scrappy neighbourhood brawler. Nothing to fear… yet.</p>
-          <div class="lv-progress" id="lv-progress-pips"></div>
-          <div class="lv-enemy-preview" id="hub-enemy-preview"></div>
-          <p class="hub-mission-tier-summary" id="hub-mission-tier-summary" aria-label="Roster progress"></p>
-          <button class="btn btn-primary btn-lg" type="button" onclick="showBuilder()">⚔ Forge hybrid &amp; fight this level</button>
-          <p style="font-family:var(--fm);font-size:.62rem;color:var(--text-dim);margin-top:10px;line-height:1.5">Hub saves your spot. Forge picks your animals, Fuse builds stats, then Battle runs the arena.</p>
-        </div>
-      </div>
-    </div>
+    <p class="hub-quick-line" id="hub-quick-line"></p>
     <p class="hub-cta-hint hub-cta-hint--below" id="hub-primary-hint">Your next step</p>
-    <div class="hub-progress-panel" id="hub-progress-panel" aria-live="polite"></div>
-    <div class="card hub-rewards-card" id="hub-rewards-card">
-      <div class="hub-card-title">Rewards &amp; boosts</div>
-      <p class="hub-reward-hint"><strong>Win battles</strong> to earn Fusion Coins. <strong>Clear levels</strong> (and some daily goals) to earn Unlock Tokens.</p>
-      <p class="hub-reward-tip" style="margin-bottom:10px">Fusion Coins — <em title="Use coins to make your hybrid stronger">use them to make your hybrid stronger</em>. Unlock Tokens — <em title="Use tokens to unlock new animals">use them to fast-unlock the next animal in your path</em> (or skip its quiz for Apex/Dinos).</p>
-      <div class="hub-reward-actions">
-        <button type="button" class="btn btn-secondary btn-sm" id="hub-btn-coin-tune" onclick="hubSpendCoinTune()" title="Spend Fusion Coins to raise a random stat on your forged hybrid">⚡ Tune hybrid (12 coins)</button>
-        <button type="button" class="btn btn-secondary btn-sm" id="hub-btn-token-recruit" onclick="hubSpendTokenRecruit()" title="Spend tokens to unlock the next roster animal">🔓 Fast-unlock next animal (5 tokens)</button>
-      </div>
-      <div id="hub-reward-msg" class="hidden" aria-live="polite"></div>
-    </div>
-    <div class="hub-daily-challenge card" id="hub-daily-challenge" aria-live="polite"></div>
-    <div class="hub-grid">
-      <div class="card">
-        <div class="hub-card-title">Your Record</div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:4px">
-          <div style="text-align:center">
-            <div style="font-family:var(--fm);font-size:.62rem;color:var(--text-dim);margin-bottom:4px">VICTORIES</div>
-            <div style="font-family:var(--fd);font-size:2.5rem;font-weight:700;color:var(--green)" id="hub-wins">0</div>
-          </div>
-          <div style="text-align:center">
-            <div style="font-family:var(--fm);font-size:.62rem;color:var(--text-dim);margin-bottom:4px">DEFEATS</div>
-            <div style="font-family:var(--fd);font-size:2.5rem;font-weight:700;color:var(--red)" id="hub-losses">0</div>
-          </div>
-        </div>
-      </div>
-      <div class="card">
-        <div class="hub-card-title">Current Hybrid</div>
-        <div id="hub-hybrid-display" style="font-family:var(--fm);font-size:.72rem;color:var(--text-dim);text-align:center;padding:8px 0">
-          No hybrid forged yet.
-        </div>
-      </div>
-    </div>
-    <div class="card">
-      <div class="hub-card-title">Animal roster</div>
-      <p class="hub-roster-hint" id="hub-roster-hint"></p>
-      <div class="animal-grid" id="hub-animal-grid"></div>
-    </div>
   </div>
   <div id="mystery-reward-overlay" class="mystery-reward-overlay hidden" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="mr-title">
     <div class="mr-panel" id="mr-panel">
@@ -1830,6 +1746,141 @@ html[data-player-faction="knights"] #screen-hub.screen.active{box-shadow:inset 0
       <div class="mr-close-row">
         <button type="button" class="btn btn-secondary btn-sm" id="mr-close">Close</button>
       </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════ COMMANDER PROFILE ══════════════ -->
+<section id="screen-profile" class="screen screen-fill">
+  <div class="topbar topbar-app">
+    <button class="btn btn-ghost btn-sm" type="button" onclick="showHub()">← Hub</button>
+    <div class="topbar-logo" style="margin-left:10px">Commander Profile</div>
+    <div class="topbar-spacer"></div>
+    <button class="btn btn-logout" type="button" onclick="logout()">Sign out</button>
+  </div>
+  <div class="profile-page" id="profile-body">
+    <h2 class="hub-section-title">Commander Profile</h2>
+    <div class="hub-commander-panel" aria-label="Commander status">
+      <div class="hub-cmd-grid">
+        <div class="hub-cmd-cell hub-cmd-cell--streak">
+          <div class="hub-cmd-hdr">
+            <div class="hsb-lbl">Streak</div>
+            <button type="button" class="hub-tip-btn" data-tip="streak" aria-label="About streak">ⓘ</button>
+          </div>
+          <div class="hsb-val green" id="profile-streak">🔥 0d</div>
+        </div>
+        <div class="hub-cmd-cell">
+          <div class="hub-cmd-hdr">
+            <div class="hsb-lbl">Coins</div>
+            <button type="button" class="hub-tip-btn" data-tip="coins" aria-label="About coins">ⓘ</button>
+          </div>
+          <div class="hsb-val orange" id="profile-coins">0</div>
+        </div>
+        <div class="hub-cmd-cell">
+          <div class="hub-cmd-hdr">
+            <div class="hsb-lbl">Tokens</div>
+            <button type="button" class="hub-tip-btn" data-tip="tokens" aria-label="About tokens">ⓘ</button>
+          </div>
+          <div class="hsb-val" id="profile-tokens">0</div>
+        </div>
+        <div class="hub-cmd-cell">
+          <div class="hub-cmd-hdr">
+            <div class="hsb-lbl">Power</div>
+            <button type="button" class="hub-tip-btn" data-tip="power" aria-label="About power">ⓘ</button>
+          </div>
+          <div class="hsb-val orange" id="profile-power">—</div>
+        </div>
+      </div>
+      <div class="hub-xp-block">
+        <div class="hub-xp-hdr">
+          <span class="hub-xp-tip"><span class="hub-xp-main-lbl" id="profile-xp-main-lbl">Level Progress: 0 / 50 XP</span><button type="button" class="hub-tip-btn" data-tip="xp" aria-label="About XP" style="margin-left:6px">ⓘ</button></span>
+          <strong id="profile-xp-seg-lbl">Spark 1</strong>
+        </div>
+        <div class="hub-xp-bar-track" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="profile-xp-bar-track">
+          <div class="hub-xp-bar-fill" id="profile-xp-bar-fill"></div>
+        </div>
+        <div class="hub-xp-meta" id="profile-xp-meta"></div>
+        <div class="hub-xp-spark" id="profile-xp-spark-hint">Win battles to earn XP in this level.</div>
+      </div>
+      <p class="hub-mission-tier-summary" id="profile-faction-line" style="margin-top:10px">Faction</p>
+    </div>
+    <div class="card" style="margin-top:12px">
+      <div class="hub-card-title">Your Record</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:4px">
+        <div style="text-align:center">
+          <div style="font-family:var(--fm);font-size:.62rem;color:var(--text-dim);margin-bottom:4px">VICTORIES</div>
+          <div style="font-family:var(--fd);font-size:2.5rem;font-weight:700;color:var(--green)" id="profile-wins">0</div>
+        </div>
+        <div style="text-align:center">
+          <div style="font-family:var(--fm);font-size:.62rem;color:var(--text-dim);margin-bottom:4px">DEFEATS</div>
+          <div style="font-family:var(--fd);font-size:2.5rem;font-weight:700;color:var(--red)" id="profile-losses">0</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════ ANIMALS & LEVELS ══════════════ -->
+<section id="screen-animals-levels" class="screen screen-fill">
+  <div class="topbar topbar-app">
+    <button class="btn btn-ghost btn-sm" type="button" onclick="showHub()">← Hub</button>
+    <div class="topbar-logo" style="margin-left:10px">Animals &amp; Levels</div>
+    <div class="topbar-spacer"></div>
+    <button class="btn btn-logout" type="button" onclick="logout()">Sign out</button>
+  </div>
+  <div class="animals-levels-page" id="animals-levels-body">
+    <div class="hub-mission-section">
+      <h2 class="hub-section-title">Current Mission</h2>
+      <div class="level-banner" id="al-level-banner">
+        <div class="lv-info" style="flex:1;min-width:0">
+          <div id="al-badge-area"></div>
+          <h2 id="al-level-name">Level 1</h2>
+          <p id="al-level-desc">A scrappy neighbourhood brawler. Nothing to fear… yet.</p>
+          <div class="lv-progress" id="al-lv-progress-pips"></div>
+          <div class="lv-enemy-preview" id="al-enemy-preview"></div>
+          <p class="hub-mission-tier-summary" id="al-mission-tier-summary" aria-label="Roster progress"></p>
+          <button class="btn btn-primary btn-lg" type="button" onclick="showBuilder()">⚔ Forge hybrid &amp; fight this level</button>
+          <p style="font-family:var(--fm);font-size:.62rem;color:var(--text-dim);margin-top:10px;line-height:1.5">Hub saves your spot. Forge picks your animals, Fuse builds stats, then Battle runs the arena.</p>
+        </div>
+      </div>
+    </div>
+    <div class="hub-progress-panel" id="al-progress-panel" aria-live="polite"></div>
+    <div class="card hub-rewards-card" id="al-rewards-card">
+      <div class="hub-card-title">Rewards &amp; boosts</div>
+      <p class="hub-reward-hint"><strong>Win battles</strong> to earn Fusion Coins. <strong>Clear levels</strong> (and some daily goals) to earn Unlock Tokens.</p>
+      <p class="hub-reward-tip" style="margin-bottom:10px">Fusion Coins — <em title="Use coins to make your hybrid stronger">use them to make your hybrid stronger</em>. Unlock Tokens — <em title="Use tokens to unlock new animals">use them to fast-unlock the next animal in your path</em> (or skip its quiz for Apex/Dinos).</p>
+      <div class="hub-reward-actions">
+        <button type="button" class="btn btn-secondary btn-sm" id="al-btn-coin-tune" onclick="hubSpendCoinTune()" title="Spend Fusion Coins to raise a random stat on your forged hybrid">⚡ Tune hybrid (12 coins)</button>
+        <button type="button" class="btn btn-secondary btn-sm" id="al-btn-token-recruit" onclick="hubSpendTokenRecruit()" title="Spend tokens to unlock the next roster animal">🔓 Fast-unlock next animal (5 tokens)</button>
+      </div>
+      <div id="al-reward-msg" class="hidden" aria-live="polite"></div>
+    </div>
+    <div class="hub-daily-challenge card" id="al-daily-challenge" aria-live="polite"></div>
+    <div class="hub-grid">
+      <div class="card">
+        <div class="hub-card-title">Your Record</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:4px">
+          <div style="text-align:center">
+            <div style="font-family:var(--fm);font-size:.62rem;color:var(--text-dim);margin-bottom:4px">VICTORIES</div>
+            <div style="font-family:var(--fd);font-size:2.5rem;font-weight:700;color:var(--green)" id="al-wins">0</div>
+          </div>
+          <div style="text-align:center">
+            <div style="font-family:var(--fm);font-size:.62rem;color:var(--text-dim);margin-bottom:4px">DEFEATS</div>
+            <div style="font-family:var(--fd);font-size:2.5rem;font-weight:700;color:var(--red)" id="al-losses">0</div>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="hub-card-title">Current Hybrid</div>
+        <div id="al-hybrid-display" style="font-family:var(--fm);font-size:.72rem;color:var(--text-dim);text-align:center;padding:8px 0">
+          No hybrid forged yet.
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="hub-card-title">Animal roster</div>
+      <p class="hub-roster-hint" id="al-roster-hint"></p>
+      <div class="animal-grid" id="al-animal-grid"></div>
     </div>
   </div>
 </section>
