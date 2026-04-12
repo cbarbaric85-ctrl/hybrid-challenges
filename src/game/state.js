@@ -85,6 +85,10 @@ function defaultProgress() {
     factionUnlocked: [],
     /** Mystery Reward — last claim local calendar day (YYYY-MM-DD). */
     lastMysteryRewardDayKey: null,
+    /** Local calendar day for mystery claim counter (YYYY-MM-DD). */
+    mysteryRewardClaimsDayKey: null,
+    /** Claims used today (0–3); resets when day key rolls over. */
+    mysteryRewardClaimsCount: 0,
     /** Extra stat boosts from Mystery Reward, merged into next battle pre-quiz summary. */
     pendingMysteryBattleBoost: null,
     /** Next creature-unlock quiz: wrong answers that count as correct (Mystery Reward). */

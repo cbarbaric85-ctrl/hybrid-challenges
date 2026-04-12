@@ -36,7 +36,7 @@ import { showScreen, escapeHtml } from './screens.js';
 import { localDateString, localYesterdayString, msUntilLocalMidnight } from '../game/utils.js';
 import { needsFactionSelection, getFaction } from '../data/factions.js';
 import { applyFactionThemeToRoot, openFactionSelectFromHub } from './faction-ui.js';
-import { canClaimMysteryRewardToday, formatCountdownShort } from '../game/mystery-reward.js';
+import { canClaimMysteryRewardToday, formatCountdownShort, getMysteryRewardStatus } from '../game/mystery-reward.js';
 import { hubActionMysteryReward } from './mystery-reward-ui.js';
 
 
@@ -384,7 +384,6 @@ function renderHub() {
 
   document.getElementById('hub-username').textContent = state.profile?.username || '—';
   const facBadge = document.getElementById('hub-faction-badge');
-  const facBtn = document.getElementById('hub-btn-faction');
   const fac = getFaction(p.faction);
   if (facBadge) {
     if (fac) {
@@ -395,7 +394,6 @@ function renderHub() {
       facBadge.classList.add('hidden');
     }
   }
-  if (facBtn) facBtn.classList.toggle('hidden', !fac || !mythicalLevelGateMet(p));
   const fcChange = document.getElementById('hub-faction-change');
   const fcChangeName = document.getElementById('hub-faction-change-name');
   if (fcChange) {
@@ -408,25 +406,16 @@ function renderHub() {
   if (quick && level) {
     quick.innerHTML =
       p.level > MAX_LEVEL
-        ? `<span class="hub-quick-mission-txt">Campaign complete</span>`
-        : `<span class="hub-quick-mission-txt">Level ${p.level} — ${level.name}</span>` +
-          ` <button type="button" class="btn btn-ghost btn-sm hub-quick-mission-btn" onclick="showAnimalsLevels()">Animals &amp; Levels</button>`;
+        ? `<span class="hub-quick-mission-txt">You finished the campaign — keep battling for fun!</span>`
+        : `<span class="hub-quick-mission-txt">Now playing: Level ${p.level} — ${level.name}</span>`;
   }
 
   const hintEl = document.getElementById('hub-primary-hint');
   if (hintEl) {
-    const lines = getProgressionNextLines(p);
-    let t = '';
-    if (lines.length) {
-      const tmp = document.createElement('div');
-      tmp.innerHTML = lines[0];
-      t = (tmp.textContent || tmp.innerText || '').replace(/\s+/g, ' ').trim();
-    }
     hintEl.textContent =
-      t ||
-      (p.level > MAX_LEVEL
-        ? 'Campaign clear — climb the leaderboard or experiment in the Forge.'
-        : 'Use Battle to fight, or open Animals & Levels for the full mission.');
+      p.level > MAX_LEVEL
+        ? 'Tip: try the leaderboard or forge a new hybrid.'
+        : 'Tip: tap Battle with a forged hybrid, or Train when a quiz is ready.';
   }
 
   renderActionPanel();
@@ -639,15 +628,16 @@ function renderActionPanel() {
   }
 
   const canMystery = !!state.profile?.uid && canClaimMysteryRewardToday(p);
+  const mysteryStatus = state.profile?.uid ? getMysteryRewardStatus(p) : null;
   if (mysteryBtn) mysteryBtn.disabled = !canMystery;
   mysteryBtn?.classList.toggle('hap-mystery--waiting', !canMystery && !!state.profile?.uid);
   const mysterySub = document.getElementById('hap-mystery-sub');
   if (mysterySub) {
     if (!state.profile?.uid) mysterySub.textContent = 'Sign in to play';
-    else if (canMystery) mysterySub.textContent = 'Once per day';
+    else if (canMystery) mysterySub.textContent = mysteryStatus?.line || '3 rewards available today';
     else {
       const ms = msUntilLocalMidnight();
-      mysterySub.textContent = `⏳ Ready in ${formatCountdownShort(ms)}`;
+      mysterySub.textContent = `${mysteryStatus?.line || '⏳ All rewards claimed — come back tomorrow!'} (${formatCountdownShort(ms)} left)`;
     }
   }
 

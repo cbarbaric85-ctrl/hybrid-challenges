@@ -140,7 +140,7 @@ body::before{
 .topbar-hub{align-items:center;flex-wrap:wrap;row-gap:4px}
 .topbar-hub .topbar-logo{flex-shrink:0}
 .topbar-nav{display:flex;align-items:center;gap:10px;flex-shrink:0;margin-left:auto}
-.hub-bar-row--nav{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px 14px;padding:10px 14px 12px;background:linear-gradient(180deg,var(--surface) 0%,#0a1524 100%);border-bottom:1px solid var(--border)}
+.hub-bar-row--nav{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px 10px;padding:8px 12px 10px;background:linear-gradient(180deg,var(--surface) 0%,#0a1524 100%);border-bottom:1px solid var(--border)}
 .hub-bar-row--nav .hub-commander{display:flex;flex-direction:column;gap:2px;min-width:0;flex:1 1 160px}
 .hub-bar-row--nav .hub-commander .hub-mini-brand{font-family:var(--fd);font-weight:700;font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;color:var(--text-dim)}
 .hub-bar-row--nav .hub-commander .hub-mini-brand em{color:var(--green);font-style:normal}
@@ -155,21 +155,29 @@ html[data-player-faction="viking_raiders"] #screen-hub.screen.active{box-shadow:
 html[data-player-faction="knights"] .hub-faction-badge:not(.hidden){color:var(--knights);text-shadow:0 0 12px var(--knights-g)}
 html[data-player-faction="knights"] #screen-hub.screen.active{box-shadow:inset 0 0 100px rgba(74,111,165,.08),inset 0 0 80px rgba(180,200,230,.05)}
 /* Faction picker */
-.faction-select-wrap{max-width:440px;margin:0 auto;padding:28px 18px 40px}
-.faction-select-hdr{text-align:center;margin-bottom:22px}
-.faction-select-kicker{font-family:var(--fm);font-size:.55rem;letter-spacing:.22em;text-transform:uppercase;color:var(--orange);margin-bottom:8px}
-.faction-select-title{font-family:var(--fd);font-size:clamp(1.35rem,5vw,1.75rem);font-weight:700;color:var(--text-bright);margin:0 0 10px;line-height:1.15}
-.faction-select-sub{font-family:var(--fb);font-size:.78rem;color:var(--text-dim);line-height:1.45;margin:0 auto;max-width:36em}
-.faction-select-cards{display:flex;flex-direction:column;gap:14px;margin-bottom:18px}
-.faction-card{display:flex;flex-direction:column;align-items:center;text-align:center;gap:8px;padding:20px 16px;border-radius:10px;border:1px solid var(--border);background:rgba(0,0,0,.28);cursor:pointer;transition:transform .15s,box-shadow .25s,border-color .25s;-webkit-tap-highlight-color:transparent}
-.faction-card:active{transform:scale(.98)}
-.faction-card-icon{font-size:2.2rem;line-height:1}
-.faction-card-name{font-family:var(--fd);font-size:1.05rem;font-weight:700;color:var(--text-bright)}
+#screen-faction-select{padding:0;min-height:0}
+.faction-select-wrap{max-width:480px;margin:0 auto;padding:18px 14px 24px;flex:1;min-height:0;overflow-y:auto;-webkit-overflow-scrolling:touch}
+.faction-select-hdr{text-align:center;margin-bottom:14px}
+.faction-select-kicker{font-family:var(--fm);font-size:.52rem;letter-spacing:.2em;text-transform:uppercase;color:var(--orange);margin-bottom:6px}
+.faction-select-title{font-family:var(--fd);font-size:clamp(1.15rem,4.5vw,1.45rem);font-weight:700;color:var(--text-bright);margin:0 0 8px;line-height:1.2}
+.faction-select-sub{font-family:var(--fb);font-size:.74rem;color:var(--text-dim);line-height:1.4;margin:0 auto;max-width:34em}
+.faction-select-cards{display:flex;flex-direction:column;gap:10px;margin-bottom:12px}
+.faction-card{display:flex;flex-direction:column;align-items:stretch;text-align:left;gap:0;padding:12px 12px 12px;border-radius:10px;border:1px solid var(--border);background:rgba(0,0,0,.28);cursor:pointer;transition:transform .15s,box-shadow .25s,border-color .25s;-webkit-tap-highlight-color:transparent}
+.faction-card:active{transform:scale(.99)}
+.faction-card-head{display:flex;align-items:center;gap:8px;justify-content:flex-start;margin-bottom:4px}
+.faction-card-icon{font-size:1.6rem;line-height:1;flex-shrink:0}
+.faction-card-name{font-family:var(--fd);font-size:.92rem;font-weight:700;color:var(--text-bright);text-align:left}
+.faction-card-kid{font-family:var(--fb);font-size:.72rem;color:var(--text);line-height:1.35;margin-top:2px}
+.faction-card-time{font-family:var(--fb);font-size:.65rem;color:var(--text-dim);line-height:1.35;margin-top:4px}
+.faction-card-benefit{font-family:var(--fb);font-size:.68rem;color:var(--green);line-height:1.35;margin-top:4px}
+.faction-card-meet{font-family:var(--fm);font-size:.6rem;color:var(--text-dim);line-height:1.4;margin-top:6px;word-break:break-word}
+.faction-card-pill{align-self:center;margin-top:8px;font-family:var(--fm);font-size:.52rem;letter-spacing:.12em;text-transform:uppercase;color:var(--green);padding:4px 10px;border-radius:999px;border:1px solid rgba(0,232,122,.45);background:rgba(0,232,122,.1)}
+.faction-card--selected{border-color:rgba(0,232,122,.55);box-shadow:0 0 18px rgba(0,232,122,.22)}
 .faction-card-desc{font-family:var(--fb);font-size:.72rem;color:var(--text-dim);line-height:1.45}
-.faction-card--egyptian_guardians:hover,.faction-card--egyptian_guardians:focus-visible{border-color:rgba(212,175,55,.55);box-shadow:0 0 24px rgba(61,158,255,.2),0 0 18px rgba(212,175,55,.15)}
-.faction-card--viking_raiders:hover,.faction-card--viking_raiders:focus-visible{border-color:rgba(255,80,80,.45);box-shadow:0 0 24px rgba(255,60,60,.18),0 0 18px rgba(120,200,255,.12)}
-.faction-card--knights:hover,.faction-card--knights:focus-visible{border-color:rgba(140,180,230,.55);box-shadow:0 0 24px rgba(74,111,165,.22),0 0 18px rgba(180,200,230,.12)}
-.faction-select-foot{font-family:var(--fm);font-size:.58rem;color:var(--text-dim);text-align:center;line-height:1.5;margin:0}
+.faction-card--egyptian_guardians:hover,.faction-card--egyptian_guardians:focus-visible{border-color:rgba(212,175,55,.55);box-shadow:0 0 20px rgba(61,158,255,.18),0 0 14px rgba(212,175,55,.12)}
+.faction-card--viking_raiders:hover,.faction-card--viking_raiders:focus-visible{border-color:rgba(255,80,80,.45);box-shadow:0 0 20px rgba(255,60,60,.15),0 0 14px rgba(120,200,255,.1)}
+.faction-card--knights:hover,.faction-card--knights:focus-visible{border-color:rgba(140,180,230,.55);box-shadow:0 0 20px rgba(74,111,165,.18),0 0 14px rgba(180,200,230,.1)}
+.faction-select-foot{font-family:var(--fm);font-size:.55rem;color:var(--text-dim);text-align:center;line-height:1.45;margin:0;padding-bottom:8px}
 /* Battle faction flash */
 .battle-faction-hint{font-family:var(--fm);font-size:.62rem;text-align:center;color:var(--green);text-shadow:0 0 14px var(--green-g);padding:6px 10px;margin:0 auto 8px;max-width:92%;line-height:1.35;animation:factionHintPop .35s ease}
 @keyframes factionHintPop{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
@@ -246,7 +254,7 @@ html[data-player-faction="knights"] #screen-hub.screen.active{box-shadow:inset 0
 .screen-fill.active{height:100vh;height:100dvh;max-height:100vh;max-height:100dvh;overflow:hidden!important}
 .screen-fill.active > .hub-body,.screen-fill.active > .builder-layout,.screen-fill.active > .quiz-body,.screen-fill.active > .lb-page,.screen-fill.active > .profile-page,.screen-fill.active > .animals-levels-page{min-height:0}
 .hub-body.hub-scroll{flex:1;min-height:0;overflow-y:auto;-webkit-overflow-scrolling:touch;scroll-behavior:smooth}
-.hub-header-cluster{flex-shrink:0;background:var(--bg);border-bottom:1px solid rgba(28,58,92,.5);box-shadow:0 6px 28px rgba(0,0,0,.25)}
+.hub-header-cluster{flex-shrink:0;background:var(--bg);border-bottom:1px solid rgba(28,58,92,.5);box-shadow:0 4px 18px rgba(0,0,0,.22)}
 .hub-header-cluster .hub-status-bar{border-bottom:none}
 
 /* ─── HUB STATUS (scroll row) ─── */
@@ -263,7 +271,7 @@ html[data-player-faction="knights"] #screen-hub.screen.active{box-shadow:inset 0
 #screen-hub{padding:0}
 #screen-profile,#screen-animals-levels{padding:0}
 .hub-action-cluster{width:100%;display:flex;flex-direction:column;gap:0}
-.hub-nav-stack{display:flex;flex-direction:column;gap:8px;padding:0 12px 12px;max-width:900px;width:100%;margin:0 auto}
+.hub-nav-stack{display:flex;flex-direction:column;gap:6px;padding:0 10px 10px;max-width:900px;width:100%;margin:0 auto}
 .hub-nav-row{display:flex;align-items:center;gap:10px;width:100%;padding:10px 12px;border-radius:8px;border:1px solid var(--border);background:rgba(0,0,0,.28);cursor:pointer;text-align:left;font-family:var(--fd);font-size:.68rem;font-weight:700;color:var(--text-bright);letter-spacing:.06em;text-transform:uppercase;-webkit-tap-highlight-color:transparent;transition:background .15s,border-color .15s}
 .hub-nav-row:hover,.hub-nav-row:focus-visible{border-color:rgba(61,158,255,.4);background:rgba(61,158,255,.08)}
 .hub-nav-ico{font-size:1.1rem;flex-shrink:0}
@@ -273,7 +281,7 @@ html[data-player-faction="knights"] #screen-hub.screen.active{box-shadow:inset 0
 .profile-page{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:12px 14px 18px;max-width:900px;width:100%;margin:0 auto}
 .animals-levels-page{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:12px 14px 18px;max-width:900px;width:100%;margin:0 auto}
 .profile-page .card,.animals-levels-page .card{padding:16px}
-.hub-body{padding:15px 16px 22px;max-width:900px;width:100%;margin:0 auto}
+.hub-body{padding:12px 14px 16px;max-width:900px;width:100%;margin:0 auto}
 .hub-cta-hint{font-family:var(--fm);font-size:.58rem;color:var(--green);letter-spacing:.12em;text-transform:uppercase;margin:0 0 12px;text-align:center;opacity:.9}
 .hub-cta-hint--below{margin-top:0;margin-bottom:14px}
 .hub-mission-section{margin-bottom:14px}
@@ -755,6 +763,7 @@ html[data-player-faction="knights"] #screen-hub.screen.active{box-shadow:inset 0
 .mr-cup--hint:not(:disabled){animation:mrCupFloat 2.2s ease-in-out infinite,mrHint 1.5s ease-in-out infinite,mrShake 2.5s ease-in-out infinite}
 .mr-cup--fade{opacity:.2;pointer-events:none;animation:none!important}
 .mr-cup--lift{transform:translateY(-12px) scale(1.06);box-shadow:0 12px 28px rgba(176,106,255,.35);animation:none!important;z-index:2;border-color:rgba(176,106,255,.8)}
+.mr-more-line{margin-top:10px;font-family:var(--fm);font-size:.65rem;color:var(--text-dim);line-height:1.4}
 .mr-result{text-align:center;padding:12px 8px;border-radius:8px;background:rgba(0,232,122,.08);border:1px solid rgba(0,232,122,.25);margin-bottom:12px;font-family:var(--fb);font-size:.92rem;line-height:1.45;color:var(--text-bright)}
 .mr-result.hidden{display:none!important}
 .mr-result--ultra{background:linear-gradient(135deg,rgba(255,140,26,.2),rgba(176,106,255,.15));border-color:rgba(255,140,26,.5);animation:mrUltraPop .55s cubic-bezier(.2,1.3,.4,1) both}
@@ -1664,7 +1673,7 @@ html[data-player-faction="knights"] #screen-hub.screen.active{box-shadow:inset 0
         <div class="hub-faction-badge hidden" id="hub-faction-badge" aria-label="Faction"></div>
       </div>
       <nav class="hub-bar-nav" aria-label="Hub navigation">
-        <button class="btn btn-ghost btn-sm hidden" type="button" id="hub-btn-faction" onclick="openFactionSelectFromHub()" title="Pick a faction — switch anytime">Faction</button>
+        <button class="btn btn-ghost btn-sm" type="button" onclick="showAnimalsLevels()">Animals &amp; Levels</button>
         <button class="btn btn-secondary btn-sm" type="button" onclick="showLeaderboard()">Leaderboard</button>
         <button class="btn btn-logout" type="button" onclick="logout()">Sign out</button>
       </nav>
@@ -1697,7 +1706,7 @@ html[data-player-faction="knights"] #screen-hub.screen.active{box-shadow:inset 0
             <span class="hap-rec-tag hidden" id="hap-rec-mystery">Recommended</span>
             <span class="hap-icon">🎁</span>
             <span class="hap-label" id="hap-mystery-label">Reward</span>
-            <span class="hap-sub" id="hap-mystery-sub">Once per day</span>
+            <span class="hap-sub" id="hap-mystery-sub">3 rewards available today</span>
           </button>
         </div>
         <div class="hap-cell" id="hap-cell-token">
@@ -1720,7 +1729,6 @@ html[data-player-faction="knights"] #screen-hub.screen.active{box-shadow:inset 0
         </span>
       </button>
       <button type="button" class="hub-nav-row" onclick="showScreen('profile')"><span class="hub-nav-ico" aria-hidden="true">👤</span><span class="hub-nav-lbl">View My Profile</span></button>
-      <button type="button" class="hub-nav-row" onclick="showAnimalsLevels()"><span class="hub-nav-ico" aria-hidden="true">🐾</span><span class="hub-nav-lbl">Animals &amp; Levels</span></button>
     </div>
     </div>
   </div>
@@ -1889,12 +1897,12 @@ html[data-player-faction="knights"] #screen-hub.screen.active{box-shadow:inset 0
 <section id="screen-faction-select" class="screen screen-fill">
   <div class="faction-select-wrap">
     <div class="faction-select-hdr">
-      <div class="faction-select-kicker">Mythical tier</div>
-      <h1 class="faction-select-title">Pick a faction to improve your chances of winning battles — switch anytime</h1>
+      <div class="faction-select-kicker">Choose your team</div>
+      <h1 class="faction-select-title">Pick a faction for cool battle bonuses</h1>
       <p class="faction-select-sub" id="faction-select-sub">The Mythical path is open — pledge your banner to gain faction bonuses in battle.</p>
     </div>
     <div class="faction-select-cards" id="faction-select-cards"></div>
-    <p class="faction-select-foot">Switch factions any time from the Hub. Faction XP grows when you win battles.</p>
+    <p class="faction-select-foot">Switch factions from the Hub anytime. Faction XP grows when you win battles.</p>
   </div>
 </section>
 

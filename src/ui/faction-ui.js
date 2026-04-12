@@ -25,15 +25,23 @@ export function applyFactionThemeToRoot() {
   }
 }
 
-function cardHtml(id) {
+function cardHtml(id, selectedId) {
   const f = FACTIONS[id];
   if (!f) return '';
-  const desc = escapeHtml(f.description);
+  const kid = f.kidTagline ? escapeHtml(f.kidTagline) : escapeHtml(f.description);
+  const timeL = f.timePeriod ? escapeHtml(f.timePeriod) : '';
+  const benefit = f.gameplayKid ? escapeHtml(f.gameplayKid) : '';
+  const meet = f.meetLine ? escapeHtml(f.meetLine) : '';
+  const isSel = selectedId === id;
+  const selClass = isSel ? ' faction-card--selected' : '';
   return `
-    <button type="button" class="faction-card faction-card--${id}" data-faction-id="${escapeHtml(id)}" onclick="pickFactionAndContinue('${escapeHtml(id)}')">
-      <span class="faction-card-icon" aria-hidden="true">${f.icon}</span>
-      <span class="faction-card-name">${escapeHtml(f.name)}</span>
-      <span class="faction-card-desc">${desc}</span>
+    <button type="button" class="faction-card faction-card--${id}${selClass}" data-faction-id="${escapeHtml(id)}" onclick="pickFactionAndContinue('${escapeHtml(id)}')" aria-pressed="${isSel}">
+      <div class="faction-card-head"><span class="faction-card-icon" aria-hidden="true">${f.icon}</span><span class="faction-card-name">${escapeHtml(f.name)}</span></div>
+      <span class="faction-card-kid">${kid}</span>
+      ${timeL ? `<span class="faction-card-time">${timeL}</span>` : ''}
+      ${benefit ? `<span class="faction-card-benefit">${benefit}</span>` : ''}
+      ${meet ? `<span class="faction-card-meet">${meet}</span>` : ''}
+      ${isSel ? '<span class="faction-card-pill">Selected</span>' : ''}
     </button>`;
 }
 
@@ -44,12 +52,13 @@ export function renderFactionSelect() {
   if (p) ensureFactionUnlockedList(p);
   const allowed = new Set(p?.factionUnlocked?.length ? p.factionUnlocked : FACTION_ORDER);
   const order = FACTION_ORDER.filter(id => allowed.has(id));
-  wrap.innerHTML = order.map(cardHtml).join('');
+  const selectedId = p?.faction || null;
+  wrap.innerHTML = order.map(id => cardHtml(id, selectedId)).join('');
   const sub = document.getElementById('faction-select-sub');
   if (sub) {
     sub.textContent = needsFactionSelection(state.progress)
-      ? 'The Mythical path is open — pledge your banner to gain faction bonuses in battle.'
-      : 'Pick another faction any time. Your progress is kept.';
+      ? 'Pick one — you can switch later and keep all your progress!'
+      : 'Tap a card to switch. Your levels and animals stay safe.';
   }
 }
 

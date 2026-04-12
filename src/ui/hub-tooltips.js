@@ -6,7 +6,7 @@ const TIPS = {
   tokens: 'Spend Unlock Tokens to fast-unlock the next creature on your path.',
   power: 'Your hybrid’s battle strength.',
   xp: 'Win battles to level up your Spark and fill this bar.',
-  reward: 'Pick 1 of 3 cups once per day.',
+  reward: 'Pick 1 of 3 cups — you can open up to 3 mystery rewards each day (same great prizes).',
   train: 'Answer questions to earn boosts.',
   unlock: 'Spend tokens to fast-unlock the next recruit on your path.',
   battle: 'Fight the current level in the arena. Forge a hybrid first if you need a new one.',

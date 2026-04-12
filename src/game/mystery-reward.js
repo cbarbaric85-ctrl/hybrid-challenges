@@ -4,6 +4,8 @@ import {
 import { isQuizEligible, MAX_LEVEL } from './progression.js';
 import { EMPTY_STAT_BOOST, localDateString } from './utils.js';
 
+const MYSTERY_CLAIMS_PER_DAY = 3;
+
 const STAT_KEYS = ['spd', 'agi', 'int', 'str'];
 
 const ALL_RECRUIT_ORDER = [
@@ -248,10 +250,47 @@ export function syncActiveBoostsView(p) {
   p.activeBoosts = arr;
 }
 
+/**
+ * Normalize daily mystery claim counter; migrate legacy single-claim saves.
+ */
+export function normalizeMysteryClaimsForDay(p) {
+  if (!p) return;
+  if (p.mysteryRewardClaimsDayKey == null) {
+    const today = localDateString();
+    p.mysteryRewardClaimsDayKey = today;
+    p.mysteryRewardClaimsCount = p.lastMysteryRewardDayKey === today ? 1 : 0;
+  }
+  const today = localDateString();
+  if (p.mysteryRewardClaimsDayKey !== today) {
+    p.mysteryRewardClaimsDayKey = today;
+    p.mysteryRewardClaimsCount = 0;
+  }
+  if (p.mysteryRewardClaimsCount == null) p.mysteryRewardClaimsCount = 0;
+  if (p.mysteryRewardClaimsCount < 0) p.mysteryRewardClaimsCount = 0;
+  if (p.mysteryRewardClaimsCount > MYSTERY_CLAIMS_PER_DAY) p.mysteryRewardClaimsCount = MYSTERY_CLAIMS_PER_DAY;
+}
+
 export function canClaimMysteryRewardToday(progress) {
   if (!progress) return false;
-  const today = localDateString();
-  return progress.lastMysteryRewardDayKey !== today;
+  normalizeMysteryClaimsForDay(progress);
+  return (progress.mysteryRewardClaimsCount || 0) < MYSTERY_CLAIMS_PER_DAY;
+}
+
+/**
+ * @returns {{ remaining: number, line: string, exhausted: boolean }}
+ */
+export function getMysteryRewardStatus(progress) {
+  if (!progress) return { remaining: 0, line: '⏳ All rewards claimed — come back tomorrow!', exhausted: true };
+  normalizeMysteryClaimsForDay(progress);
+  const used = progress.mysteryRewardClaimsCount || 0;
+  const remaining = Math.max(0, MYSTERY_CLAIMS_PER_DAY - used);
+  const exhausted = remaining === 0;
+  let line = '';
+  if (remaining === 3) line = '3 rewards available today';
+  else if (remaining === 2) line = '2 rewards left';
+  else if (remaining === 1) line = '1 reward left';
+  else line = '⏳ All rewards claimed — come back tomorrow!';
+  return { remaining, line, exhausted };
 }
 
 export function formatCountdownShort(ms) {

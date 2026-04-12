@@ -6,6 +6,8 @@ import {
   rollMysteryReward,
   applyMysteryReward,
   canClaimMysteryRewardToday,
+  normalizeMysteryClaimsForDay,
+  getMysteryRewardStatus,
 } from '../game/mystery-reward.js';
 
 let hintCupIndex = -1;
@@ -192,6 +194,9 @@ function onCupClick(cupIndex) {
   }
 
   applyMysteryReward(p, rolled);
+  normalizeMysteryClaimsForDay(p);
+  p.mysteryRewardClaimsCount = (p.mysteryRewardClaimsCount || 0) + 1;
+  p.mysteryRewardClaimsDayKey = localDateString();
   p.lastMysteryRewardDayKey = localDateString();
 
   saveUserProgress(p, { mysteryClaim: true }).catch(e => console.error('[mystery] save failed', e));
@@ -200,12 +205,14 @@ function onCupClick(cupIndex) {
   const msgEl = $('mr-result-msg');
   if (resultEl && msgEl) {
     resultEl.classList.remove('hidden');
+    const statusAfter = getMysteryRewardStatus(p);
+    const moreLine = `<div class="mr-more-line">${statusAfter.line}</div>`;
     if (rolled.isUltraLevel) {
       resultEl.classList.add('mr-result--ultra');
-      msgEl.innerHTML = `<span class="mr-ultra-txt">${rolled.ultraMessage || '🔥 Incredible!'}</span>`;
+      msgEl.innerHTML = `<span class="mr-ultra-txt">${rolled.ultraMessage || '🔥 Incredible!'}</span>${moreLine}`;
     } else {
       resultEl.classList.remove('mr-result--ultra');
-      msgEl.innerHTML = `🎉 <strong>You got: ${rolled.displayName}!</strong>`;
+      msgEl.innerHTML = `🎉 <strong>You got: ${rolled.displayName}!</strong>${moreLine}`;
     }
   }
 

@@ -28,6 +28,10 @@ export const FACTIONS = {
       glow: 'rgba(212, 175, 55, 0.25)',
       accent2: 'rgba(61, 158, 255, 0.35)',
     },
+    kidTagline: 'Ancient protectors of pyramids and powerful gods!',
+    timePeriod: '📜 Ancient Egypt — over 3,000 years ago',
+    gameplayKid: '🧠 Bonus smarts on brain rounds — plus a lucky second chance when a round goes wrong!',
+    meetLine: 'Meet: Anubis 🐺 • Ra ☀️ • Horus 🦅',
   },
   [FACTION_VIKING]: {
     id: FACTION_VIKING,
@@ -45,6 +49,10 @@ export const FACTIONS = {
       glow: 'rgba(255, 60, 60, 0.22)',
       accent2: 'rgba(120, 200, 255, 0.3)',
     },
+    kidTagline: 'Wild sea raiders who never give up!',
+    timePeriod: '⚓ Viking Age — long ago in Northern Europe',
+    gameplayKid: '🔥 Fight harder after a tough round — and hit stronger in the final rounds!',
+    meetLine: 'Meet: Battle Wolf 🐺 • Snow Bear 🐻 • Storm Eagle 🦅',
   },
   [FACTION_KNIGHTS]: {
     id: FACTION_KNIGHTS,
@@ -62,6 +70,10 @@ export const FACTIONS = {
       glow: 'rgba(180, 200, 230, 0.28)',
       accent2: 'rgba(61, 120, 200, 0.35)',
     },
+    kidTagline: 'Armor, honor, and castle defenders!',
+    timePeriod: '🏰 Medieval times — knights and castles',
+    gameplayKid: '🛡️ Tougher defense — enemy hits can count for less, and you get stronger in late rounds!',
+    meetLine: 'Meet: Shield Knight 🪖 • Templar ✝️ • Paladin ⚔️',
   },
 };
 

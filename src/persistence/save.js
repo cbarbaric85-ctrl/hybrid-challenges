@@ -6,7 +6,7 @@ import {
   ANIMALS, APEX_IDS, DINO_IDS, STARTER_BASE_IDS,
 } from '../data/animals.js';
 import { state, defaultProgress } from '../game/state.js';
-import { syncActiveBoostsView } from '../game/mystery-reward.js';
+import { syncActiveBoostsView, normalizeMysteryClaimsForDay } from '../game/mystery-reward.js';
 
 // Forward-declare: set by persistence/leaderboard.js to avoid circular dep
 let _syncLeaderboardEntry = async () => { console.warn('syncLeaderboardEntry not wired yet'); return false; };
@@ -35,10 +35,13 @@ function normalizeProgress(p) {
   if (!Array.isArray(p.factionUnlocked)) p.factionUnlocked = [];
   if (p.faction != null && typeof p.faction !== 'string') p.faction = null;
   if (p.lastMysteryRewardDayKey != null && typeof p.lastMysteryRewardDayKey !== 'string') p.lastMysteryRewardDayKey = null;
+  if (p.mysteryRewardClaimsDayKey != null && typeof p.mysteryRewardClaimsDayKey !== 'string') p.mysteryRewardClaimsDayKey = null;
+  if (p.mysteryRewardClaimsCount != null && typeof p.mysteryRewardClaimsCount !== 'number') p.mysteryRewardClaimsCount = 0;
   if (p.pendingQuizGrace == null) p.pendingQuizGrace = 0;
   if (p.pendingMysteryBattleBoost != null && typeof p.pendingMysteryBattleBoost !== 'object') p.pendingMysteryBattleBoost = null;
   if (!Array.isArray(p.activeBoosts)) p.activeBoosts = [];
   if (!Array.isArray(p.unlockedRewards)) p.unlockedRewards = [];
+  normalizeMysteryClaimsForDay(p);
   syncActiveBoostsView(p);
   return p;
 }
@@ -125,6 +128,8 @@ function firestoreDataToProgress(data) {
       knights: data.stageAccess?.knights !== false,
     },
     lastMysteryRewardDayKey: typeof data.lastMysteryRewardDayKey === 'string' ? data.lastMysteryRewardDayKey : null,
+    mysteryRewardClaimsDayKey: typeof data.mysteryRewardClaimsDayKey === 'string' ? data.mysteryRewardClaimsDayKey : null,
+    mysteryRewardClaimsCount: Number.isFinite(data.mysteryRewardClaimsCount) ? Math.min(3, Math.max(0, data.mysteryRewardClaimsCount)) : null,
     pendingQuizGrace: data.pendingQuizGrace ?? 0,
     pendingMysteryBattleBoost:
       data.pendingMysteryBattleBoost && typeof data.pendingMysteryBattleBoost === 'object'
@@ -210,6 +215,8 @@ async function saveUserProgress(progress, opts = {}) {
       factionUnlocked: [...(p.factionUnlocked || [])],
       stageAccess: { ...(p.stageAccess || { base: true, apex: true, dinosaur: true }) },
       lastMysteryRewardDayKey: p.lastMysteryRewardDayKey ?? null,
+      mysteryRewardClaimsDayKey: p.mysteryRewardClaimsDayKey ?? null,
+      mysteryRewardClaimsCount: p.mysteryRewardClaimsCount ?? 0,
       pendingQuizGrace: p.pendingQuizGrace ?? 0,
       pendingMysteryBattleBoost: p.pendingMysteryBattleBoost || null,
       activeBoosts: [...(p.activeBoosts || [])],
