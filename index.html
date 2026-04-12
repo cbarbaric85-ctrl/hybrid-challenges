@@ -175,17 +175,20 @@ html[data-player-faction="knights"] #screen-hub.screen.active{box-shadow:inset 0
 @keyframes factionHintPop{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
 .hub-bar-nav{display:flex;align-items:center;gap:8px;flex-wrap:wrap;flex-shrink:0}
 .hub-bar-nav .btn{white-space:nowrap}
-.hub-stats-scroll-wrap{border-bottom:1px solid var(--border);background:var(--surface2);flex-shrink:0}
-.hub-stats-scroll{display:flex;flex-direction:row;flex-wrap:nowrap;gap:10px;padding:10px 12px;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:thin;align-items:stretch}
-.hub-stats-scroll .hsb-seg{flex:0 0 auto;min-width:76px;max-width:130px;padding:8px 10px;border:1px solid var(--border);border-radius:8px;background:rgba(0,0,0,.2)}
-.hub-stats-scroll .hsb-lbl{font-size:.5rem;letter-spacing:.14em;margin-bottom:4px}
-.hub-stats-scroll .hsb-val{font-size:.82rem}
-.hub-xp-block{padding:10px 14px 12px;background:var(--surface);border-bottom:1px solid var(--border);flex-shrink:0}
-.hub-xp-hdr{display:flex;justify-content:space-between;align-items:baseline;gap:10px;margin-bottom:6px;font-family:var(--fm);font-size:.55rem;letter-spacing:.12em;text-transform:uppercase;color:var(--text-dim)}
-.hub-xp-hdr strong{color:var(--blue);font-family:var(--fd);font-size:.72rem;letter-spacing:.06em}
-.hub-xp-bar-track{height:9px;background:rgba(0,0,0,.35);border-radius:5px;overflow:hidden;border:1px solid var(--border)}
+.hub-commander-panel{border-bottom:1px solid var(--border);background:var(--surface2);flex-shrink:0;padding:14px 14px 16px}
+.hub-section-title{font-family:var(--fm);font-size:.58rem;letter-spacing:.22em;text-transform:uppercase;color:var(--text-dim);margin:0 0 12px;text-align:center}
+.hub-cmd-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:4px}
+.hub-cmd-cell{padding:12px 10px;border:1px solid var(--border);border-radius:8px;background:rgba(0,0,0,.22);min-height:76px;display:flex;flex-direction:column;justify-content:center;gap:4px}
+.hub-cmd-cell .hsb-lbl{margin-bottom:0}
+.hub-cmd-cell--streak .hsb-val{font-size:1.05rem}
+.hub-xp-block{padding:0;margin:0;border:none;background:transparent}
+.hub-xp-hdr{display:flex;justify-content:space-between;align-items:baseline;gap:10px;margin-bottom:6px;font-family:var(--fb);font-size:.78rem;color:var(--text-bright)}
+.hub-xp-hdr .hub-xp-main-lbl{flex:1;min-width:0}
+.hub-xp-hdr strong{color:var(--blue);font-family:var(--fd);font-size:.68rem;letter-spacing:.04em;font-weight:600}
+.hub-xp-bar-track{height:11px;background:rgba(0,0,0,.35);border-radius:5px;overflow:hidden;border:1px solid var(--border)}
 .hub-xp-bar-fill{height:100%;width:0%;background:linear-gradient(90deg,var(--blue),var(--green));transition:width .65s ease;box-shadow:0 0 14px rgba(0,232,122,.28)}
-.hub-xp-meta{margin-top:6px;font-family:var(--fm);font-size:.55rem;color:var(--text-dim);line-height:1.35}
+.hub-xp-meta{margin-top:6px;font-family:var(--fm);font-size:.58rem;color:var(--text-dim);line-height:1.4}
+.hub-xp-spark{font-family:var(--fm);font-size:.52rem;color:var(--text-dim);margin-top:4px;text-align:center}
 .hub-rewards-card .hub-reward-hint{font-family:var(--fb);font-size:.72rem;color:var(--text-dim);line-height:1.45;margin-bottom:10px}
 .hub-reward-actions{display:flex;flex-direction:column;gap:8px}
 .hub-reward-actions .btn{text-align:center}
@@ -224,9 +227,19 @@ html[data-player-faction="knights"] #screen-hub.screen.active{box-shadow:inset 0
 /* ─── HUB ─── */
 #screen-hub{padding:0}
 .hub-body{padding:20px 18px 28px;max-width:900px;width:100%;margin:0 auto}
-.hub-cta-hint{font-family:var(--fm);font-size:.58rem;color:var(--green);letter-spacing:.12em;text-transform:uppercase;margin:0 0 8px;text-align:center;opacity:.9}
+.hub-cta-hint{font-family:var(--fm);font-size:.58rem;color:var(--green);letter-spacing:.12em;text-transform:uppercase;margin:0 0 16px;text-align:center;opacity:.9}
+.hub-cta-hint--below{margin-top:0;margin-bottom:18px}
+.hub-mission-section{margin-bottom:18px}
+.hub-mission-tier-summary{font-family:var(--fm);font-size:.62rem;color:var(--text-dim);margin:0 0 12px;line-height:1.4;word-break:break-word}
+.hub-mission-tier-summary.hub-tier-purple{color:var(--purple)}
+.hub-mission-tier-summary.hub-tier-dino{color:var(--dino)}
+.hub-mission-tier-summary.hub-tier-legendary{color:var(--legendary)}
+.hub-mission-tier-summary.hub-tier-mythical{color:var(--mythical)}
+.hub-mission-tier-summary.hub-tier-egyptian{color:var(--egyptian)}
+.hub-mission-tier-summary.hub-tier-knights{color:var(--knights)}
+.hub-mission-section .level-banner .btn-primary{width:100%;max-width:100%;font-size:1.12rem;padding:16px 22px;box-shadow:0 0 24px rgba(0,232,122,.18)}
 .level-banner .btn-primary{font-size:1.05rem;padding:14px 28px}
-.level-banner{background:var(--surface);border:1px solid var(--border);padding:22px 26px;margin-bottom:20px;display:flex;align-items:center;gap:22px;position:relative;overflow:hidden}
+.level-banner{background:var(--surface);border:1px solid var(--border);padding:22px 26px;margin-bottom:0;display:flex;align-items:center;gap:22px;position:relative;overflow:hidden}
 .level-banner::after{content:'';position:absolute;right:-30px;top:50%;transform:translateY(-50%);width:250px;height:250px;background:radial-gradient(circle,rgba(0,232,122,.05) 0%,transparent 70%);pointer-events:none}
 .lv-info h2{font-family:var(--fd);font-size:1.4rem;font-weight:700;color:var(--text-bright);margin-bottom:3px}
 .lv-info p{color:var(--text-dim);font-size:.85rem;margin-bottom:12px}
@@ -592,9 +605,10 @@ html[data-player-faction="knights"] #screen-hub.screen.active{box-shadow:inset 0
 .hub-dc-desc{font-family:var(--fb);font-size:.78rem;color:var(--text-dim);line-height:1.4;margin-bottom:8px}
 .hub-dc-status{font-family:var(--fm);font-size:.65rem;color:var(--green)}
 /* ── Action Panel ── */
-.hub-action-panel{margin-top:18px;margin-bottom:16px;padding:16px 14px 14px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;box-shadow:0 0 22px rgba(0,232,122,.04)}
-.hap-title{font-family:var(--fm);font-size:.58rem;letter-spacing:.22em;text-transform:uppercase;color:var(--text-dim);margin-bottom:12px;text-align:center}
+.hub-action-panel{margin-top:0;margin-bottom:16px;padding:16px 14px 14px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;box-shadow:0 0 22px rgba(0,232,122,.04)}
+.hap-title{font-family:var(--fm);font-size:.58rem;letter-spacing:.22em;text-transform:uppercase;color:var(--text-dim);margin:0 0 12px;text-align:center}
 .hap-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.hap-grid .hap-fusion:nth-child(3):last-child{grid-column:1/-1;max-width:min(100%,280px);justify-self:center}
 .hap-btn{position:relative;display:flex;flex-direction:column;align-items:center;gap:2px;padding:14px 8px 12px;border-radius:8px;border:1px solid var(--border);background:rgba(0,0,0,.25);cursor:pointer;transition:transform .15s,box-shadow .25s,border-color .25s;text-align:center;-webkit-tap-highlight-color:transparent}
 .hap-btn:active{transform:scale(.96)}
 .hap-btn:disabled{opacity:.35;pointer-events:none;filter:grayscale(.6)}
@@ -1550,79 +1564,69 @@ html[data-player-faction="knights"] #screen-hub.screen.active{box-shadow:inset 0
         <button class="btn btn-logout" type="button" onclick="logout()">Sign out</button>
       </nav>
     </div>
-    <div class="hub-stats-scroll-wrap">
-      <div class="hub-stats-scroll" id="hub-stats-scroll" aria-label="Commander stats">
-        <div class="hsb-seg">
+    <div class="hub-commander-panel" aria-label="Commander status">
+      <h2 class="hub-section-title">Commander Status</h2>
+      <div class="hub-cmd-grid">
+        <div class="hub-cmd-cell hub-cmd-cell--streak">
           <div class="hsb-lbl">Streak</div>
           <div class="hsb-val green" id="hub-streak">🔥 0 days</div>
         </div>
-        <div class="hsb-seg" title="Use coins to make your hybrid stronger">
+        <div class="hub-cmd-cell" title="Use coins to make your hybrid stronger">
           <div class="hsb-lbl">Fusion Coins</div>
           <div class="hsb-val orange" id="hsb-coins">0</div>
         </div>
-        <div class="hsb-seg" title="Use tokens to unlock new animals">
+        <div class="hub-cmd-cell" title="Use tokens to unlock new animals">
           <div class="hsb-lbl">Unlock tokens</div>
           <div class="hsb-val" id="hsb-tokens">0</div>
         </div>
-        <div class="hsb-seg">
-          <div class="hsb-lbl">Current Level</div>
-          <div class="hsb-val orange" id="hsb-level">1 / 10</div>
-        </div>
-        <div class="hsb-seg">
-          <div class="hsb-lbl">Active Hybrid</div>
-          <div class="hsb-val" id="hsb-hybrid">—</div>
-        </div>
-        <div class="hsb-seg" id="hsb-power-seg">
+        <div class="hub-cmd-cell">
           <div class="hsb-lbl">Hybrid Power</div>
           <div class="hsb-val orange" id="hsb-power">—</div>
         </div>
-        <div class="hsb-seg">
-          <div class="hsb-lbl">Stages</div>
-          <div class="hsb-val" id="hsb-tiers">Base</div>
+      </div>
+      <div class="hub-xp-block">
+        <div class="hub-xp-hdr">
+          <span class="hub-xp-main-lbl" id="hub-xp-main-lbl">Level Progress: 0 / 50 XP</span>
+          <strong id="hub-xp-seg-lbl">Spark 1</strong>
         </div>
+        <div class="hub-xp-bar-track" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="hub-xp-bar-track">
+          <div class="hub-xp-bar-fill" id="hub-xp-bar-fill"></div>
+        </div>
+        <div class="hub-xp-meta" id="hub-xp-meta"></div>
+        <div class="hub-xp-spark" id="hub-xp-spark-hint">Win battles to earn XP in this level.</div>
       </div>
-    </div>
-    <div class="hub-xp-block">
-      <div class="hub-xp-hdr"><span>Commander XP</span><strong id="hub-xp-seg-lbl">Spark 1</strong></div>
-      <div class="hub-xp-bar-track" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="hub-xp-bar-track">
-        <div class="hub-xp-bar-fill" id="hub-xp-bar-fill"></div>
-      </div>
-      <div class="hub-xp-meta" id="hub-xp-meta"></div>
     </div>
   </div>
   <div class="hub-body hub-scroll">
-    <p class="hub-cta-hint" id="hub-primary-hint">Your next step</p>
-    <div class="level-banner" id="level-banner">
-      <div class="lv-info" style="flex:1;min-width:0">
-        <div id="hub-badge-area"></div>
-        <h2 id="hub-level-name">Level 1</h2>
-        <p id="hub-level-desc">A scrappy neighbourhood brawler. Nothing to fear… yet.</p>
-        <div class="lv-progress" id="lv-progress-pips"></div>
-        <div class="lv-enemy-preview" id="hub-enemy-preview"></div>
-        <button class="btn btn-primary btn-lg" type="button" onclick="showBuilder()">⚔ Forge hybrid &amp; fight this level</button>
-        <p style="font-family:var(--fm);font-size:.62rem;color:var(--text-dim);margin-top:10px;line-height:1.5">Hub saves your spot. Forge picks your animals, Fuse builds stats, then Battle runs the arena.</p>
+    <div class="hub-mission-section">
+      <h2 class="hub-section-title">Current Mission</h2>
+      <div class="level-banner" id="level-banner">
+        <div class="lv-info" style="flex:1;min-width:0">
+          <div id="hub-badge-area"></div>
+          <h2 id="hub-level-name">Level 1</h2>
+          <p id="hub-level-desc">A scrappy neighbourhood brawler. Nothing to fear… yet.</p>
+          <div class="lv-progress" id="lv-progress-pips"></div>
+          <div class="lv-enemy-preview" id="hub-enemy-preview"></div>
+          <p class="hub-mission-tier-summary" id="hub-mission-tier-summary" aria-label="Roster progress"></p>
+          <button class="btn btn-primary btn-lg" type="button" onclick="showBuilder()">⚔ Forge hybrid &amp; fight this level</button>
+          <p style="font-family:var(--fm);font-size:.62rem;color:var(--text-dim);margin-top:10px;line-height:1.5">Hub saves your spot. Forge picks your animals, Fuse builds stats, then Battle runs the arena.</p>
+        </div>
       </div>
     </div>
-    <!-- Action panel -->
     <div class="hub-action-panel" id="hub-action-panel">
       <div class="hap-title">Choose Your Next Move</div>
       <div class="hap-grid" id="hap-grid">
-        <button class="hap-btn hap-allegiance" id="hap-allegiance" type="button" onclick="hubActionAllegiance()">
-          <span class="hap-icon">🏛️</span>
-          <span class="hap-label" id="hap-allegiance-label">Faction bonus</span>
-          <span class="hap-sub" id="hap-allegiance-sub">Pick a faction to improve your chances of winning battles — switch anytime.</span>
-        </button>
-        <button class="hap-btn hap-unlock" id="hap-unlock" type="button" onclick="hubActionUnlock()">
-          <span class="hap-rec-tag hidden" id="hap-rec-unlock">Recommended</span>
-          <span class="hap-icon">🧠</span>
-          <span class="hap-label" id="hap-unlock-label">Train (Quiz Boost)</span>
-          <span class="hap-sub" id="hap-unlock-sub">Quizzes unlock creatures and train your brain</span>
-        </button>
         <button class="hap-btn hap-mystery" id="hap-mystery" type="button" onclick="hubActionMysteryReward()">
           <span class="hap-rec-tag hidden" id="hap-rec-mystery">Recommended</span>
           <span class="hap-icon">🎁</span>
           <span class="hap-label" id="hap-mystery-label">Mystery Reward</span>
           <span class="hap-sub" id="hap-mystery-sub">Open a surprise once per day</span>
+        </button>
+        <button class="hap-btn hap-unlock" id="hap-unlock" type="button" onclick="hubActionUnlock()">
+          <span class="hap-rec-tag hidden" id="hap-rec-unlock">Recommended</span>
+          <span class="hap-icon">🔓</span>
+          <span class="hap-label" id="hap-unlock-label">Unlock Creature</span>
+          <span class="hap-sub" id="hap-unlock-sub">Quiz boost and new recruits</span>
         </button>
         <button class="hap-btn hap-fusion" id="hap-fusion" type="button" onclick="hubActionNewFusion()">
           <span class="hap-rec-tag hidden" id="hap-rec-fusion">Recommended</span>
@@ -1632,6 +1636,7 @@ html[data-player-faction="knights"] #screen-hub.screen.active{box-shadow:inset 0
         </button>
       </div>
     </div>
+    <p class="hub-cta-hint hub-cta-hint--below" id="hub-primary-hint">Your next step</p>
     <div class="hub-progress-panel" id="hub-progress-panel" aria-live="polite"></div>
     <div class="card hub-rewards-card" id="hub-rewards-card">
       <div class="hub-card-title">Rewards &amp; boosts</div>

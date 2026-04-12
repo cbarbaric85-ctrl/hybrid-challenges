@@ -232,9 +232,6 @@ function renderHub() {
   const tokEl = document.getElementById('hsb-tokens');
   if (tokEl) tokEl.textContent = String(p.unlockTokens ?? 0);
 
-  // Status bar
-  document.getElementById('hsb-level').textContent = p.level > MAX_LEVEL ? 'Complete!' : `${p.level} / ${MAX_LEVEL}`;
-
   const apexCount = APEX_IDS.filter(id => p.quizUnlocked.includes(id)).length;
   const dinoCount = DINO_IDS.filter(id => p.quizUnlocked.includes(id)).length;
   const legCount = LEGENDARY_IDS.filter(id => p.quizUnlocked.includes(id)).length;
@@ -249,17 +246,17 @@ function renderHub() {
   if (mythicalLevelGateMet(p)) tierTxt += ` · M ${mythCount}/10`;
   if (egyptianTierQuizOpen(p)) tierTxt += ` · Eg ${egyptCount}/10`;
   if (knightTierQuizOpen(p)) tierTxt += ` · K ${knightCount}/10`;
-  document.getElementById('hsb-tiers').textContent = tierTxt;
-  const tierColor = knightCount > 0 ? 'knights' : egyptCount > 0 ? 'egyptian' : mythCount > 0 ? 'mythical' : legCount > 0 ? 'legendary' : dinoCount > 0 ? 'dino' : apexCount > 0 ? 'purple' : '';
-  document.getElementById('hsb-tiers').className = 'hsb-val ' + tierColor;
+  const tierSummaryEl = document.getElementById('hub-mission-tier-summary');
+  if (tierSummaryEl) {
+    tierSummaryEl.textContent = `Roster progress: ${tierTxt}`;
+    const tierColor = knightCount > 0 ? 'knights' : egyptCount > 0 ? 'egyptian' : mythCount > 0 ? 'mythical' : legCount > 0 ? 'legendary' : dinoCount > 0 ? 'dino' : apexCount > 0 ? 'purple' : '';
+    tierSummaryEl.className = 'hub-mission-tier-summary' + (tierColor ? ` hub-tier-${tierColor}` : '');
+  }
 
-  // Current hybrid
   if (state.playerHybrid) {
     const h = state.playerHybrid;
-    document.getElementById('hsb-hybrid').textContent = `${h.emojis} ${h.name}`;
     document.getElementById('hsb-power').textContent = `${h.power} ⚡`;
   } else {
-    document.getElementById('hsb-hybrid').textContent = '—';
     document.getElementById('hsb-power').textContent = '—';
   }
 
@@ -267,12 +264,20 @@ function renderHub() {
   const xpFill = document.getElementById('hub-xp-bar-fill');
   const xpMeta = document.getElementById('hub-xp-meta');
   const xpSegLbl = document.getElementById('hub-xp-seg-lbl');
+  const xpMainLbl = document.getElementById('hub-xp-main-lbl');
+  const xpSparkHint = document.getElementById('hub-xp-spark-hint');
   const xpTrack = document.getElementById('hub-xp-bar-track');
   if (xpFill) xpFill.style.width = `${xpUi.pct}%`;
   if (xpSegLbl) xpSegLbl.textContent = `Spark ${xpUi.tier}`;
+  if (xpMainLbl) {
+    xpMainLbl.textContent = `Level Progress: ${xpUi.inSeg} / ${xpUi.seg} XP`;
+  }
   if (xpTrack) xpTrack.setAttribute('aria-valuenow', String(Math.round(xpUi.pct)));
   if (xpMeta) {
-    xpMeta.textContent = `Commander XP · ${xpUi.inSeg} / ${xpUi.seg} points in this spark (wins fill the bar)`;
+    xpMeta.textContent = 'Wins fill the bar. When it fills, you move up a Spark level.';
+  }
+  if (xpSparkHint) {
+    xpSparkHint.textContent = `Spark ${xpUi.tier} — keep winning to level up your commander.`;
   }
 
   const coinBtn = document.getElementById('hub-btn-coin-tune');
@@ -500,15 +505,11 @@ function renderActionPanel() {
 
   const rec = getRecommendedAction(p);
 
-  const allegianceBtn = document.getElementById('hap-allegiance');
   const unlockBtn = document.getElementById('hap-unlock');
   const mysteryBtn = document.getElementById('hap-mystery');
   const fusionBtn = document.getElementById('hap-fusion');
 
-  const hasHybrid = !!state.playerHybrid;
   const unlockTarget = getFirstQuizEligibleId(p);
-
-  if (allegianceBtn) allegianceBtn.disabled = false;
 
   // Unlock — available if a quiz-eligible creature exists
   const unlockLabel = document.getElementById('hap-unlock-label');
@@ -524,8 +525,8 @@ function renderActionPanel() {
       [STAGE_KNIGHTS]: 'Knight',
     };
     const tier = tierMap[a?.stage] || 'New';
-    if (unlockLabel) unlockLabel.textContent = `Train (${tier} quiz)`;
-    if (unlockSub) unlockSub.textContent = `${a?.emoji || ''} ${a?.name || 'Unknown'} — quiz boost & unlock`;
+    if (unlockLabel) unlockLabel.textContent = `Unlock ${tier} creature`;
+    if (unlockSub) unlockSub.textContent = `${a?.emoji || ''} ${a?.name || 'Unknown'} — pass the quiz to recruit`;
     unlockBtn.disabled = false;
   } else {
     if (unlockLabel) unlockLabel.textContent = 'Train (Quiz Boost)';
@@ -560,7 +561,7 @@ function renderActionPanel() {
   // Recommended highlight
   const btnMap = { UNLOCK: unlockBtn, MYSTERY: mysteryBtn, FIGHT: null };
   const recMap = { UNLOCK: 'hap-rec-unlock', MYSTERY: 'hap-rec-mystery', FUSION: 'hap-rec-fusion' };
-  [allegianceBtn, unlockBtn, mysteryBtn, fusionBtn].forEach(b => b?.classList.remove('hap-recommended'));
+  [unlockBtn, mysteryBtn, fusionBtn].forEach(b => b?.classList.remove('hap-recommended'));
   for (const id of Object.values(recMap)) {
     document.getElementById(id)?.classList.add('hidden');
   }
