@@ -19,6 +19,7 @@ import {
 import { sanitizeHybridName, recordQuizAnswers, saveUserProgress, persistGameProgress } from '../persistence/save.js';
 import { syncActiveBoostsView } from '../game/mystery-reward.js';
 import { showScreen } from './screens.js';
+import { openCreatureIntel } from './creature-intel-ui.js';
 
 function showBuilder() {
   clearDefeatAutoReturn();
@@ -223,6 +224,18 @@ function renderBuilder() {
   updateForgeNextHint();
 }
 
+function bacMiniBarsHtml(a) {
+  const max = STAT_MAX;
+  const pct = k => Math.max(6, Math.round((a[k] / max) * 100));
+  const keys = ['spd', 'agi', 'int', 'str'];
+  return `<div class="bac-mini-bars">${keys
+    .map(
+      k =>
+        `<div class="bac-mini-pillar"><div class="bac-mini-track"><div class="bac-mini-fill sf-${k}" style="height:${pct(k)}%"></div></div><span class="bac-mini-lbl">${k}</span></div>`
+    )
+    .join('')}</div>`;
+}
+
 function makeAnimalCard(id) {
   const a = ANIMALS[id];
   const card = document.createElement('div');
@@ -235,7 +248,10 @@ function makeAnimalCard(id) {
           : a.stage === STAGE_APEX ? ' apex-card' : '';
   card.id = `bac-${id}`;
   card.className = `bac${stageCls}${isSelected?' sel':''}`;
-  card.onclick = () => toggleAnimalSelect(id);
+  card.addEventListener('click', e => {
+    if (e.target.closest('.bac-intel-btn')) return;
+    toggleAnimalSelect(id);
+  });
   const tierMap = {
     [STAGE_KNIGHTS]: ['🛡️ KNIGHT', 't8'],
     [STAGE_EGYPTIAN]: ['⚱️ EGYPTIAN', 't7'],
@@ -245,15 +261,20 @@ function makeAnimalCard(id) {
     [STAGE_APEX]: ['◈ APEX', 't3'],
   };
   const [tierLbl, tierCls] = tierMap[a.stage] || ['BASE', ''];
-  card.innerHTML = `<div class="bac-em">${a.emoji}</div>
+  card.innerHTML = `<div class="bac-row-top">
+    <button type="button" class="bac-intel-btn" aria-label="Creature info">ⓘ</button>
+    <div class="bac-em">${a.emoji}</div>
+  </div>
     <div class="bac-nm">${a.name}</div>
     <div class="bac-tier-tag ${tierCls}">${tierLbl}</div>
-    <div class="bac-stats-mini">
-      <div class="bac-s">SPD <em>${a.spd}</em></div>
-      <div class="bac-s">AGI <em>${a.agi}</em></div>
-      <div class="bac-s">INT <em>${a.int}</em></div>
-      <div class="bac-s">STR <em>${a.str}</em></div>
-    </div>`;
+    ${bacMiniBarsHtml(a)}`;
+  const intelBtn = card.querySelector('.bac-intel-btn');
+  if (intelBtn) {
+    intelBtn.addEventListener('click', e => {
+      e.stopPropagation();
+      openCreatureIntel(id, { returnScreen: 'builder' });
+    });
+  }
   return card;
 }
 
@@ -470,7 +491,24 @@ function applyHybridDisplayName() {
 }
 
 function renderHybridPreview(h) {
-  document.getElementById('h-emojis').textContent = h.emojis;
+  const emEl = document.getElementById('h-emojis');
+  if (emEl && h.animals?.length) {
+    emEl.innerHTML = h.animals
+      .map(
+        aid =>
+          `<button type="button" class="h-emoji-btn" data-hybrid-aid="${aid}" aria-label="${ANIMALS[aid]?.name || 'Animal'} info">${ANIMALS[aid]?.emoji || '?'}</button>`
+      )
+      .join('');
+    emEl.querySelectorAll('.h-emoji-btn').forEach(btn => {
+      btn.addEventListener('click', e => {
+        e.stopPropagation();
+        const aid = btn.getAttribute('data-hybrid-aid');
+        if (aid) openCreatureIntel(aid, { returnScreen: 'builder' });
+      });
+    });
+  } else if (emEl) {
+    emEl.textContent = h.emojis;
+  }
   const nameGlowMap = {
     knights: 'knights-glow', egyptian: 'egyptian-glow', mythical: 'mythical-glow', legendary: 'legendary-glow', dino: 'dino-glow', apex: 'apex-glow',
   };
@@ -496,7 +534,11 @@ function renderHybridPreview(h) {
 }
 
 function clearHybridPreview() {
-  document.getElementById('h-emojis').textContent = '—';
+  const emEl = document.getElementById('h-emojis');
+  if (emEl) {
+    emEl.innerHTML = '';
+    emEl.textContent = '—';
+  }
   document.getElementById('h-name').className = 'h-name';
   document.getElementById('h-name').textContent = 'No Animals Selected';
   document.getElementById('h-sub').textContent = 'SELECT 1–3 ANIMALS TO FUSE';

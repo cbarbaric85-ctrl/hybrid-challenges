@@ -45,9 +45,32 @@ import { saveUserProgress, persistGameProgress, recordQuizAnswers, computeQuizAc
 import { syncActiveBoostsView } from '../game/mystery-reward.js';
 import { syncLeaderboardEntry } from '../persistence/leaderboard.js';
 import { showScreen, escapeHtml } from './screens.js';
+import { openCreatureIntel } from './creature-intel-ui.js';
 import { localDateString } from '../game/utils.js';
 
 const ARENA_CLASSES = ['arena-ocean','arena-jungle','arena-sky','arena-volcanic','arena-underworld','arena-celestial','arena-desert','arena-castle'];
+
+function wireBattlePlayerIntelEmojis(disp) {
+  const el = document.getElementById('bp-em');
+  if (!el) return;
+  if (!disp?.animals?.length) {
+    el.textContent = disp?.emojis || '';
+    return;
+  }
+  el.innerHTML = disp.animals
+    .map(
+      aid =>
+        `<button type="button" class="f-em-intel" data-bp-aid="${aid}" aria-label="${ANIMALS[aid]?.name || 'Animal'} info">${ANIMALS[aid]?.emoji || '?'}</button>`
+    )
+    .join('');
+  el.querySelectorAll('.f-em-intel').forEach(btn => {
+    btn.addEventListener('click', e => {
+      e.stopPropagation();
+      const aid = btn.getAttribute('data-bp-aid');
+      if (aid) openCreatureIntel(aid, { returnScreen: 'battle' });
+    });
+  });
+}
 
 let _factionHintTimer = null;
 function showFactionBattleHints(messages) {
@@ -944,7 +967,7 @@ function confirmPreBattleAndStartFight() {
   const nm = document.getElementById('bp-name');
   const comp = document.getElementById('bp-comp');
   const pw = document.getElementById('bp-power');
-  if (em) em.textContent = disp.emojis;
+  if (em) wireBattlePlayerIntelEmojis(disp);
   if (nm) nm.textContent = disp.name;
   if (comp) comp.textContent = disp.composition;
   const qPts = sumBoostPoints(state.battle.quizBoosts || EMPTY_STAT_BOOST());
@@ -983,7 +1006,7 @@ function renderBattleScreen() {
   const bpEm = document.getElementById('bp-em');
   const bpName = document.getElementById('bp-name');
   const bpComp = document.getElementById('bp-comp');
-  if (bpEm) bpEm.textContent = disp.emojis;
+  if (bpEm) wireBattlePlayerIntelEmojis(disp);
   if (bpName) bpName.textContent = disp.name;
   if (bpComp) bpComp.textContent = disp.composition;
   const qPts = sumBoostPoints(state.battle.quizBoosts || EMPTY_STAT_BOOST());

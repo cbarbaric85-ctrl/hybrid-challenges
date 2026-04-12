@@ -34,6 +34,7 @@ import { saveUserProgress, persistGameProgress } from '../persistence/save.js';
 import { backfillLeaderboardIfMissing } from '../persistence/leaderboard.js';
 import { showScreen, escapeHtml } from './screens.js';
 import { showBuilder } from './forge.js';
+import { openCreatureIntel } from './creature-intel-ui.js';
 import { localDateString, localYesterdayString, msUntilLocalMidnight } from '../game/utils.js';
 import { needsFactionSelection, getFaction } from '../data/factions.js';
 import { applyFactionThemeToRoot, openFactionSelectFromHub } from './faction-ui.js';
@@ -125,6 +126,26 @@ function hubSpendCoinTune() {
   renderHub();
 }
 
+function clearHubTuneBarBoost() {
+  for (const k of ['spd', 'agi', 'int', 'str']) {
+    document.getElementById(`hub-tune-bar-${k}`)?.classList.remove('hub-tune-bar--boost');
+  }
+}
+
+function syncHubTuneIdentity() {
+  const emEl = document.getElementById('hub-tune-emojis');
+  const nmEl = document.getElementById('hub-tune-hybrid-name');
+  const h = state.playerHybrid;
+  if (!emEl || !nmEl) return;
+  if (!h) {
+    emEl.textContent = '—';
+    nmEl.textContent = '—';
+    return;
+  }
+  emEl.textContent = h.emojis || '';
+  nmEl.textContent = h.name || 'Hybrid';
+}
+
 function syncHubTuneBarsFromHybrid() {
   const h = state.playerHybrid;
   const keys = ['spd', 'agi', 'int', 'str'];
@@ -141,6 +162,8 @@ function openHubTuneOverlay() {
   const o = document.getElementById('hub-tune-overlay');
   if (!o) return;
   const p = state.progress;
+  clearHubTuneBarBoost();
+  syncHubTuneIdentity();
   syncHubTuneBarsFromHybrid();
   const line = document.getElementById('hub-tune-coins-line');
   if (line) line.textContent = p ? `Fusion Coins: ${p.coins ?? 0} · ${COIN_TUNING_COST} each tune` : '';
@@ -167,7 +190,14 @@ function hubTuneOverlayApply() {
     closeHubTuneOverlay();
     return;
   }
+  clearHubTuneBarBoost();
   syncHubTuneBarsFromHybrid();
+  syncHubTuneIdentity();
+  if (r.stat) {
+    const bar = document.getElementById(`hub-tune-bar-${r.stat}`);
+    bar?.classList.add('hub-tune-bar--boost');
+    setTimeout(() => bar?.classList.remove('hub-tune-bar--boost'), 1400);
+  }
   const line = document.getElementById('hub-tune-coins-line');
   if (line && state.progress) line.textContent = `Fusion Coins: ${state.progress.coins ?? 0} · ${COIN_TUNING_COST} each tune`;
   const btn = document.getElementById('hub-tune-apply');
@@ -451,8 +481,14 @@ function fillMissionDetail(p, ids) {
   if (hd) {
     if (state.playerHybrid) {
       const h = state.playerHybrid;
+      const emojiRow = (h.animals || [])
+        .map(
+          aid =>
+            `<button type="button" class="h-emoji-btn hub-mission-hybrid-emoji" data-mission-aid="${aid}" aria-label="${ANIMALS[aid]?.name || 'Animal'} info">${ANIMALS[aid]?.emoji || '?'}</button>`
+        )
+        .join('');
       hd.innerHTML = `
-      <div style="font-size:1.9rem;margin-bottom:4px">${h.emojis}</div>
+      <div style="font-size:1.9rem;margin-bottom:4px">${emojiRow}</div>
       <div style="font-family:var(--fd);font-size:1rem;font-weight:700;color:var(--text-bright);margin-bottom:2px">${h.name}</div>
       <div style="font-size:.6rem;font-family:var(--fm);color:var(--text-dim);margin-bottom:8px">${h.composition}</div>
       <div class="hub-power-row" style="justify-content:center;gap:16px">
@@ -461,6 +497,13 @@ function fillMissionDetail(p, ids) {
           <div class="hub-power-lbl">Power Score</div>
         </div>
       </div>`;
+      hd.querySelectorAll('.hub-mission-hybrid-emoji').forEach(btn => {
+        btn.addEventListener('click', e => {
+          e.stopPropagation();
+          const aid = btn.getAttribute('data-mission-aid');
+          if (aid) openCreatureIntel(aid, { returnScreen: 'animals-levels' });
+        });
+      });
     } else {
       hd.innerHTML = `<div style="padding:8px 0;color:var(--text-dim);font-size:.72rem">No hybrid forged yet.<br>Go to the Forge to build one.</div>`;
     }
@@ -671,7 +714,9 @@ function renderHubAnimalGrid(gridId = 'hub-animal-grid', quizReturnTarget = 'hub
         ? `<div class="a-chip-stats-preview" aria-hidden="true">${formatMiniStatPreview(a)}</div>`
         : '';
     if (premiumPreview) chip.classList.add('premium-preview');
-    chip.innerHTML = `<span class="a-chip-em">${a.emoji}</span>
+    const intelReturn = gridId === 'al-animal-grid' ? 'animals-levels' : 'hub';
+    chip.innerHTML = `<button type="button" class="a-chip-intel" aria-label="Creature info">ⓘ</button>
+      <span class="a-chip-em">${a.emoji}</span>
       <span class="a-chip-nm">${a.name}</span>
       <span class="a-chip-tier ${tierClass}">${isLL ? '🔒' : isQL ? '📝' : tierLbl}</span>${premiumPreview}`;
 
@@ -686,14 +731,24 @@ function renderHubAnimalGrid(gridId = 'hub-animal-grid', quizReturnTarget = 'hub
       chip.innerHTML += `<div class="unlock-gate-list">${gateHtml}</div>`;
     }
 
-    if (isQL) {
-      chip.title = `Unlock ${a.name}: level done ✓ — tap to try the quiz.`;
-      chip.onclick = () => {
+    chip.addEventListener('click', e => {
+      if (e.target.closest('.a-chip-intel')) {
+        e.stopPropagation();
+        openCreatureIntel(id, { returnScreen: intelReturn });
+        return;
+      }
+      if (isQL) {
         state.quizReturnScreen = quizReturnTarget;
         window.openQuiz(id);
-      };
+      }
+    });
+
+    if (isQL) {
+      chip.title = `Unlock ${a.name}: level done ✓ — tap to try the quiz. · ⓘ Creature intel`;
     } else if (isLL && gates) {
       chip.title = gates.map(g => `${g.ok ? 'Done' : 'Todo'}: ${g.text}`).join('\n');
+    } else {
+      chip.title = `${a.name} — ⓘ Creature intel`;
     }
 
     grid.appendChild(chip);

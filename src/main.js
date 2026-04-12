@@ -2,6 +2,9 @@
 import './boot.js';
 
 import { showScreen } from './ui/screens.js';
+import { state } from './game/state.js';
+import { getAvailableAnimals } from './game/progression.js';
+import { openCreatureIntel, closeCreatureIntel } from './ui/creature-intel-ui.js';
 import { switchTab, handleAuth, logout, setupAuth } from './ui/auth.js';
 import {
   renderHub, hubSpendCoinTune, hubSpendTokenRecruit,
@@ -21,6 +24,14 @@ import {
   returnFromQuiz, returnFromQuizHub, openQuiz, exitQuiz,
   toggleAnimalSelect,
 } from './ui/forge.js';
+
+function creatureIntelUseInHybrid(id) {
+  closeCreatureIntel();
+  const p = state.progress;
+  showScreen('builder');
+  if (!p || !getAvailableAnimals(p).includes(id)) return;
+  toggleAnimalSelect(id);
+}
 import { showLeaderboard, renderLeaderboard } from './ui/leaderboard-ui.js';
 import {
   startBattle, beginBattle,
@@ -84,6 +95,9 @@ Object.assign(window, {
   clearAnimalsLevelsTierFilter,
   toggleAnimalSelect,
   buildMiniStats,
+  openCreatureIntel,
+  closeCreatureIntel,
+  creatureIntelUseInHybrid,
 });
 
 initMysteryRewardUi();
