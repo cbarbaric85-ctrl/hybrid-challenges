@@ -375,9 +375,10 @@ function scrollForgeColumnToFusionPanel() {
   const pad = 16;
   if (isForgeMobileLayout() && layout && layout.classList.contains('forge-mobile-step-2')) {
     const targetEl = anchor || panel;
-    const top = targetEl.getBoundingClientRect().top - layout.getBoundingClientRect().top + layout.scrollTop - 8;
-    console.log('[forge] fusion section ready — mobile layout scroll', { top, layoutScrollH: layout.scrollHeight });
-    layout.scrollTo({ top: Math.max(0, top), behavior: 'smooth' });
+    const col = forgeCol;
+    const top = targetEl.getBoundingClientRect().top - col.getBoundingClientRect().top + col.scrollTop - 8;
+    console.log('[forge] fusion section ready — mobile forge column scroll', { top, colScrollH: col.scrollHeight });
+    col.scrollTo({ top: Math.max(0, top), behavior: 'smooth' });
     return;
   }
   const relTop = panel.getBoundingClientRect().top - forgeCol.getBoundingClientRect().top + forgeCol.scrollTop;
@@ -768,7 +769,9 @@ function showQuizResult(passed) {
 
   const body = document.getElementById('quiz-body');
   const fromHub =
-    state.quizReturnScreen === 'hub' || state.quizReturnScreen === 'animals-levels';
+    state.quizReturnScreen === 'hub'
+    || state.quizReturnScreen === 'animals-levels'
+    || state.quizReturnScreen === 'animals-tier';
 
   if (passed) {
     const hubNextHint = fromHub
@@ -836,11 +839,13 @@ function returnFromQuizHub() {
   document.getElementById('battle-result-overlay')?.classList.add('hidden');
   document.getElementById('battle-countdown-overlay')?.classList.add('hidden');
   if (state.quizReturnScreen === 'animals-levels') showScreen('animals-levels');
+  else if (state.quizReturnScreen === 'animals-tier') showScreen('animals-tier');
   else showScreen('hub');
 }
 function exitQuiz() {
   if (state.quizReturnScreen === 'hub') showScreen('hub');
   else if (state.quizReturnScreen === 'animals-levels') showScreen('animals-levels');
+  else if (state.quizReturnScreen === 'animals-tier') showScreen('animals-tier');
   else {
     state.selectedAnimals = state.playerHybrid ? [...state.playerHybrid.animals] : [];
     showScreen('builder');

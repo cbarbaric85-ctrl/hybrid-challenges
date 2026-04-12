@@ -258,7 +258,7 @@ html[data-player-faction] #screen-hub .card::before{background:linear-gradient(9
 .btn-logout:hover{color:#fff!important;border-color:var(--red)!important;background:rgba(255,34,68,.32)!important;box-shadow:0 0 20px rgba(255,34,68,.2)}
 /* Full-height screens: header fixed, body scrolls */
 .screen-fill.active{height:100vh;height:100dvh;max-height:100vh;max-height:100dvh;overflow:hidden!important}
-.screen-fill.active > .hub-body,.screen-fill.active > .builder-layout,.screen-fill.active > .quiz-body,.screen-fill.active > .lb-page,.screen-fill.active > .profile-page,.screen-fill.active > .animals-levels-page{min-height:0}
+.screen-fill.active > .hub-body,.screen-fill.active > .builder-layout,.screen-fill.active > .quiz-body,.screen-fill.active > .lb-page,.screen-fill.active > .profile-page,.screen-fill.active > .animals-levels-page,.screen-fill.active > .animals-tier-page{min-height:0}
 .hub-body.hub-scroll{flex:1;min-height:0;overflow-y:auto;-webkit-overflow-scrolling:touch;scroll-behavior:smooth}
 .hub-header-cluster{flex-shrink:0;background:var(--bg);border-bottom:1px solid rgba(28,58,92,.5);box-shadow:0 4px 18px rgba(0,0,0,.22)}
 .hub-header-cluster .hub-status-bar{border-bottom:none}
@@ -275,7 +275,7 @@ html[data-player-faction] #screen-hub .card::before{background:linear-gradient(9
 
 /* ─── HUB ─── */
 #screen-hub{padding:0}
-#screen-profile,#screen-animals-levels{padding:0}
+#screen-profile,#screen-animals-levels,#screen-animals-tier{padding:0}
 .hub-action-cluster{width:100%;display:flex;flex-direction:column;gap:0}
 .hub-nav-stack{display:flex;flex-direction:column;gap:6px;padding:0 10px 10px;max-width:900px;width:100%;margin:0 auto}
 .hub-nav-row{display:flex;align-items:center;gap:10px;width:100%;padding:10px 12px;border-radius:8px;border:1px solid var(--border);background:rgba(0,0,0,.28);cursor:pointer;text-align:left;font-family:var(--fd);font-size:.68rem;font-weight:700;color:var(--text-bright);letter-spacing:.06em;text-transform:uppercase;-webkit-tap-highlight-color:transparent;transition:background .15s,border-color .15s}
@@ -286,6 +286,24 @@ html[data-player-faction] #screen-hub .card::before{background:linear-gradient(9
 .hub-quick-mission-btn{margin-left:6px;vertical-align:middle}
 .profile-page{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:12px 14px 18px;max-width:900px;width:100%;margin:0 auto}
 .animals-levels-page{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:12px 14px 18px;max-width:900px;width:100%;margin:0 auto}
+.animals-tier-page{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:12px 14px 18px;max-width:520px;width:100%;margin:0 auto}
+.al-progress-kicker{font-family:var(--fm);font-size:.52rem;color:var(--text-dim);text-align:center;margin:0 0 10px;letter-spacing:.06em}
+.al-troster-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(64px,1fr));gap:10px;margin-top:4px}
+.al-troster-cell{
+  position:relative;aspect-ratio:1;border-radius:12px;border:1px solid var(--border);background:rgba(0,0,0,.28);
+  display:flex;align-items:center;justify-content:center;padding:4px;cursor:pointer;-webkit-tap-highlight-color:transparent;
+  transition:transform .12s ease,border-color .15s,background .15s
+}
+.al-troster-cell:active{transform:scale(.97)}
+.al-troster-cell--unlocked{border-color:rgba(61,158,255,.35)}
+.al-troster-cell--quiz{border-color:rgba(0,232,122,.4)}
+.al-troster-cell--locked{opacity:.45;filter:grayscale(.35) brightness(.85)}
+.al-troster-em{font-size:2rem;line-height:1;pointer-events:none}
+.al-troster-intel{
+  position:absolute;top:2px;right:2px;width:22px;height:22px;padding:0;border:1px solid var(--border);border-radius:6px;
+  background:rgba(0,0,0,.45);color:var(--text-dim);font-size:.55rem;line-height:1;cursor:pointer;z-index:2;
+  display:flex;align-items:center;justify-content:center
+}
 .profile-page .card,.animals-levels-page .card{padding:16px}
 .hub-body{padding:12px 14px 16px;max-width:900px;width:100%;margin:0 auto}
 .hub-cta-hint{font-family:var(--fm);font-size:.58rem;color:var(--green);letter-spacing:.12em;text-transform:uppercase;margin:0 0 12px;text-align:center;opacity:.9}
@@ -352,7 +370,12 @@ html[data-player-faction] #screen-hub .card::before{background:linear-gradient(9
 
 /* ─── BUILDER ─── */
 #screen-builder{padding:0}
-.builder-layout{flex:1;display:grid;grid-template-columns:minmax(0,3fr) minmax(240px,28%);overflow:hidden;min-height:0}
+#screen-builder > .topbar.topbar-app{
+  flex-shrink:0;position:relative;z-index:6;
+  background:var(--bg);border-bottom:1px solid rgba(28,58,92,.5);
+  box-shadow:0 2px 12px rgba(0,0,0,.2)
+}
+.builder-layout{flex:1;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);overflow:hidden;min-height:0}
 .builder-left{padding:16px;overflow-y:auto;min-height:0}
 .builder-right{background:var(--surface);border-left:1px solid var(--border);padding:14px 14px 16px;display:flex;flex-direction:column;overflow-y:auto;min-height:0;scroll-behavior:smooth}
 /* Compact hybrid rail in forge only */
@@ -829,7 +852,10 @@ html[data-player-faction] #screen-hub .card::before{background:linear-gradient(9
   -webkit-tap-highlight-color:transparent
 }
 .al-tier-card:active{background:rgba(255,255,255,.04)}
-.al-tier-card.al-tier--locked{opacity:.72;cursor:default}
+.al-tier-card.al-tier--locked{opacity:.72}
+.al-tier-card.al-tier--locked[data-al-tier]{cursor:pointer}
+.al-tier-card.al-tier--locked:not([data-al-tier]){cursor:default}
+.al-tier-card.al-tier--locked[data-al-tier]:active{background:rgba(255,255,255,.04)}
 .al-tier-card.al-tier--locked:active{background:rgba(0,0,0,.2)}
 .al-tier-hdr{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:6px}
 .al-tier-name{font-family:var(--fd);font-size:.82rem;font-weight:700}
@@ -1402,36 +1428,27 @@ html[data-player-faction] #screen-hub .card::before{background:linear-gradient(9
     display:block;font-family:var(--fm);font-size:.56rem;letter-spacing:.12em;text-transform:uppercase;
     color:var(--green);margin:-4px 0 8px;padding:5px 10px;background:rgba(0,232,122,.08);border:1px solid rgba(0,232,122,.22);border-radius:4px;line-height:1.3
   }
+  /* Forge: 50/50 — animals top, hybrid bottom (scroll each half) */
   .builder-layout{
     display:flex;flex-direction:column;flex:1;min-height:0;max-height:none;
     grid-template:none;
   }
-  /* Default: hide fusion column on mobile until step-2 is active — prevents flash */
-  .builder-layout .builder-right{display:none!important}
-  .builder-layout.forge-mobile-step-1{overflow:hidden}
-  .builder-layout.forge-mobile-step-1 .builder-left{
-    flex:1 1 auto;min-height:0;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:10px 10px 14px
+  .builder-layout .builder-left{
+    order:1;flex:1 1 50%;min-height:0;overflow-y:auto;-webkit-overflow-scrolling:touch;
+    padding:10px 10px 12px;border-bottom:1px solid var(--border)
   }
-  .builder-layout.forge-mobile-step-2{
-    overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior-y:contain;
-    flex-direction:column
-  }
-  /* Hybrid first (~25vh), animal grid below (~75%) */
-  .builder-layout.forge-mobile-step-2 .builder-right{
-    display:flex!important;order:1;flex:0 0 min(25vh,200px);max-height:min(25vh,200px);min-height:140px;
-    border-left:none;border-bottom:2px solid var(--green);overflow-y:auto;-webkit-overflow-scrolling:touch;
-    padding:8px 10px 10px
-  }
-  .builder-layout.forge-mobile-step-2 .builder-left{
-    order:2;flex:1 1 auto;min-height:0;overflow-y:auto;-webkit-overflow-scrolling:touch;
-    padding:10px 10px max(16px,env(safe-area-inset-bottom));border-top:none;position:relative
+  .builder-layout .builder-right{
+    order:2;display:flex!important;flex:1 1 50%;min-height:0;max-height:none;
+    border-left:none;border-top:none;padding:10px 10px max(14px,env(safe-area-inset-bottom));
+    overflow-y:auto;-webkit-overflow-scrolling:touch
   }
   .builder-layout.forge-mobile-step-2 .builder-left::before{
-    content:'▲ PICK MORE ANIMALS ABOVE — OR FUSE BELOW';display:block;text-align:center;
-    font-family:var(--fm);font-size:.48rem;letter-spacing:.12em;color:var(--text-dim);
-    padding:0 0 8px;opacity:.85
+    content:'▼ Hybrid preview below — tap Fuse when ready';display:block;text-align:center;
+    font-family:var(--fm);font-size:.48rem;letter-spacing:.1em;color:var(--text-dim);
+    padding:0 0 8px;opacity:.9
   }
-  .builder-layout.forge-mobile-step-2 .builder-right > .section-hdr{color:var(--orange);letter-spacing:.18em;font-size:.72rem}
+  .builder-layout.forge-mobile-step-1 .builder-left::before{display:none}
+  .builder-layout .builder-right > .section-hdr{color:var(--orange);letter-spacing:.18em;font-size:.72rem}
   #forge-fusion-anchor{scroll-margin-top:10px}
   #forge-panel{scroll-margin-top:20px}
   .b-animal-grid{grid-template-columns:repeat(auto-fill,minmax(76px,1fr));gap:5px}
@@ -1478,7 +1495,7 @@ html[data-player-faction] #screen-hub .card::before{background:linear-gradient(9
   .level-banner{flex-direction:column;align-items:stretch;text-align:center;padding:18px 16px}
   .hub-bar-row--nav .hub-bar-nav{width:100%;justify-content:stretch}
   .hub-bar-row--nav .hub-bar-nav .btn{flex:1;justify-content:center}
-  .topbar-forge-hint{display:none}
+  #screen-builder .topbar-forge-hint{display:block;font-size:.52rem;max-width:min(140px,38vw);line-height:1.25;text-align:right}
 }
 
 /* ─── ARENA BACKGROUNDS ─── */
@@ -2215,7 +2232,7 @@ html[data-faction-effect="snow"] body::after{animation:factionSnowDrift 22s ease
   </div>
 </section>
 
-<!-- ══════════════ ANIMALS & LEVELS ══════════════ -->
+<!-- ══════════════ ANIMALS & LEVELS (tier progression only) ══════════════ -->
 <section id="screen-animals-levels" class="screen screen-fill">
   <div class="topbar topbar-app">
     <button class="btn btn-ghost btn-sm" type="button" onclick="showHub()">← Hub</button>
@@ -2224,60 +2241,20 @@ html[data-faction-effect="snow"] body::after{animation:factionSnowDrift 22s ease
     <button class="btn btn-logout" type="button" onclick="logout()">Sign out</button>
   </div>
   <div class="animals-levels-page" id="animals-levels-body">
-    <div class="hub-mission-section">
-      <h2 class="hub-section-title">Mission</h2>
-      <div class="level-banner" id="al-level-banner">
-        <div class="lv-info" style="flex:1;min-width:0">
-          <div id="al-badge-area"></div>
-          <h2 id="al-level-name">Level 1</h2>
-          <p id="al-level-desc" class="hub-mission-desc-short">—</p>
-          <div class="lv-progress" id="al-lv-progress-pips"></div>
-          <div class="lv-enemy-preview" id="al-enemy-preview"></div>
-          <p class="hub-mission-tier-summary" id="al-mission-tier-summary" aria-label="Roster progress"></p>
-          <button class="btn btn-primary btn-lg" type="button" onclick="showBuilder()">⚔ Forge &amp; fight</button>
-        </div>
-      </div>
-    </div>
     <div class="hub-progress-panel" id="al-progress-panel" aria-live="polite"></div>
-    <div class="card hub-rewards-card" id="al-rewards-card">
-      <div class="hub-card-title">Coins &amp; tokens</div>
-      <div class="hub-reward-actions">
-        <button type="button" class="btn btn-secondary btn-sm" id="al-btn-coin-tune" onclick="hubSpendCoinTune()" title="Spend Fusion Coins to raise a random stat on your forged hybrid">⚡ Tune (coins)</button>
-        <button type="button" class="btn btn-secondary btn-sm" id="al-btn-token-recruit" onclick="hubSpendTokenRecruit()" title="Spend tokens to unlock the next roster animal">🔓 Unlock (tokens)</button>
-      </div>
-      <div id="al-reward-msg" class="hidden" aria-live="polite"></div>
-    </div>
-    <div class="hub-daily-challenge card" id="al-daily-challenge" aria-live="polite"></div>
-    <div class="hub-grid">
-      <div class="card">
-        <div class="hub-card-title">Your Record</div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:4px">
-          <div style="text-align:center">
-            <div style="font-family:var(--fm);font-size:.62rem;color:var(--text-dim);margin-bottom:4px">VICTORIES</div>
-            <div style="font-family:var(--fd);font-size:2.5rem;font-weight:700;color:var(--green)" id="al-wins">0</div>
-          </div>
-          <div style="text-align:center">
-            <div style="font-family:var(--fm);font-size:.62rem;color:var(--text-dim);margin-bottom:4px">DEFEATS</div>
-            <div style="font-family:var(--fd);font-size:2.5rem;font-weight:700;color:var(--red)" id="al-losses">0</div>
-          </div>
-        </div>
-      </div>
-      <div class="card">
-        <div class="hub-card-title">Current Hybrid</div>
-        <div id="al-hybrid-display" style="font-family:var(--fm);font-size:.72rem;color:var(--text-dim);text-align:center;padding:8px 0">
-          No hybrid forged yet.
-        </div>
-      </div>
-    </div>
-    <div class="card">
-      <div class="hub-card-title">Roster</div>
-      <div class="al-roster-filter hidden" id="al-roster-filter">
-        <span id="al-roster-filter-lbl"></span>
-        <button type="button" class="btn btn-ghost btn-sm" onclick="clearAnimalsLevelsTierFilter()">Show all</button>
-      </div>
-      <p class="hub-roster-hint" id="al-roster-hint"></p>
-      <div class="animal-grid" id="al-animal-grid"></div>
-    </div>
+  </div>
+</section>
+
+<!-- ══════════════ TIER ROSTER (icon grid) ══════════════ -->
+<section id="screen-animals-tier" class="screen screen-fill">
+  <div class="topbar topbar-app">
+    <button class="btn btn-ghost btn-sm" type="button" onclick="showAnimalsLevelsFromTier()">← Back</button>
+    <div class="topbar-logo" style="margin-left:10px" id="al-tier-roster-title">Roster</div>
+    <div class="topbar-spacer"></div>
+    <button class="btn btn-logout" type="button" onclick="logout()">Sign out</button>
+  </div>
+  <div class="animals-tier-page" id="animals-tier-body">
+    <div class="al-troster-grid" id="al-tier-roster-grid"></div>
   </div>
 </section>
 

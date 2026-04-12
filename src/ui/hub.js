@@ -41,8 +41,8 @@ import { applyFactionThemeToRoot, openFactionSelectFromHub } from './faction-ui.
 import { canClaimMysteryRewardToday, formatCountdownShort, getMysteryRewardStatus } from '../game/mystery-reward.js';
 import { hubActionMysteryReward } from './mystery-reward-ui.js';
 
-/** When set, `al-animal-grid` only lists animals in that tier (`base` … `knights`). */
-let _animalsLevelsTierFilter = null;
+/** Which tier roster is shown on `#screen-animals-tier` (UI only, not persisted). */
+let _animalsTierRosterKey = null;
 
 const TIER_IDS_MAP = {
   base: BASE_IDS,
@@ -224,20 +224,71 @@ function hubActionTuneHybrid() {
   openHubTuneOverlay();
 }
 
-function setAnimalsLevelsTierFilter(key) {
-  if (!TIER_IDS_MAP[key]) return;
-  _animalsLevelsTierFilter = key;
-  const strip = document.getElementById('al-roster-filter');
-  const lbl = document.getElementById('al-roster-filter-lbl');
-  if (strip) strip.classList.remove('hidden');
-  if (lbl) lbl.textContent = `Showing: ${TIER_LABELS[key] || key}`;
-  renderHubAnimalGrid('al-animal-grid', 'animals-levels', key);
+function clearAnimalsLevelsTierFilter() {
+  /* Legacy no-op: old Animals & Levels roster filter removed. */
 }
 
-function clearAnimalsLevelsTierFilter() {
-  _animalsLevelsTierFilter = null;
-  document.getElementById('al-roster-filter')?.classList.add('hidden');
-  renderHubAnimalGrid('al-animal-grid', 'animals-levels', null);
+function openAnimalsTierScreen(tierKey) {
+  if (!TIER_IDS_MAP[tierKey]) return;
+  _animalsTierRosterKey = tierKey;
+  showScreen('animals-tier');
+}
+
+function showAnimalsLevelsFromTier() {
+  _animalsTierRosterKey = null;
+  showScreen('animals-levels');
+}
+
+/**
+ * Icon-first grid for one tier; mirrors `renderHubAnimalGrid` unlock/quiz rules.
+ */
+function renderAnimalsTierRoster() {
+  const grid = document.getElementById('al-tier-roster-grid');
+  const titleEl = document.getElementById('al-tier-roster-title');
+  const p = state.progress;
+  if (!grid || !p || !_animalsTierRosterKey) return;
+  const key = _animalsTierRosterKey;
+  const ids = TIER_IDS_MAP[key];
+  if (!ids?.length || !titleEl) return;
+  titleEl.textContent = TIER_LABELS[key] || 'Roster';
+  grid.innerHTML = '';
+  const available = getAvailableAnimals(p);
+  for (const id of ids) {
+    const a = ANIMALS[id];
+    if (!a) continue;
+    const isAvail = available.includes(id);
+    const isQL = isQuizEligible(id, p);
+    const cell = document.createElement('div');
+    cell.className = 'al-troster-cell';
+    if (isAvail) cell.classList.add('al-troster-cell--unlocked');
+    else if (isQL) cell.classList.add('al-troster-cell--quiz');
+    else cell.classList.add('al-troster-cell--locked');
+    const intelBtn = document.createElement('button');
+    intelBtn.type = 'button';
+    intelBtn.className = 'al-troster-intel';
+    intelBtn.setAttribute('aria-label', 'Creature info');
+    intelBtn.textContent = 'ⓘ';
+    intelBtn.addEventListener('click', e => {
+      e.stopPropagation();
+      openCreatureIntel(id, { returnScreen: 'animals-tier' });
+    });
+    const em = document.createElement('span');
+    em.className = 'al-troster-em';
+    em.textContent = a.emoji;
+    em.setAttribute('aria-hidden', 'true');
+    cell.appendChild(intelBtn);
+    cell.appendChild(em);
+    cell.addEventListener('click', e => {
+      if (e.target.closest('.al-troster-intel')) return;
+      if (isQL) {
+        state.quizReturnScreen = 'animals-tier';
+        window.openQuiz(id);
+      } else {
+        openCreatureIntel(id, { returnScreen: 'animals-tier' });
+      }
+    });
+    grid.appendChild(cell);
+  }
 }
 
 function renderAnimalsLevelsTierCards(containerId) {
@@ -267,7 +318,6 @@ function renderAnimalsLevelsTierCards(containerId) {
     const complete = !locked && unlocked >= total;
     const fillCls = locked ? 'al-tier-fill al-tier-fill--locked' : complete ? 'al-tier-fill al-tier-fill--complete' : 'al-tier-fill al-tier-fill--partial';
     const cardCls = locked ? 'al-tier-card al-tier--locked' : 'al-tier-card';
-    const meta = locked ? `${unlocked} / ${total}` : complete ? 'Complete' : `${unlocked} / ${total}`;
     const dataAttr = key === 'future' ? '' : ` data-al-tier="${key}"`;
     return `
       <div class="${cardCls}"${dataAttr} role="button" tabindex="0" aria-label="${escapeHtml(name)}">
@@ -276,7 +326,6 @@ function renderAnimalsLevelsTierCards(containerId) {
           <span class="al-tier-peek" aria-hidden="true">${peek(ids)}</span>
         </div>
         <div class="al-tier-bar"><div class="${fillCls}" style="width:${pct}%"></div></div>
-        <div class="al-tier-meta">${escapeHtml(meta)}</div>
         ${lockLine ? `<div class="al-tier-lock">${escapeHtml(lockLine)}</div>` : ''}
       </div>`;
   }
@@ -299,21 +348,22 @@ function renderAnimalsLevelsTierCards(containerId) {
     </div>`,
   ].join('');
 
-  const nextHint = getProgressionNextLines(p)[0] || '';
   el.innerHTML = `
     <div class="hub-progress-hdr">Tier progress</div>
-    <div class="hub-progress-meta">
-      <span><em>Level</em> <strong>${p.level > MAX_LEVEL ? '✓' : p.level}</strong></span>
-      <span><em>Stage</em> <strong>${escapeHtml(getPlayerStageLabel(p))}</strong></span>
-    </div>
-    <div class="al-tier-grid">${tiersHtml}</div>
-    ${nextHint ? `<div class="hub-progress-next">${escapeHtml(nextHint)}</div>` : ''}`;
+    <p class="al-progress-kicker">Level <strong>${p.level > MAX_LEVEL ? '✓' : p.level}</strong> · ${escapeHtml(getPlayerStageLabel(p))}</p>
+    <div class="al-tier-grid">${tiersHtml}</div>`;
 
   el.querySelectorAll('.al-tier-card[data-al-tier]').forEach(card => {
-    card.addEventListener('click', () => {
-      if (card.classList.contains('al-tier--locked')) return;
+    const go = () => {
       const k = card.getAttribute('data-al-tier');
-      if (k) setAnimalsLevelsTierFilter(k);
+      if (k) openAnimalsTierScreen(k);
+    };
+    card.addEventListener('click', go);
+    card.addEventListener('keydown', e => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        go();
+      }
     });
   });
 }
@@ -567,33 +617,9 @@ function renderProfile() {
 
 function renderAnimalsLevels() {
   const p = state.progress;
-  if (!p || !document.getElementById('al-animal-grid')) return;
+  if (!p || !document.getElementById('screen-animals-levels')?.classList.contains('active')) return;
   applyFactionThemeToRoot();
-  const alWins = document.getElementById('al-wins');
-  const alLosses = document.getElementById('al-losses');
-  if (alWins) alWins.textContent = String(p.totalWins ?? 0);
-  if (alLosses) alLosses.textContent = String(p.totalLosses ?? 0);
-  fillMissionDetail(p, ANIMALS_LEVEL_IDS);
   renderAnimalsLevelsTierCards('al-progress-panel');
-  renderHubDailyChallenge('al-daily-challenge');
-
-  const coinBtn = document.getElementById('al-btn-coin-tune');
-  const tokBtn = document.getElementById('al-btn-token-recruit');
-  const coinCan = (p.coins || 0) >= COIN_TUNING_COST && !!state.playerHybrid;
-  const tokTgt = findNextTokenRecruitTarget(p);
-  const tokCan = (p.unlockTokens || 0) >= TOKEN_RECRUIT_COST && !!tokTgt;
-  if (coinBtn) coinBtn.disabled = !coinCan;
-  if (tokBtn) tokBtn.disabled = !tokCan;
-
-  renderHubAnimalGrid('al-animal-grid', 'animals-levels', _animalsLevelsTierFilter);
-  const rosterStrip = document.getElementById('al-roster-filter');
-  const rosterLbl = document.getElementById('al-roster-filter-lbl');
-  if (_animalsLevelsTierFilter) {
-    rosterStrip?.classList.remove('hidden');
-    if (rosterLbl) rosterLbl.textContent = `Showing: ${TIER_LABELS[_animalsLevelsTierFilter] || _animalsLevelsTierFilter}`;
-  } else {
-    rosterStrip?.classList.add('hidden');
-  }
 }
 
 function showProfile() {
@@ -655,7 +681,6 @@ function renderHub() {
 
   renderActionPanel();
   renderProfile();
-  renderAnimalsLevels();
 }
 
 function renderHubAnimalGrid(gridId = 'hub-animal-grid', quizReturnTarget = 'hub', tierKey = null) {
@@ -996,4 +1021,7 @@ export {
   closeHubTuneOverlay,
   hubTuneOverlayApply,
   clearAnimalsLevelsTierFilter,
+  renderAnimalsTierRoster,
+  showAnimalsLevelsFromTier,
+  openAnimalsTierScreen,
 };

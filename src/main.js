@@ -4,13 +4,14 @@ import './boot.js';
 import { showScreen } from './ui/screens.js';
 import { state } from './game/state.js';
 import { getAvailableAnimals } from './game/progression.js';
-import { openCreatureIntel, closeCreatureIntel } from './ui/creature-intel-ui.js';
+import { openCreatureIntel, closeCreatureIntel, getLastCreatureIntelReturnScreen } from './ui/creature-intel-ui.js';
 import { switchTab, handleAuth, logout, setupAuth } from './ui/auth.js';
 import {
   renderHub, hubSpendCoinTune, hubSpendTokenRecruit,
   renderProfile, renderAnimalsLevels, showProfile, showAnimalsLevels,
   hubActionAllegiance, hubActionBattle, hubActionTrain, hubActionUnlock, hubActionMysteryReward, hubActionNewFusion,
-  hubActionCurrentHybrid, hubActionTuneHybrid, closeHubTuneOverlay, hubTuneOverlayApply, clearAnimalsLevelsTierFilter,
+  hubActionCurrentHybrid,   hubActionTuneHybrid, closeHubTuneOverlay, hubTuneOverlayApply, clearAnimalsLevelsTierFilter,
+  renderAnimalsTierRoster, showAnimalsLevelsFromTier,
 } from './ui/hub.js';
 import { initMysteryRewardUi } from './ui/mystery-reward-ui.js';
 import { initHubTooltips } from './ui/hub-tooltips.js';
@@ -35,7 +36,11 @@ function creatureIntelUseInHybrid(id) {
 
 function creatureIntelReturnToAnimals() {
   closeCreatureIntel();
-  showAnimalsLevels();
+  if (getLastCreatureIntelReturnScreen() === 'animals-tier') {
+    showScreen('animals-tier');
+  } else {
+    showAnimalsLevels();
+  }
 }
 import { showLeaderboard, renderLeaderboard } from './ui/leaderboard-ui.js';
 import {
@@ -104,6 +109,8 @@ Object.assign(window, {
   closeCreatureIntel,
   creatureIntelUseInHybrid,
   creatureIntelReturnToAnimals,
+  renderAnimalsTierRoster,
+  showAnimalsLevelsFromTier,
 });
 
 initMysteryRewardUi();

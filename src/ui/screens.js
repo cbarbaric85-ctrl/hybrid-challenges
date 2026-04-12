@@ -6,6 +6,7 @@ function showScreen(name, sub) {
   if (name === 'hub') window.renderHub?.();
   if (name === 'profile') window.renderProfile?.();
   if (name === 'animals-levels') window.renderAnimalsLevels?.();
+  if (name === 'animals-tier') window.renderAnimalsTierRoster?.();
   if (name === 'faction-select') window.renderFactionSelect?.();
   if (name === 'builder') window.renderBuilder?.();
   if (name === 'leaderboard') void window.renderLeaderboard?.();
@@ -26,6 +27,10 @@ function showScreen(name, sub) {
     if (name === 'animals-levels') {
       const ab = document.getElementById('animals-levels-body');
       if (ab) ab.scrollTop = 0;
+    }
+    if (name === 'animals-tier') {
+      const tb = document.getElementById('animals-tier-body');
+      if (tb) tb.scrollTop = 0;
     }
     if (name === 'builder') {
       const bl = document.querySelector('#screen-builder .builder-left');

@@ -121,3 +121,7 @@ export function closeCreatureIntel() {
   o.classList.add('hidden');
   o.setAttribute('aria-hidden', 'true');
 }
+
+export function getLastCreatureIntelReturnScreen() {
+  return _returnScreen;
+}
