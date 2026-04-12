@@ -33,12 +33,36 @@ import { STAT_LABELS_SIMPLE } from '../game/battle.js';
 import { saveUserProgress, persistGameProgress } from '../persistence/save.js';
 import { backfillLeaderboardIfMissing } from '../persistence/leaderboard.js';
 import { showScreen, escapeHtml } from './screens.js';
+import { showBuilder } from './forge.js';
 import { localDateString, localYesterdayString, msUntilLocalMidnight } from '../game/utils.js';
 import { needsFactionSelection, getFaction } from '../data/factions.js';
 import { applyFactionThemeToRoot, openFactionSelectFromHub } from './faction-ui.js';
 import { canClaimMysteryRewardToday, formatCountdownShort, getMysteryRewardStatus } from '../game/mystery-reward.js';
 import { hubActionMysteryReward } from './mystery-reward-ui.js';
 
+/** When set, `al-animal-grid` only lists animals in that tier (`base` … `knights`). */
+let _animalsLevelsTierFilter = null;
+
+const TIER_IDS_MAP = {
+  base: BASE_IDS,
+  apex: APEX_IDS,
+  dino: DINO_IDS,
+  legendary: LEGENDARY_IDS,
+  mythical: MYTHICAL_IDS,
+  egyptian: EGYPTIAN_IDS,
+  knights: KNIGHT_IDS,
+};
+
+const TIER_LABELS = {
+  base: 'Base Animals',
+  apex: 'Apex Predators',
+  dino: 'Dinosaurs',
+  legendary: 'Legendary Beasts',
+  mythical: 'Mythical Gods',
+  egyptian: 'Egyptian Guardians',
+  knights: 'Knights of the Realm',
+  future: 'Future tiers',
+};
 
 function getCommanderXpSegment(xp) {
   const x = Math.max(0, xp | 0);
@@ -75,16 +99,11 @@ function flashHubRewardMsg(msg) {
   }, 3200);
 }
 
-function hubSpendCoinTune() {
+/** Shared coin-tune rules (single source of truth). */
+function performCoinTune() {
   const p = state.progress;
-  if (!p || (p.coins || 0) < COIN_TUNING_COST) {
-    flashHubRewardMsg('You need more Fusion Coins — win battles!');
-    return;
-  }
-  if (!state.playerHybrid) {
-    flashHubRewardMsg('Forge a hybrid in the Forge, then tune stats here.');
-    return;
-  }
+  if (!p || (p.coins || 0) < COIN_TUNING_COST) return { ok: false, reason: 'coins' };
+  if (!state.playerHybrid) return { ok: false, reason: 'hybrid' };
   p.coins -= COIN_TUNING_COST;
   const h = state.playerHybrid;
   const keys = ['spd', 'agi', 'int', 'str'];
@@ -92,8 +111,181 @@ function hubSpendCoinTune() {
   h.stats[stat] = Math.min(STAT_MAX, (h.stats[stat] || 0) + 1);
   h.power = powerScore(h.stats);
   saveUserProgress(p).catch(e => console.error('[hub] coinTune save failed', e));
-  flashHubRewardMsg(`+1 ${STAT_LABELS_SIMPLE[stat]} — your hybrid grows stronger!`);
+  return { ok: true, stat, newVal: h.stats[stat] };
+}
+
+function hubSpendCoinTune() {
+  const r = performCoinTune();
+  if (!r.ok) {
+    if (r.reason === 'coins') flashHubRewardMsg('You need more Fusion Coins — win battles!');
+    else flashHubRewardMsg('Forge a hybrid in the Forge, then tune stats here.');
+    return;
+  }
+  flashHubRewardMsg(`+1 ${STAT_LABELS_SIMPLE[r.stat]} — your hybrid grows stronger!`);
   renderHub();
+}
+
+function syncHubTuneBarsFromHybrid() {
+  const h = state.playerHybrid;
+  const keys = ['spd', 'agi', 'int', 'str'];
+  for (const k of keys) {
+    const el = document.getElementById(`hub-tune-bar-${k}`);
+    if (el) {
+      const v = h?.stats?.[k] ?? 0;
+      el.style.width = `${Math.min(100, (v / STAT_MAX) * 100)}%`;
+    }
+  }
+}
+
+function openHubTuneOverlay() {
+  const o = document.getElementById('hub-tune-overlay');
+  if (!o) return;
+  const p = state.progress;
+  syncHubTuneBarsFromHybrid();
+  const line = document.getElementById('hub-tune-coins-line');
+  if (line) line.textContent = p ? `Fusion Coins: ${p.coins ?? 0} · ${COIN_TUNING_COST} each tune` : '';
+  const btn = document.getElementById('hub-tune-apply');
+  if (btn) {
+    btn.disabled = !state.playerHybrid || (p?.coins || 0) < COIN_TUNING_COST;
+  }
+  o.classList.remove('hidden');
+  o.setAttribute('aria-hidden', 'false');
+}
+
+function closeHubTuneOverlay() {
+  const o = document.getElementById('hub-tune-overlay');
+  if (!o) return;
+  o.classList.add('hidden');
+  o.setAttribute('aria-hidden', 'true');
+}
+
+function hubTuneOverlayApply() {
+  const r = performCoinTune();
+  if (!r.ok) {
+    if (r.reason === 'coins') flashHubRewardMsg('You need more Fusion Coins — win battles!');
+    else flashHubRewardMsg('Forge a hybrid first.');
+    closeHubTuneOverlay();
+    return;
+  }
+  syncHubTuneBarsFromHybrid();
+  const line = document.getElementById('hub-tune-coins-line');
+  if (line && state.progress) line.textContent = `Fusion Coins: ${state.progress.coins ?? 0} · ${COIN_TUNING_COST} each tune`;
+  const btn = document.getElementById('hub-tune-apply');
+  if (btn) btn.disabled = (state.progress?.coins || 0) < COIN_TUNING_COST;
+  flashHubRewardMsg(`+1 ${STAT_LABELS_SIMPLE[r.stat]} — your hybrid grows stronger!`);
+  renderHub();
+  renderAnimalsLevels();
+}
+
+function hubActionCurrentHybrid() {
+  showBuilder();
+}
+
+function hubActionTuneHybrid() {
+  if (!state.playerHybrid) {
+    flashHubRewardMsg('Forge a hybrid first — then tune!');
+    showBuilder();
+    return;
+  }
+  if ((state.progress?.coins || 0) < COIN_TUNING_COST) {
+    flashHubRewardMsg('You need more Fusion Coins — win battles!');
+    return;
+  }
+  openHubTuneOverlay();
+}
+
+function setAnimalsLevelsTierFilter(key) {
+  if (!TIER_IDS_MAP[key]) return;
+  _animalsLevelsTierFilter = key;
+  const strip = document.getElementById('al-roster-filter');
+  const lbl = document.getElementById('al-roster-filter-lbl');
+  if (strip) strip.classList.remove('hidden');
+  if (lbl) lbl.textContent = `Showing: ${TIER_LABELS[key] || key}`;
+  renderHubAnimalGrid('al-animal-grid', 'animals-levels', key);
+}
+
+function clearAnimalsLevelsTierFilter() {
+  _animalsLevelsTierFilter = null;
+  document.getElementById('al-roster-filter')?.classList.add('hidden');
+  renderHubAnimalGrid('al-animal-grid', 'animals-levels', null);
+}
+
+function renderAnimalsLevelsTierCards(containerId) {
+  const el = document.getElementById(containerId);
+  if (!el || !state.progress) return;
+  const p = state.progress;
+  const bU = countBaseUnlocked(p);
+  const aU = countApexUnlocked(p);
+  const dU = countDinoUnlocked(p);
+  const lU = countLegendaryUnlocked(p);
+  const mU = countMythicalUnlocked(p);
+  const eU = countEgyptianUnlocked(p);
+  const kU = countKnightsUnlocked(p);
+  const apexOpen = apexLevelGateMet(p);
+  const dinoOpen = dinoLevelGateMet(p);
+  const legendOpen = legendaryLevelGateMet(p);
+  const mythOpen = mythicalLevelGateMet(p);
+  const egyptOpen = egyptianTierQuizOpen(p);
+  const knightOpen = knightTierQuizOpen(p);
+
+  const peek = ids => ids.slice(0, 3).map(id => ANIMALS[id]?.emoji || '').join(' ');
+
+  function tierCard(key, name, ids, unlocked, gate, lockLine) {
+    const total = ids.length;
+    const locked = !gate;
+    const pct = locked ? 0 : Math.min(100, Math.round((unlocked / total) * 100));
+    const complete = !locked && unlocked >= total;
+    const fillCls = locked ? 'al-tier-fill al-tier-fill--locked' : complete ? 'al-tier-fill al-tier-fill--complete' : 'al-tier-fill al-tier-fill--partial';
+    const cardCls = locked ? 'al-tier-card al-tier--locked' : 'al-tier-card';
+    const meta = locked ? `${unlocked} / ${total}` : complete ? 'Complete' : `${unlocked} / ${total}`;
+    const dataAttr = key === 'future' ? '' : ` data-al-tier="${key}"`;
+    return `
+      <div class="${cardCls}"${dataAttr} role="button" tabindex="0" aria-label="${escapeHtml(name)}">
+        <div class="al-tier-hdr">
+          <span class="al-tier-name">${escapeHtml(name)}</span>
+          <span class="al-tier-peek" aria-hidden="true">${peek(ids)}</span>
+        </div>
+        <div class="al-tier-bar"><div class="${fillCls}" style="width:${pct}%"></div></div>
+        <div class="al-tier-meta">${escapeHtml(meta)}</div>
+        ${lockLine ? `<div class="al-tier-lock">${escapeHtml(lockLine)}</div>` : ''}
+      </div>`;
+  }
+
+  const tiersHtml = [
+    tierCard('base', TIER_LABELS.base, BASE_IDS, bU, true, null),
+    tierCard('apex', TIER_LABELS.apex, APEX_IDS, aU, apexOpen, apexOpen ? null : 'Unlock after Level 5'),
+    tierCard('dino', TIER_LABELS.dino, DINO_IDS, dU, dinoOpen, dinoOpen ? null : 'Unlock after Level 8'),
+    tierCard('legendary', TIER_LABELS.legendary, LEGENDARY_IDS, lU, legendOpen, legendOpen ? null : 'Unlock after Level 12'),
+    tierCard('mythical', TIER_LABELS.mythical, MYTHICAL_IDS, mU, mythOpen, mythOpen ? null : 'Unlock after Level 16'),
+    tierCard('egyptian', TIER_LABELS.egyptian, EGYPTIAN_IDS, eU, egyptOpen, egyptOpen ? null : 'Recruit all Mythical Gods first'),
+    tierCard('knights', TIER_LABELS.knights, KNIGHT_IDS, kU, knightOpen, knightOpen ? null : 'Recruit all Egyptian Guardians first'),
+    `<div class="al-tier-card al-tier--locked" aria-label="Future tiers">
+      <div class="al-tier-hdr">
+        <span class="al-tier-name">${TIER_LABELS.future}</span>
+        <span class="al-tier-peek" aria-hidden="true">✨</span>
+      </div>
+      <div class="al-tier-bar"><div class="al-tier-fill al-tier-fill--locked" style="width:0%"></div></div>
+      <div class="al-tier-lock">More creatures coming in updates</div>
+    </div>`,
+  ].join('');
+
+  const nextHint = getProgressionNextLines(p)[0] || '';
+  el.innerHTML = `
+    <div class="hub-progress-hdr">Tier progress</div>
+    <div class="hub-progress-meta">
+      <span><em>Level</em> <strong>${p.level > MAX_LEVEL ? '✓' : p.level}</strong></span>
+      <span><em>Stage</em> <strong>${escapeHtml(getPlayerStageLabel(p))}</strong></span>
+    </div>
+    <div class="al-tier-grid">${tiersHtml}</div>
+    ${nextHint ? `<div class="hub-progress-next">${escapeHtml(nextHint)}</div>` : ''}`;
+
+  el.querySelectorAll('.al-tier-card[data-al-tier]').forEach(card => {
+    card.addEventListener('click', () => {
+      if (card.classList.contains('al-tier--locked')) return;
+      const k = card.getAttribute('data-al-tier');
+      if (k) setAnimalsLevelsTierFilter(k);
+    });
+  });
 }
 
 function hubSpendTokenRecruit() {
@@ -276,15 +468,7 @@ function fillMissionDetail(p, ids) {
 
   const rosterHint = document.getElementById(ids.rosterHint);
   if (rosterHint) {
-    rosterHint.innerHTML =
-      '<strong>Base</strong> — win levels to recruit the full roster (3 starters, then 7 more).<br>' +
-      '<strong>Apex</strong> — beat Level 5, then pass each Apex quiz.<br>' +
-      '<strong>Dinos</strong> — beat Level 8, then pass each Dino quiz.<br>' +
-      '<strong>Legendary</strong> — beat Level 12 to unlock Legendary Beast quizzes.<br>' +
-      '<strong>Mythical</strong> — beat Level 16 to unlock Mythical God quizzes.<br>' +
-      '<strong>Egyptian Guardians</strong> — recruit every Mythical God, then quiz; desert missions Levels 21–25.<br>' +
-      '<strong>Knights of the Realm</strong> — recruit every Egyptian Guardian, then quiz; castle missions Levels 26–30.<br>' +
-      'Locked rows show ✓/○ for what’s done.';
+    rosterHint.textContent = 'Tap a tier above to filter. 📝 = quiz ready · 🔒 = locked.';
   }
 }
 
@@ -347,7 +531,7 @@ function renderAnimalsLevels() {
   if (alWins) alWins.textContent = String(p.totalWins ?? 0);
   if (alLosses) alLosses.textContent = String(p.totalLosses ?? 0);
   fillMissionDetail(p, ANIMALS_LEVEL_IDS);
-  renderHubProgressionPanel('al-progress-panel');
+  renderAnimalsLevelsTierCards('al-progress-panel');
   renderHubDailyChallenge('al-daily-challenge');
 
   const coinBtn = document.getElementById('al-btn-coin-tune');
@@ -358,7 +542,15 @@ function renderAnimalsLevels() {
   if (coinBtn) coinBtn.disabled = !coinCan;
   if (tokBtn) tokBtn.disabled = !tokCan;
 
-  renderHubAnimalGrid('al-animal-grid', 'animals-levels');
+  renderHubAnimalGrid('al-animal-grid', 'animals-levels', _animalsLevelsTierFilter);
+  const rosterStrip = document.getElementById('al-roster-filter');
+  const rosterLbl = document.getElementById('al-roster-filter-lbl');
+  if (_animalsLevelsTierFilter) {
+    rosterStrip?.classList.remove('hidden');
+    if (rosterLbl) rosterLbl.textContent = `Showing: ${TIER_LABELS[_animalsLevelsTierFilter] || _animalsLevelsTierFilter}`;
+  } else {
+    rosterStrip?.classList.add('hidden');
+  }
 }
 
 function showProfile() {
@@ -423,15 +615,18 @@ function renderHub() {
   renderAnimalsLevels();
 }
 
-function renderHubAnimalGrid(gridId = 'hub-animal-grid', quizReturnTarget = 'hub') {
+function renderHubAnimalGrid(gridId = 'hub-animal-grid', quizReturnTarget = 'hub', tierKey = null) {
   const p = state.progress;
   const available = getAvailableAnimals(p);
   const grid = document.getElementById(gridId);
   if (!grid) return;
   grid.innerHTML = '';
 
-  for (const id of Object.keys(ANIMALS)) {
+  const idList = tierKey && TIER_IDS_MAP[tierKey] ? [...TIER_IDS_MAP[tierKey]] : Object.keys(ANIMALS);
+
+  for (const id of idList) {
     const a = ANIMALS[id];
+    if (!a) continue;
     const isAvail = available.includes(id);
     const isQL = isQuizEligible(id, p);
     const isLL = isLevelLocked(id, p);
@@ -641,6 +836,21 @@ function renderActionPanel() {
     }
   }
 
+  const hybridBtn = document.getElementById('hap-hybrid');
+  const hybridSub = document.getElementById('hap-hybrid-sub');
+  if (hybridSub) hybridSub.textContent = state.playerHybrid ? 'Open builder' : 'Forge a hybrid';
+  if (hybridBtn) hybridBtn.disabled = false;
+
+  const tuneBtn = document.getElementById('hap-tune');
+  const tuneSub = document.getElementById('hap-tune-sub');
+  const tuneCan = !!state.playerHybrid && (p.coins || 0) >= COIN_TUNING_COST;
+  if (tuneBtn) tuneBtn.disabled = !tuneCan;
+  if (tuneSub) {
+    if (!state.playerHybrid) tuneSub.textContent = 'Forge first';
+    else if ((p.coins || 0) < COIN_TUNING_COST) tuneSub.textContent = `Need ${COIN_TUNING_COST} coins`;
+    else tuneSub.textContent = `${COIN_TUNING_COST} coins / tune`;
+  }
+
   const btnMap = {
     BATTLE: battleBtn,
     TRAIN: trainBtn,
@@ -726,4 +936,9 @@ export {
   hubActionUnlock,
   hubActionMysteryReward,
   hubActionNewFusion,
+  hubActionCurrentHybrid,
+  hubActionTuneHybrid,
+  closeHubTuneOverlay,
+  hubTuneOverlayApply,
+  clearAnimalsLevelsTierFilter,
 };

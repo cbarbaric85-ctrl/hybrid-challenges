@@ -7,6 +7,7 @@ import {
   renderHub, hubSpendCoinTune, hubSpendTokenRecruit,
   renderProfile, renderAnimalsLevels, showProfile, showAnimalsLevels,
   hubActionAllegiance, hubActionBattle, hubActionTrain, hubActionUnlock, hubActionMysteryReward, hubActionNewFusion,
+  hubActionCurrentHybrid, hubActionTuneHybrid, closeHubTuneOverlay, hubTuneOverlayApply, clearAnimalsLevelsTierFilter,
 } from './ui/hub.js';
 import { initMysteryRewardUi } from './ui/mystery-reward-ui.js';
 import { initHubTooltips } from './ui/hub-tooltips.js';
@@ -76,6 +77,11 @@ Object.assign(window, {
   hubActionUnlock,
   hubActionMysteryReward,
   hubActionNewFusion,
+  hubActionCurrentHybrid,
+  hubActionTuneHybrid,
+  closeHubTuneOverlay,
+  hubTuneOverlayApply,
+  clearAnimalsLevelsTierFilter,
   toggleAnimalSelect,
   buildMiniStats,
 });
