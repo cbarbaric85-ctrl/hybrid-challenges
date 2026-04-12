@@ -75,6 +75,8 @@ function hideFactionBattleHint() {
 const WEATHER_CLASSES = ['weather-rain','weather-storm','weather-fog','weather-heatwave','weather-wind'];
 const CAP_ANIM_CLASS = { spd: 'cap-anim-spd', agi: 'cap-anim-agi', int: 'cap-anim-int', str: 'cap-anim-str' };
 const STAT_RESULT_EMOJI = { spd: '⚡', agi: '✦', int: '🧠', str: '💥' };
+const ROUND_ANNOUNCE_STAT_CLASSES = ['round-announce--spd', 'round-announce--agi', 'round-announce--int', 'round-announce--str'];
+const BATTLE_ROUND_FLASH_CLASSES = ['battle-round-flash-win', 'battle-round-flash-loss', 'battle-round-flash-tie'];
 
 function setArenaTheme(arenaId) {
   const screen = document.getElementById('screen-battle');
@@ -102,7 +104,11 @@ function showRoundAnnounce(roundNum, statKey, statLabel) {
   const el = document.getElementById('round-announce');
   const numEl = document.getElementById('round-announce-num');
   const statEl = document.getElementById('round-announce-stat');
+  const iconEl = document.getElementById('round-announce-icon');
   if (!el || !numEl || !statEl) return;
+  ROUND_ANNOUNCE_STAT_CLASSES.forEach(c => el.classList.remove(c));
+  el.classList.add(`round-announce--${statKey}`);
+  if (iconEl) iconEl.textContent = STAT_TRAIL_ICONS[statKey] || STAT_RESULT_EMOJI[statKey] || '◆';
   numEl.textContent = `Round ${roundNum} — ${statLabel} Clash`;
   statEl.textContent = statLabel.toUpperCase();
   statEl.className = `round-announce-stat ${statKey}`;
@@ -114,11 +120,21 @@ function showRoundAnnounce(roundNum, statKey, statLabel) {
 
 function hideRoundAnnounce() {
   const el = document.getElementById('round-announce');
-  if (el) el.classList.add('hidden');
+  if (el) {
+    el.classList.add('hidden');
+    ROUND_ANNOUNCE_STAT_CLASSES.forEach(c => el.classList.remove(c));
+  }
 }
 
 function showRoundResultFlash(winner, statLabel) {
   const el = document.getElementById('round-result-flash');
+  const screen = document.getElementById('screen-battle');
+  if (screen) {
+    BATTLE_ROUND_FLASH_CLASSES.forEach(c => screen.classList.remove(c));
+    if (winner === 'player') screen.classList.add('battle-round-flash-win');
+    else if (winner === 'enemy') screen.classList.add('battle-round-flash-loss');
+    else screen.classList.add('battle-round-flash-tie');
+  }
   if (!el) return;
   const emoji = winner === 'player' ? '💥' : winner === 'enemy' ? '💀' : '⚡';
   const text = winner === 'player' ? `${emoji} ${statLabel} Wins!`
@@ -134,6 +150,8 @@ function showRoundResultFlash(winner, statLabel) {
 
 function hideRoundResultFlash() {
   const el = document.getElementById('round-result-flash');
+  const screen = document.getElementById('screen-battle');
+  if (screen) BATTLE_ROUND_FLASH_CLASSES.forEach(c => screen.classList.remove(c));
   if (el) el.className = 'round-result-flash hidden';
 }
 
@@ -221,9 +239,14 @@ function runBossIntro(levelDef, done) {
   void overlay.offsetWidth;
   overlay.style.animation = '';
 
+  const screen = document.getElementById('screen-battle');
   setTimeout(() => {
     overlay.classList.add('boss-shake');
+    screen?.classList.add('boss-screen-shake');
   }, 1200);
+  setTimeout(() => {
+    screen?.classList.remove('boss-screen-shake');
+  }, 1650);
 
   setTimeout(() => {
     overlay.classList.add('hidden');
@@ -405,6 +428,8 @@ function playInteractiveRound(roundIdx) {
       winner: b.interactivePWins >= 3 ? 'player' : 'enemy',
     };
     b.result = result;
+    document.getElementById('final-round-banner')?.classList.add('hidden');
+    document.getElementById('battle-zone-focus')?.classList.remove('battle-final-round');
     hideRoundAnnounce();
     hideRoundResultFlash();
     hideBossAbilityFlash();
@@ -416,6 +441,17 @@ function playInteractiveRound(roundIdx) {
   const stat = pickRoundStat();
   const statWord = STAT_LABELS_SIMPLE[stat];
   const roundNum = roundIdx + 1;
+  const bzf = document.getElementById('battle-zone-focus');
+  const frb = document.getElementById('final-round-banner');
+  const fpRow = document.getElementById('fighter-player');
+  if (roundIdx === 4) {
+    frb?.classList.remove('hidden');
+    bzf?.classList.add('battle-final-round');
+  } else {
+    frb?.classList.add('hidden');
+    bzf?.classList.remove('battle-final-round');
+  }
+  if (fpRow) fpRow.classList.toggle('fighter-momentum', roundIdx > 0 && !b.playerLostLastRound);
 
   if (b.isBoss && b.bossAbility && roundIdx === 2 && !b.bossAbilityFired) {
     b.bossAbilityFired = true;
@@ -505,6 +541,7 @@ function animateRoundResult(round, roundIdx, done) {
   resetClashMeters();
   scrollToBattleFocus();
 
+  const scheduleClashReveal = () => {
   // T+400: Player bar fills, value revealed
   setTimeout(() => {
     if (pval) {
@@ -599,6 +636,12 @@ function animateRoundResult(round, roundIdx, done) {
       { scrollFocus: true }
     );
     document.getElementById('r-counter').textContent = `${roundNum} / 5`;
+
+    const lossStage = document.getElementById('battle-zone-focus');
+    if (round.winner === 'enemy' && lossStage) {
+      lossStage.classList.add('battle-zone-loss-shake');
+      setTimeout(() => lossStage.classList.remove('battle-zone-loss-shake'), 520);
+    }
   }, 1500);
 
   // T+2600: Cleanup → next
@@ -610,6 +653,8 @@ function animateRoundResult(round, roundIdx, done) {
     fe?.classList.remove('f-side-win', 'f-side-lose');
     done();
   }, 2600);
+  };
+  requestAnimationFrame(() => requestAnimationFrame(scheduleClashReveal));
 }
 
 function startBattle() {
@@ -968,6 +1013,7 @@ function resetBattleRoundStrip() {
   dots.innerHTML = '';
   for (let i = 0; i < 5; i++) dots.innerHTML += '<span class="brs-dot up" aria-hidden="true"></span>';
   label.textContent = 'Round 1 of 5';
+  document.querySelectorAll('#round-pips .r-pip').forEach(p => p.classList.remove('current'));
 }
 
 function showBattleRoundStrip() {
@@ -984,6 +1030,9 @@ function setBattleRoundStripProgress(roundIdx) {
     else if (i === roundIdx) d.classList.add('current');
     else d.classList.add('up');
   });
+  document.querySelectorAll('#round-pips .r-pip').forEach((pip, i) => {
+    pip.classList.toggle('current', i === roundIdx);
+  });
 }
 
 function finalizeBattleRoundStrip() {
@@ -991,6 +1040,7 @@ function finalizeBattleRoundStrip() {
     d.classList.remove('current', 'up');
     d.classList.add('done');
   });
+  document.querySelectorAll('#round-pips .r-pip').forEach(p => p.classList.remove('current'));
   const label = document.getElementById('brs-label');
   if (label) label.textContent = 'Round 5 of 5';
 }
@@ -1046,7 +1096,7 @@ function setClashMetersPlayerPortion(pTotal, eTotal) {
   if (!pm || !em) return;
   const sum = Math.max(1, pTotal + eTotal);
   const pw = Math.round((pTotal / sum) * 100);
-  pm.style.transition = 'width .45s cubic-bezier(.35,.85,.4,1)';
+  pm.style.transition = 'width .52s cubic-bezier(.22,.85,.28,1)';
   em.style.transition = 'width .35s ease';
   em.style.width = '0%';
   pm.style.width = `${pw}%`;
@@ -1059,7 +1109,7 @@ function setClashMetersEnemyPortion(pTotal, eTotal) {
   if (!pm || !em) return;
   const sum = Math.max(1, pTotal + eTotal);
   const ew = Math.round((eTotal / sum) * 100);
-  em.style.transition = 'width .45s cubic-bezier(.35,.85,.4,1)';
+  em.style.transition = 'width .52s cubic-bezier(.22,.85,.28,1)';
   em.style.width = `${ew}%`;
 }
 
@@ -1239,10 +1289,14 @@ function showBattleResultOverlay(result, opts) {
       : '';
   } else if (nextEl) nextEl.innerHTML = '';
   overlay.classList.remove('hidden');
+  overlay.classList.toggle('battle-result-overlay--confetti', won);
 }
 
 function hideBattleResultOverlay() {
-  document.getElementById('battle-result-overlay').classList.add('hidden');
+  const overlay = document.getElementById('battle-result-overlay');
+  if (!overlay) return;
+  overlay.classList.add('hidden');
+  overlay.classList.remove('battle-result-overlay--confetti');
   const loot = document.getElementById('battle-result-loot');
   if (loot) {
     loot.classList.add('hidden');
@@ -1687,6 +1741,13 @@ function cleanupBattleVisuals() {
   clearBossMode();
   hideClashQuiz();
   hideFactionBattleHint();
+  const screen = document.getElementById('screen-battle');
+  if (screen) {
+    screen.classList.remove('boss-screen-shake', ...BATTLE_ROUND_FLASH_CLASSES);
+  }
+  document.getElementById('battle-zone-focus')?.classList.remove('battle-final-round', 'clash-screen-shake', 'battle-zone-loss-shake');
+  document.getElementById('final-round-banner')?.classList.add('hidden');
+  document.getElementById('fighter-player')?.classList.remove('fighter-momentum');
 }
 
 function goNextLevel() {

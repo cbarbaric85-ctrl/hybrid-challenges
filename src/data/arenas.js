@@ -1,6 +1,16 @@
 /**
  * Arena definitions: visual themes, stat modifiers, and display metadata.
  * Each arena has a CSS class, a stat boost map, and a banner message.
+ *
+ * Theme mapping (levels / copy → cssClass used in battle UI):
+ *   ocean → arena-ocean
+ *   jungle / forest → arena-jungle
+ *   sky → arena-sky
+ *   volcanic / volcano → arena-volcanic
+ *   underworld / gods / dark power → arena-underworld
+ *   lightning / stars / divine → arena-celestial
+ *   Egyptian / desert / sand → arena-desert
+ *   castle / fortress → arena-castle
  */
 
 export const ARENAS = {
