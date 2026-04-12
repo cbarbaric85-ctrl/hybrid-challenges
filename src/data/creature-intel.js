@@ -7,7 +7,7 @@ import {
   ANIMALS, STAT_MAX, STAGE_BASE, STAGE_APEX, STAGE_DINO, STAGE_LEGENDARY, STAGE_MYTHICAL, STAGE_EGYPTIAN, STAGE_KNIGHTS,
 } from './animals.js';
 import { FACTION_EGYPTIAN, FACTION_VIKING, FACTION_KNIGHTS, FACTIONS } from './factions.js';
-import { getAvailableAnimals, isQuizEligible } from '../game/progression.js';
+import { getAvailableAnimals } from '../game/progression.js';
 import { STAT_LABELS_SIMPLE } from '../game/battle.js';
 
 const STAT_KEYS = ['spd', 'agi', 'int', 'str'];
@@ -125,7 +125,8 @@ export function getCreatureIntel(id, ctx) {
   }
 
   const available = getAvailableAnimals(p);
-  const rosterUnlocked = available.includes(id) || isQuizEligible(id, p);
+  /** True when this animal can be selected in the Forge for fusion. */
+  const unlockedForFusion = available.includes(id);
   const ov = INTEL_OVERRIDES[id] || {};
 
   const stats = { spd: a.spd, agi: a.agi, int: a.int, str: a.str };
@@ -177,27 +178,9 @@ export function getCreatureIntel(id, ctx) {
 
   const funFact = ov.funFact || oneSentence(a.bio);
 
-  if (!rosterUnlocked) {
-    return {
-      id,
-      locked: true,
-      name: a.name,
-      emoji: a.emoji,
-      tierLabel,
-      teaser: 'Unlock to discover its strengths',
-      funFact: '',
-      strengths: [],
-      pairings: [],
-      favouredBy: [],
-      huntedBy: [],
-      stats: null,
-      statMax: STAT_MAX,
-    };
-  }
-
   return {
     id,
-    locked: false,
+    unlockedForFusion,
     name: a.name,
     emoji: a.emoji,
     tierLabel,

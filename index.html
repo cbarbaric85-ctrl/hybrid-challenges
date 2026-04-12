@@ -813,6 +813,9 @@ html[data-player-faction] #screen-hub .card::before{background:linear-gradient(9
 .ci-fav-hunt{font-size:.78rem;line-height:1.5;color:#e8f4ff}
 .ci-fun p{font-size:.82rem;color:var(--text);line-height:1.45;margin:0}
 .ci-actions{margin-top:14px;text-align:center}
+.ci-actions-row{display:flex;flex-direction:column;gap:8px;margin-top:14px}
+.ci-fusion-note{font-family:var(--fm);font-size:.58rem;color:var(--text-dim);margin:0 0 8px;line-height:1.4;text-align:center}
+.ci-actions-row .btn[disabled],.ci-actions-row .btn:disabled{opacity:.45;cursor:not-allowed}
 .ci-locked-hdr{display:flex;align-items:center;gap:12px;margin-bottom:8px}
 .a-chip{position:relative}
 .a-chip-intel{
@@ -2109,15 +2112,6 @@ html[data-faction-effect="snow"] body::after{animation:factionSnowDrift 22s ease
       </div>
     </div>
   </div>
-  <div id="creature-intel-overlay" class="creature-intel-overlay hidden" aria-hidden="true" role="dialog" aria-modal="true">
-    <div class="creature-intel-panel">
-      <div class="creature-intel-hdr">
-        <h2 id="creature-intel-title">Creature intel</h2>
-        <button type="button" class="btn btn-ghost btn-sm" onclick="closeCreatureIntel()" aria-label="Close">✕</button>
-      </div>
-      <div id="creature-intel-body"></div>
-    </div>
-  </div>
   <div id="mystery-reward-overlay" class="mystery-reward-overlay hidden" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="mr-title">
     <div class="mr-panel" id="mr-panel">
       <div class="mr-title" id="mr-title">Mystery Reward</div>
@@ -2139,6 +2133,17 @@ html[data-faction-effect="snow"] body::after{animation:factionSnowDrift 22s ease
     </div>
   </div>
 </section>
+
+<!-- Global overlay: outside .screen so it is visible on Forge / Animals & Levels (inactive screens use display:none). -->
+<div id="creature-intel-overlay" class="creature-intel-overlay hidden" aria-hidden="true" role="dialog" aria-modal="true">
+  <div class="creature-intel-panel">
+    <div class="creature-intel-hdr">
+      <h2 id="creature-intel-title">Creature intel</h2>
+      <button type="button" class="btn btn-ghost btn-sm" onclick="closeCreatureIntel()" aria-label="Close">✕</button>
+    </div>
+    <div id="creature-intel-body"></div>
+  </div>
+</div>
 
 <!-- ══════════════ COMMANDER PROFILE ══════════════ -->
 <section id="screen-profile" class="screen screen-fill">

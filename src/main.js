@@ -32,6 +32,11 @@ function creatureIntelUseInHybrid(id) {
   if (!p || !getAvailableAnimals(p).includes(id)) return;
   toggleAnimalSelect(id);
 }
+
+function creatureIntelReturnToAnimals() {
+  closeCreatureIntel();
+  showAnimalsLevels();
+}
 import { showLeaderboard, renderLeaderboard } from './ui/leaderboard-ui.js';
 import {
   startBattle, beginBattle,
@@ -98,6 +103,7 @@ Object.assign(window, {
   openCreatureIntel,
   closeCreatureIntel,
   creatureIntelUseInHybrid,
+  creatureIntelReturnToAnimals,
 });
 
 initMysteryRewardUi();

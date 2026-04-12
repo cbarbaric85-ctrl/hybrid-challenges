@@ -15,25 +15,13 @@ function renderCreatureIntel(id) {
   const title = document.getElementById('creature-intel-title');
   if (!body || !title) return;
 
-  title.textContent = data.locked ? 'Creature intel' : data.name;
-
   if (data.error) {
+    title.textContent = 'Creature intel';
     body.innerHTML = '<p class="ci-teaser">Creature data not found.</p>';
     return;
   }
 
-  if (data.locked) {
-    body.innerHTML = `
-      <div class="ci-locked-hdr">
-        <span class="ci-emoji ci-emoji--dim" aria-hidden="true">${data.emoji}</span>
-        <div>
-          <div class="ci-name">${escapeHtml(data.name)}</div>
-          <div class="ci-tier">${escapeHtml(data.tierLabel)}</div>
-        </div>
-      </div>
-      <p class="ci-teaser">${escapeHtml(data.teaser)}</p>`;
-    return;
-  }
+  title.textContent = data.name;
 
   const statRows = ['spd', 'agi', 'int', 'str']
     .map(k => {
@@ -70,6 +58,12 @@ function renderCreatureIntel(id) {
     )
     .join('<br>');
 
+  const fusionNote = data.unlockedForFusion
+    ? ''
+    : '<p class="ci-fusion-note">Not unlocked for fusion yet — you can still browse full intel below.</p>';
+
+  const useFusionDisabled = data.unlockedForFusion ? '' : ' disabled';
+
   body.innerHTML = `
     <div class="ci-header">
       <span class="ci-emoji" aria-hidden="true">${data.emoji}</span>
@@ -78,14 +72,16 @@ function renderCreatureIntel(id) {
         <div class="ci-tier">${escapeHtml(data.tierLabel)}</div>
       </div>
     </div>
+    ${fusionNote}
     <div class="ci-stats-block">${statRows}</div>
     <div class="ci-section"><div class="ci-sec-hdr">Strong areas</div><div class="ci-pill-row">${strengths}</div></div>
     <div class="ci-section"><div class="ci-sec-hdr">Best pairings</div><div class="ci-pair-list">${pairings}</div></div>
     <div class="ci-section"><div class="ci-sec-hdr">Favoured by</div><div class="ci-fav-hunt">${fav}</div></div>
     <div class="ci-section"><div class="ci-sec-hdr">Hunted by</div><div class="ci-fav-hunt">${hunt}</div></div>
     <div class="ci-section ci-fun"><div class="ci-sec-hdr">Fun fact</div><p>${escapeHtml(data.funFact)}</p></div>
-    <div class="ci-actions">
-      <button type="button" class="btn btn-secondary btn-sm ci-use-hybrid-btn">Use in Hybrid</button>
+    <div class="ci-actions-row">
+      <button type="button" class="btn btn-secondary btn-sm ci-use-fusion-btn"${useFusionDisabled}>Use in fusion</button>
+      <button type="button" class="btn btn-secondary btn-sm ci-return-animals-btn">Return to animals</button>
     </div>`;
 
   body.querySelectorAll('[data-intel-pair-id]').forEach(btn => {
@@ -94,10 +90,18 @@ function renderCreatureIntel(id) {
       if (oid) openCreatureIntel(oid, { returnScreen: _returnScreen });
     });
   });
-  const useBtn = body.querySelector('.ci-use-hybrid-btn');
-  if (useBtn) {
-    useBtn.addEventListener('click', () => {
+
+  const useFusionBtn = body.querySelector('.ci-use-fusion-btn');
+  if (useFusionBtn && data.unlockedForFusion) {
+    useFusionBtn.addEventListener('click', () => {
       if (typeof window.creatureIntelUseInHybrid === 'function') window.creatureIntelUseInHybrid(id);
+    });
+  }
+
+  const retBtn = body.querySelector('.ci-return-animals-btn');
+  if (retBtn) {
+    retBtn.addEventListener('click', () => {
+      if (typeof window.creatureIntelReturnToAnimals === 'function') window.creatureIntelReturnToAnimals();
     });
   }
 }

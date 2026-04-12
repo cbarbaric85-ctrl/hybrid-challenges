@@ -176,6 +176,10 @@ function renderBuilder() {
         <em style="font-size:.55rem;color:var(--egyptian)">"Sacred guardians of the Duat — wisdom of the desert."</em><br>
         <span class="unlock-gate-row"><span class="unlock-gate-no">○</span> Recruit <strong>every Mythical God</strong> (pass all Mythical quizzes)</span><br>
         <span class="unlock-gate-row"><span class="unlock-gate-no">○</span> Desert missions unlock from <strong>Level 21</strong> after the Pantheon falls</span></div>`;
+      const gridEg = document.createElement('div');
+      gridEg.className = 'b-animal-grid';
+      EGYPTIAN_IDS.forEach(id => gridEg.appendChild(makeQuizLockCard(id, 'egyptian')));
+      sec.appendChild(gridEg);
     } else {
       const grid = document.createElement('div');
       grid.className = 'b-animal-grid';
@@ -202,6 +206,10 @@ function renderBuilder() {
         <em style="font-size:.55rem;color:var(--knights)">"Honour-bound warriors who defend, endure, and outlast."</em><br>
         <span class="unlock-gate-row"><span class="unlock-gate-no">○</span> Recruit <strong>every Egyptian Guardian</strong> (pass all Egyptian quizzes)</span><br>
         <span class="unlock-gate-row"><span class="unlock-gate-no">○</span> Castle missions run from <strong>Level 26</strong> to <strong>30</strong></span></div>`;
+      const gridK = document.createElement('div');
+      gridK.className = 'b-animal-grid';
+      KNIGHT_IDS.forEach(id => gridK.appendChild(makeQuizLockCard(id, 'knights')));
+      sec.appendChild(gridK);
     } else {
       const grid = document.createElement('div');
       grid.className = 'b-animal-grid';
@@ -291,7 +299,10 @@ function makeQuizLockCard(id, tierType) {
         `<div class="unlock-gate-row" style="font-size:.52rem"><span class="${g.ok ? 'unlock-gate-ok' : 'unlock-gate-no'}">${g.ok ? '✓' : '○'}</span> ${g.text}</div>`
     )
     .join('');
-  card.innerHTML = `<div class="bql-em">${a.emoji}</div>
+  card.innerHTML = `<div class="bac-row-top">
+    <button type="button" class="bac-intel-btn" aria-label="Creature info">ⓘ</button>
+    <div class="bql-em">${a.emoji}</div>
+  </div>
     <div class="bql-nm">${a.name}</div>
     <div class="bql-lbl ${tierType}">🔒 ${eligible ? 'Quiz next' : 'Level first'}</div>
     <div class="bql-stats-preview bac-stats-mini" aria-hidden="true">
@@ -301,6 +312,13 @@ function makeQuizLockCard(id, tierType) {
       <div class="bac-s">STR <em>${a.str}</em></div>
     </div>
     ${gateHtml ? `<div class="unlock-gate-list" style="margin-top:4px">${gateHtml}</div>` : ''}`;
+  const intelBtn = card.querySelector('.bac-intel-btn');
+  if (intelBtn) {
+    intelBtn.addEventListener('click', e => {
+      e.stopPropagation();
+      openCreatureIntel(id, { returnScreen: 'builder' });
+    });
+  }
   if (eligible) {
     const btn = document.createElement('button');
     const quizBtnCls = {knights:'btn-knights',egyptian:'btn-egyptian',mythical:'btn-mythical',legendary:'btn-legendary',dino:'btn-dino'}[tierType] || 'btn-purple';
