@@ -225,7 +225,7 @@ function renderHub() {
   const streakEl = document.getElementById('hub-streak');
   if (streakEl) {
     const n = p.streakCount || 0;
-    streakEl.textContent = `🔥 ${n} day streak`;
+    streakEl.textContent = `🔥 ${n}d`;
   }
   const coinsEl = document.getElementById('hsb-coins');
   if (coinsEl) coinsEl.textContent = String(p.coins ?? 0);
@@ -469,14 +469,17 @@ function getRecommendedAction(p) {
   const unlockTarget = getFirstQuizEligibleId(p);
   const hasHybrid = !!state.playerHybrid;
   const mysteryOk = state.profile?.uid && canClaimMysteryRewardToday(p);
+  const tokTgt = findNextTokenRecruitTarget(p);
+  const tokCan = (p.unlockTokens || 0) >= TOKEN_RECRUIT_COST && !!tokTgt;
 
   if (state.lastBattleResult === 'loss') {
-    if (unlockTarget) return 'UNLOCK';
+    if (unlockTarget) return 'TRAIN';
+    if (tokCan) return 'TOKEN_UNLOCK';
     if (hasHybrid && mysteryOk) return 'MYSTERY';
     return 'FIGHT';
   }
 
-  if (unlockTarget) return 'UNLOCK';
+  if (unlockTarget) return 'TRAIN';
 
   if (mysteryOk && state.playerHybrid && state.enemyHybrid) {
     if (state.playerHybrid.power < state.enemyHybrid.power) return 'MYSTERY';
@@ -489,31 +492,38 @@ function getRecommendedAction(p) {
     }
   }
 
+  if (tokCan && !unlockTarget) return 'TOKEN_UNLOCK';
+
   return 'FIGHT';
 }
 
 function renderActionPanel() {
   const panel = document.getElementById('hub-action-panel');
+  const actionCol = document.getElementById('hub-action-col');
   if (!panel || !state.progress) return;
   const p = state.progress;
 
   if (p.level > MAX_LEVEL) {
     panel.classList.add('hidden');
+    if (actionCol) actionCol.classList.add('hidden');
     return;
   }
   panel.classList.remove('hidden');
+  if (actionCol) actionCol.classList.remove('hidden');
 
   const rec = getRecommendedAction(p);
 
-  const unlockBtn = document.getElementById('hap-unlock');
+  const trainBtn = document.getElementById('hap-train');
+  const tokenBtn = document.getElementById('hap-token');
   const mysteryBtn = document.getElementById('hap-mystery');
   const fusionBtn = document.getElementById('hap-fusion');
 
   const unlockTarget = getFirstQuizEligibleId(p);
+  const tokTgt = findNextTokenRecruitTarget(p);
+  const tokCan = (p.unlockTokens || 0) >= TOKEN_RECRUIT_COST && !!tokTgt;
 
-  // Unlock — available if a quiz-eligible creature exists
-  const unlockLabel = document.getElementById('hap-unlock-label');
-  const unlockSub = document.getElementById('hap-unlock-sub');
+  const trainLabel = document.getElementById('hap-train-label');
+  const trainSub = document.getElementById('hap-train-sub');
   if (unlockTarget) {
     const a = ANIMALS[unlockTarget];
     const tierMap = {
@@ -525,11 +535,11 @@ function renderActionPanel() {
       [STAGE_KNIGHTS]: 'Knight',
     };
     const tier = tierMap[a?.stage] || 'New';
-    if (unlockLabel) unlockLabel.textContent = `Unlock ${tier} creature`;
-    if (unlockSub) unlockSub.textContent = `${a?.emoji || ''} ${a?.name || 'Unknown'} — pass the quiz to recruit`;
-    unlockBtn.disabled = false;
+    if (trainLabel) trainLabel.textContent = `Train (${tier})`;
+    if (trainSub) trainSub.textContent = `${a?.emoji || ''} ${a?.name || 'Unknown'} — quiz to recruit`;
+    if (trainBtn) trainBtn.disabled = false;
   } else {
-    if (unlockLabel) unlockLabel.textContent = 'Train (Quiz Boost)';
+    if (trainLabel) trainLabel.textContent = 'Train';
     const nextGate = !apexLevelGateMet(p) ? 'Beat Level 5 first'
       : !dinoLevelGateMet(p) ? 'Beat Level 8 first'
       : !legendaryLevelGateMet(p) ? 'Beat Level 12 first'
@@ -539,29 +549,53 @@ function renderActionPanel() {
       : !knightTierQuizOpen(p) ? 'Recruit all Egyptian Guardians first'
       : countKnightsUnlocked(p) < KNIGHT_IDS.length ? 'Finish Knight quizzes'
       : 'All creatures unlocked!';
-    if (unlockSub) unlockSub.textContent = nextGate;
-    unlockBtn.disabled = true;
+    if (trainSub) trainSub.textContent = nextGate;
+    if (trainBtn) trainBtn.disabled = true;
+  }
+
+  const tokenLabel = document.getElementById('hap-token-label');
+  const tokenSub = document.getElementById('hap-token-sub');
+  if (tokTgt && ANIMALS[tokTgt.id]) {
+    const a = ANIMALS[tokTgt.id];
+    if (tokenLabel) tokenLabel.textContent = 'Unlock';
+    if (tokenSub) {
+      tokenSub.textContent = `${a.emoji} ${a.name} · ${TOKEN_RECRUIT_COST} tokens`;
+    }
+    if (tokenBtn) tokenBtn.disabled = !tokCan;
+  } else {
+    if (tokenLabel) tokenLabel.textContent = 'Unlock';
+    if (tokenSub) tokenSub.textContent = 'Roster complete';
+    if (tokenBtn) tokenBtn.disabled = true;
   }
 
   const canMystery = !!state.profile?.uid && canClaimMysteryRewardToday(p);
-  mysteryBtn.disabled = !canMystery;
+  if (mysteryBtn) mysteryBtn.disabled = !canMystery;
   const mysterySub = document.getElementById('hap-mystery-sub');
   if (mysterySub) {
     if (!state.profile?.uid) mysterySub.textContent = 'Sign in to play';
-    else if (canMystery) mysterySub.textContent = 'Open a surprise once per day';
+    else if (canMystery) mysterySub.textContent = 'Once per day';
     else {
       const ms = msUntilLocalMidnight();
-      mysterySub.textContent = `Next gift in ${formatCountdownShort(ms)}`;
+      mysterySub.textContent = `Next in ${formatCountdownShort(ms)}`;
     }
   }
 
-  // Fusion — always available
-  fusionBtn.disabled = false;
+  if (fusionBtn) fusionBtn.disabled = false;
 
-  // Recommended highlight
-  const btnMap = { UNLOCK: unlockBtn, MYSTERY: mysteryBtn, FIGHT: null };
-  const recMap = { UNLOCK: 'hap-rec-unlock', MYSTERY: 'hap-rec-mystery', FUSION: 'hap-rec-fusion' };
-  [unlockBtn, mysteryBtn, fusionBtn].forEach(b => b?.classList.remove('hap-recommended'));
+  const btnMap = {
+    TRAIN: trainBtn,
+    TOKEN_UNLOCK: tokenBtn,
+    MYSTERY: mysteryBtn,
+    FUSION: fusionBtn,
+    FIGHT: null,
+  };
+  const recMap = {
+    TRAIN: 'hap-rec-train',
+    TOKEN_UNLOCK: 'hap-rec-token',
+    MYSTERY: 'hap-rec-mystery',
+    FUSION: 'hap-rec-fusion',
+  };
+  [trainBtn, tokenBtn, mysteryBtn, fusionBtn].forEach(b => b?.classList.remove('hap-recommended'));
   for (const id of Object.values(recMap)) {
     document.getElementById(id)?.classList.add('hidden');
   }
@@ -579,13 +613,18 @@ function hubActionAllegiance() {
   openFactionSelectFromHub();
 }
 
-function hubActionUnlock() {
+function hubActionTrain() {
   const p = state.progress;
   if (!p) return;
   const target = getFirstQuizEligibleId(p);
   if (!target) return;
   state.quizReturnScreen = 'hub';
   window.openQuiz(target);
+}
+
+/** @deprecated Use hubActionTrain — kept for inline handlers / older links */
+function hubActionUnlock() {
+  hubActionTrain();
 }
 
 function hubActionNewFusion() {
@@ -607,6 +646,7 @@ export {
   getRecommendedAction,
   renderActionPanel,
   hubActionAllegiance,
+  hubActionTrain,
   hubActionUnlock,
   hubActionMysteryReward,
   hubActionNewFusion,

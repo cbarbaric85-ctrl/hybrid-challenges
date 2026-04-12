@@ -175,14 +175,39 @@ html[data-player-faction="knights"] #screen-hub.screen.active{box-shadow:inset 0
 @keyframes factionHintPop{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
 .hub-bar-nav{display:flex;align-items:center;gap:8px;flex-wrap:wrap;flex-shrink:0}
 .hub-bar-nav .btn{white-space:nowrap}
-.hub-commander-panel{border-bottom:1px solid var(--border);background:var(--surface2);flex-shrink:0;padding:14px 14px 16px}
+.hub-top-split{display:flex;flex-wrap:wrap;align-items:stretch;width:100%;border-bottom:1px solid rgba(28,58,92,.5)}
+.hub-top-split__col{flex:1 1 min(100%,340px);min-width:0;display:flex;flex-direction:column}
+.hub-top-split__col--actions.hidden{display:none!important}
+.hub-top-split__col--cmd .hub-commander-panel{flex:1}
+@media (min-width: 520px){
+  .hub-top-split__col--cmd{border-right:1px solid var(--border)}
+}
+@media (max-width: 519px){
+  .hub-top-split{flex-direction:column}
+  .hub-top-split__col--cmd{border-bottom:1px solid var(--border)}
+}
+.hub-commander-panel{border-bottom:1px solid var(--border);background:var(--surface2);flex-shrink:0;padding:12px 12px 14px}
+.hub-top-split .hub-commander-panel{border-bottom:none}
+@media (max-width: 519px){
+  .hub-top-split .hub-commander-panel{border-bottom:none}
+}
 .hub-section-title{font-family:var(--fm);font-size:.58rem;letter-spacing:.22em;text-transform:uppercase;color:var(--text-dim);margin:0 0 12px;text-align:center}
-.hub-cmd-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:4px}
-.hub-cmd-cell{padding:12px 10px;border:1px solid var(--border);border-radius:8px;background:rgba(0,0,0,.22);min-height:76px;display:flex;flex-direction:column;justify-content:center;gap:4px}
+.hub-cmd-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:4px}
+.hub-cmd-cell{padding:8px 8px;border:1px solid var(--border);border-radius:8px;background:rgba(0,0,0,.22);min-height:68px;display:flex;flex-direction:column;justify-content:center;gap:2px}
 .hub-cmd-cell .hsb-lbl{margin-bottom:0}
+.hub-cmd-hdr{display:flex;align-items:center;justify-content:space-between;gap:4px}
+.hub-cmd-hdr .hsb-lbl{flex:1;min-width:0}
+.hub-tip-btn{flex-shrink:0;width:22px;height:22px;padding:0;border:1px solid var(--border);border-radius:50%;background:rgba(0,0,0,.35);color:var(--text-dim);font-size:.65rem;line-height:1;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:color .15s,border-color .15s,background .15s}
+.hub-tip-btn:hover,.hub-tip-btn:focus-visible{color:var(--green);border-color:rgba(0,232,122,.45)}
 .hub-cmd-cell--streak .hsb-val{font-size:1.05rem}
+#hub-tip-backdrop{position:fixed;inset:0;z-index:140;background:transparent;pointer-events:auto}
+#hub-tip-backdrop.hidden{display:none!important}
+.hub-tooltip-bubble{position:fixed;z-index:150;max-width:min(240px,calc(100vw - 24px));padding:10px 12px;border-radius:10px;background:rgba(12,22,38,.96);border:1px solid var(--border);box-shadow:0 8px 28px rgba(0,0,0,.45);font-family:var(--fb);font-size:.78rem;line-height:1.35;color:var(--text);pointer-events:none;opacity:0;transition:opacity .2s ease}
+.hub-tooltip-bubble:not(.hidden){opacity:1}
+.hub-tooltip-bubble.hidden{display:none!important}
 .hub-xp-block{padding:0;margin:0;border:none;background:transparent}
 .hub-xp-hdr{display:flex;justify-content:space-between;align-items:baseline;gap:10px;margin-bottom:6px;font-family:var(--fb);font-size:.78rem;color:var(--text-bright)}
+.hub-xp-hdr .hub-xp-tip{display:flex;align-items:center;flex:1;min-width:0;gap:4px;flex-wrap:wrap}
 .hub-xp-hdr .hub-xp-main-lbl{flex:1;min-width:0}
 .hub-xp-hdr strong{color:var(--blue);font-family:var(--fd);font-size:.68rem;letter-spacing:.04em;font-weight:600}
 .hub-xp-bar-track{height:11px;background:rgba(0,0,0,.35);border-radius:5px;overflow:hidden;border:1px solid var(--border)}
@@ -605,11 +630,16 @@ html[data-player-faction="knights"] #screen-hub.screen.active{box-shadow:inset 0
 .hub-dc-desc{font-family:var(--fb);font-size:.78rem;color:var(--text-dim);line-height:1.4;margin-bottom:8px}
 .hub-dc-status{font-family:var(--fm);font-size:.65rem;color:var(--green)}
 /* ── Action Panel ── */
-.hub-action-panel{margin-top:0;margin-bottom:16px;padding:16px 14px 14px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;box-shadow:0 0 22px rgba(0,232,122,.04)}
+.hub-action-panel{margin-top:0;margin-bottom:0;padding:12px 12px 14px;background:var(--surface2);border:none;border-radius:0;box-shadow:none;flex:1;display:flex;flex-direction:column}
+.hub-top-split .hub-action-panel{border-left:none}
+@media (min-width: 520px){
+  .hub-top-split .hub-action-panel{border-left:1px solid var(--border);margin-left:-1px}
+}
 .hap-title{font-family:var(--fm);font-size:.58rem;letter-spacing:.22em;text-transform:uppercase;color:var(--text-dim);margin:0 0 12px;text-align:center}
-.hap-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.hap-grid .hap-fusion:nth-child(3):last-child{grid-column:1/-1;max-width:min(100%,280px);justify-self:center}
-.hap-btn{position:relative;display:flex;flex-direction:column;align-items:center;gap:2px;padding:14px 8px 12px;border-radius:8px;border:1px solid var(--border);background:rgba(0,0,0,.25);cursor:pointer;transition:transform .15s,box-shadow .25s,border-color .25s;text-align:center;-webkit-tap-highlight-color:transparent}
+.hap-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.hap-cell{position:relative;min-width:0}
+.hap-cell>.hub-tip-btn{position:absolute;top:4px;right:4px;width:20px;height:20px;font-size:.55rem;z-index:2}
+.hap-btn{position:relative;display:flex;width:100%;flex-direction:column;align-items:center;gap:2px;padding:12px 6px 10px;border-radius:8px;border:1px solid var(--border);background:rgba(0,0,0,.25);cursor:pointer;transition:transform .15s,box-shadow .25s,border-color .25s;text-align:center;-webkit-tap-highlight-color:transparent}
 .hap-btn:active{transform:scale(.96)}
 .hap-btn:disabled{opacity:.35;pointer-events:none;filter:grayscale(.6)}
 .hap-icon{font-size:1.35rem;line-height:1;margin-bottom:2px}
@@ -621,10 +651,14 @@ html[data-player-faction="knights"] #screen-hub.screen.active{box-shadow:inset 0
 .hap-allegiance{border-color:rgba(61,158,255,.4);color:#7ec8ff}
 .hap-allegiance:hover:not(:disabled){box-shadow:0 0 18px rgba(61,158,255,.28);border-color:rgba(100,180,255,.65)}
 .hap-allegiance .hap-rec-tag{background:rgba(61,158,255,.9);color:#000}
-/* Unlock – gold/orange */
-.hap-unlock{border-color:rgba(255,180,40,.35);color:#ffc355}
-.hap-unlock:hover:not(:disabled){box-shadow:0 0 18px rgba(255,180,40,.3);border-color:rgba(255,180,40,.6)}
-.hap-unlock .hap-rec-tag{background:rgba(255,160,20,.85);color:#000}
+/* Train – quiz / teal */
+.hap-train{border-color:rgba(61,158,255,.4);color:#7ec8ff}
+.hap-train:hover:not(:disabled){box-shadow:0 0 18px rgba(61,158,255,.28);border-color:rgba(100,180,255,.65)}
+.hap-train .hap-rec-tag{background:rgba(61,158,255,.9);color:#000}
+/* Token unlock – gold/orange */
+.hap-token{border-color:rgba(255,180,40,.35);color:#ffc355}
+.hap-token:hover:not(:disabled){box-shadow:0 0 18px rgba(255,180,40,.3);border-color:rgba(255,180,40,.6)}
+.hap-token .hap-rec-tag{background:rgba(255,160,20,.85);color:#000}
 /* Mystery Reward – gift / purple */
 .hap-mystery{border-color:rgba(176,106,255,.4);color:#c9a8ff}
 .hap-mystery:hover:not(:disabled){box-shadow:0 0 18px rgba(176,106,255,.28);border-color:rgba(176,106,255,.65)}
@@ -635,8 +669,51 @@ html[data-player-faction="knights"] #screen-hub.screen.active{box-shadow:inset 0
 .mr-panel{max-width:380px;width:100%;background:var(--surface2);border:1px solid rgba(176,106,255,.35);border-radius:12px;padding:18px 16px 16px;box-shadow:0 0 40px rgba(176,106,255,.15)}
 .mr-title{font-family:var(--fd);font-size:1.25rem;font-weight:700;text-align:center;color:var(--text-bright);margin-bottom:4px}
 .mr-sub{font-family:var(--fb);font-size:.78rem;color:var(--text-dim);text-align:center;margin-bottom:16px;line-height:1.4}
-.mr-cups{display:flex;justify-content:center;gap:10px;margin-bottom:14px}
-.mr-cup{flex:1;min-height:100px;max-width:100px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;border-radius:10px;border:2px solid rgba(176,106,255,.4);background:rgba(0,0,0,.3);cursor:pointer;transition:transform .2s,opacity .35s,box-shadow .25s;font-size:2rem;-webkit-tap-highlight-color:transparent;padding:12px 8px}
+.mr-flash-strip{display:flex;justify-content:center;align-items:center;gap:12px;min-height:28px;margin-bottom:10px;font-size:1.25rem;opacity:.85;pointer-events:none}
+.mr-flash-strip.hidden{display:none!important}
+.mr-flash-cell{opacity:.2;transition:opacity .12s ease;will-change:opacity}
+.mr-flash-cell--on{opacity:1}
+.mr-cups{display:flex;justify-content:center;gap:10px;margin-bottom:14px;position:relative;will-change:transform}
+.mr-cups.mr-phase--shuffling{pointer-events:none}
+.mr-cups.mr-phase--shuffling .mr-cup{animation:none!important;cursor:default}
+.mr-cup{flex:1;min-height:100px;max-width:100px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;border-radius:10px;border:2px solid rgba(176,106,255,.4);background:rgba(0,0,0,.3);cursor:pointer;transition:transform .2s,opacity .35s,box-shadow .25s;font-size:2rem;-webkit-tap-highlight-color:transparent;padding:12px 8px;will-change:transform}
+.mr-cups.mr-phase--shuffling .mr-cup:nth-child(1){animation:mrShuffleA 1.45s cubic-bezier(.45,.05,.25,1) both}
+.mr-cups.mr-phase--shuffling .mr-cup:nth-child(2){animation:mrShuffleB 1.45s cubic-bezier(.45,.05,.25,1) both}
+.mr-cups.mr-phase--shuffling .mr-cup:nth-child(3){animation:mrShuffleC 1.45s cubic-bezier(.45,.05,.25,1) both}
+@keyframes mrShuffleA{
+  0%{transform:translateX(0) rotate(0deg)}
+  15%{transform:translateX(-28px) rotate(-8deg)}
+  35%{transform:translateX(22px) rotate(12deg)}
+  55%{transform:translateX(-18px) rotate(-10deg)}
+  75%{transform:translateX(14px) rotate(8deg)}
+  100%{transform:translateX(0) rotate(0deg)}
+}
+@keyframes mrShuffleB{
+  0%{transform:translateX(0) rotate(0deg)}
+  15%{transform:translateX(26px) rotate(10deg)}
+  35%{transform:translateX(-24px) rotate(-12deg)}
+  55%{transform:translateX(20px) rotate(9deg)}
+  75%{transform:translateX(-12px) rotate(-7deg)}
+  100%{transform:translateX(0) rotate(0deg)}
+}
+@keyframes mrShuffleC{
+  0%{transform:translateX(0) rotate(0deg)}
+  15%{transform:translateX(8px) rotate(14deg)}
+  35%{transform:translateX(-30px) rotate(-11deg)}
+  55%{transform:translateX(24px) rotate(10deg)}
+  75%{transform:translateX(-16px) rotate(-9deg)}
+  100%{transform:translateX(0) rotate(0deg)}
+}
+.mr-cups.mr-phase--settle .mr-cup{animation:mrSettle .45s cubic-bezier(.34,1.56,.64,1) both}
+@keyframes mrSettle{0%{transform:translateY(4px) scale(.98)}60%{transform:translateY(-6px) scale(1.03)}100%{transform:translateY(0) scale(1)}}
+.mr-theme--early .mr-panel{box-shadow:0 0 32px rgba(0,232,122,.12)}
+.mr-theme--apex .mr-cups.mr-phase--shuffling .mr-cup:nth-child(n){animation-duration:1.15s}
+.mr-theme--dino .mr-cup{border-color:rgba(255,68,0,.45)}
+.mr-theme--dino .mr-cups.mr-phase--shuffling .mr-cup{animation-timing-function:cubic-bezier(.55,.08,.25,1)}
+.mr-theme--myth .mr-panel{border-color:rgba(0,200,255,.4);box-shadow:0 0 36px rgba(0,200,255,.18)}
+.mr-theme--faction-egyptian_guardians .mr-panel{box-shadow:0 0 34px rgba(212,175,55,.2)}
+.mr-theme--faction-viking_raiders .mr-panel{box-shadow:0 0 34px rgba(120,200,255,.18)}
+.mr-theme--faction-knights .mr-panel{box-shadow:0 0 34px rgba(140,180,230,.2)}
 .mr-cup:active{transform:scale(.96)}
 .mr-cup:disabled{cursor:default}
 .mr-cup-lbl{font-family:var(--fm);font-size:.48rem;letter-spacing:.12em;color:var(--text-dim);text-transform:uppercase}
@@ -1564,29 +1641,43 @@ html[data-player-faction="knights"] #screen-hub.screen.active{box-shadow:inset 0
         <button class="btn btn-logout" type="button" onclick="logout()">Sign out</button>
       </nav>
     </div>
+    <div class="hub-top-split">
+    <div class="hub-top-split__col hub-top-split__col--cmd">
     <div class="hub-commander-panel" aria-label="Commander status">
       <h2 class="hub-section-title">Commander Status</h2>
       <div class="hub-cmd-grid">
         <div class="hub-cmd-cell hub-cmd-cell--streak">
-          <div class="hsb-lbl">Streak</div>
-          <div class="hsb-val green" id="hub-streak">🔥 0 days</div>
+          <div class="hub-cmd-hdr">
+            <div class="hsb-lbl">Streak</div>
+            <button type="button" class="hub-tip-btn" data-tip="streak" aria-label="About streak">ⓘ</button>
+          </div>
+          <div class="hsb-val green" id="hub-streak">🔥 0d</div>
         </div>
-        <div class="hub-cmd-cell" title="Use coins to make your hybrid stronger">
-          <div class="hsb-lbl">Fusion Coins</div>
+        <div class="hub-cmd-cell">
+          <div class="hub-cmd-hdr">
+            <div class="hsb-lbl">Coins</div>
+            <button type="button" class="hub-tip-btn" data-tip="coins" aria-label="About coins">ⓘ</button>
+          </div>
           <div class="hsb-val orange" id="hsb-coins">0</div>
         </div>
-        <div class="hub-cmd-cell" title="Use tokens to unlock new animals">
-          <div class="hsb-lbl">Unlock tokens</div>
+        <div class="hub-cmd-cell">
+          <div class="hub-cmd-hdr">
+            <div class="hsb-lbl">Tokens</div>
+            <button type="button" class="hub-tip-btn" data-tip="tokens" aria-label="About tokens">ⓘ</button>
+          </div>
           <div class="hsb-val" id="hsb-tokens">0</div>
         </div>
         <div class="hub-cmd-cell">
-          <div class="hsb-lbl">Hybrid Power</div>
+          <div class="hub-cmd-hdr">
+            <div class="hsb-lbl">Power</div>
+            <button type="button" class="hub-tip-btn" data-tip="power" aria-label="About power">ⓘ</button>
+          </div>
           <div class="hsb-val orange" id="hsb-power">—</div>
         </div>
       </div>
       <div class="hub-xp-block">
         <div class="hub-xp-hdr">
-          <span class="hub-xp-main-lbl" id="hub-xp-main-lbl">Level Progress: 0 / 50 XP</span>
+          <span class="hub-xp-tip"><span class="hub-xp-main-lbl" id="hub-xp-main-lbl">Level Progress: 0 / 50 XP</span><button type="button" class="hub-tip-btn" data-tip="xp" aria-label="About XP" style="margin-left:6px">ⓘ</button></span>
           <strong id="hub-xp-seg-lbl">Spark 1</strong>
         </div>
         <div class="hub-xp-bar-track" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="hub-xp-bar-track">
@@ -1595,6 +1686,51 @@ html[data-player-faction="knights"] #screen-hub.screen.active{box-shadow:inset 0
         <div class="hub-xp-meta" id="hub-xp-meta"></div>
         <div class="hub-xp-spark" id="hub-xp-spark-hint">Win battles to earn XP in this level.</div>
       </div>
+    </div>
+    </div>
+    <div class="hub-top-split__col hub-top-split__col--actions" id="hub-action-col">
+    <div class="hub-action-panel" id="hub-action-panel">
+      <div class="hap-title">Next Move</div>
+      <div class="hap-grid" id="hap-grid">
+        <div class="hap-cell">
+          <button type="button" class="hub-tip-btn" data-tip="reward" aria-label="About reward">ⓘ</button>
+          <button class="hap-btn hap-mystery" id="hap-mystery" type="button" onclick="hubActionMysteryReward()">
+            <span class="hap-rec-tag hidden" id="hap-rec-mystery">Recommended</span>
+            <span class="hap-icon">🎁</span>
+            <span class="hap-label" id="hap-mystery-label">Reward</span>
+            <span class="hap-sub" id="hap-mystery-sub">Open a surprise once per day</span>
+          </button>
+        </div>
+        <div class="hap-cell">
+          <button type="button" class="hub-tip-btn" data-tip="train" aria-label="About train">ⓘ</button>
+          <button class="hap-btn hap-train" id="hap-train" type="button" onclick="hubActionTrain()">
+            <span class="hap-rec-tag hidden" id="hap-rec-train">Recommended</span>
+            <span class="hap-icon">🧠</span>
+            <span class="hap-label" id="hap-train-label">Train</span>
+            <span class="hap-sub" id="hap-train-sub">Answer questions to earn boosts</span>
+          </button>
+        </div>
+        <div class="hap-cell">
+          <button type="button" class="hub-tip-btn" data-tip="unlock" aria-label="About unlock">ⓘ</button>
+          <button class="hap-btn hap-token" id="hap-token" type="button" onclick="hubSpendTokenRecruit()">
+            <span class="hap-rec-tag hidden" id="hap-rec-token">Recommended</span>
+            <span class="hap-icon">🔓</span>
+            <span class="hap-label" id="hap-token-label">Unlock</span>
+            <span class="hap-sub" id="hap-token-sub">Fast-unlock next (5 tokens)</span>
+          </button>
+        </div>
+        <div class="hap-cell">
+          <button type="button" class="hub-tip-btn" data-tip="fusion" aria-label="About fusion">ⓘ</button>
+          <button class="hap-btn hap-fusion" id="hap-fusion" type="button" onclick="hubActionNewFusion()">
+            <span class="hap-rec-tag hidden" id="hap-rec-fusion">Recommended</span>
+            <span class="hap-icon">🔀</span>
+            <span class="hap-label" id="hap-fusion-label">Fusion</span>
+            <span class="hap-sub" id="hap-fusion-sub">Reset &amp; experiment</span>
+          </button>
+        </div>
+      </div>
+    </div>
+    </div>
     </div>
   </div>
   <div class="hub-body hub-scroll">
@@ -1611,29 +1747,6 @@ html[data-player-faction="knights"] #screen-hub.screen.active{box-shadow:inset 0
           <button class="btn btn-primary btn-lg" type="button" onclick="showBuilder()">⚔ Forge hybrid &amp; fight this level</button>
           <p style="font-family:var(--fm);font-size:.62rem;color:var(--text-dim);margin-top:10px;line-height:1.5">Hub saves your spot. Forge picks your animals, Fuse builds stats, then Battle runs the arena.</p>
         </div>
-      </div>
-    </div>
-    <div class="hub-action-panel" id="hub-action-panel">
-      <div class="hap-title">Choose Your Next Move</div>
-      <div class="hap-grid" id="hap-grid">
-        <button class="hap-btn hap-mystery" id="hap-mystery" type="button" onclick="hubActionMysteryReward()">
-          <span class="hap-rec-tag hidden" id="hap-rec-mystery">Recommended</span>
-          <span class="hap-icon">🎁</span>
-          <span class="hap-label" id="hap-mystery-label">Mystery Reward</span>
-          <span class="hap-sub" id="hap-mystery-sub">Open a surprise once per day</span>
-        </button>
-        <button class="hap-btn hap-unlock" id="hap-unlock" type="button" onclick="hubActionUnlock()">
-          <span class="hap-rec-tag hidden" id="hap-rec-unlock">Recommended</span>
-          <span class="hap-icon">🔓</span>
-          <span class="hap-label" id="hap-unlock-label">Unlock Creature</span>
-          <span class="hap-sub" id="hap-unlock-sub">Quiz boost and new recruits</span>
-        </button>
-        <button class="hap-btn hap-fusion" id="hap-fusion" type="button" onclick="hubActionNewFusion()">
-          <span class="hap-rec-tag hidden" id="hap-rec-fusion">Recommended</span>
-          <span class="hap-icon">⚗️</span>
-          <span class="hap-label" id="hap-fusion-label">Try New Fusion</span>
-          <span class="hap-sub" id="hap-fusion-sub">Reset &amp; experiment</span>
-        </button>
       </div>
     </div>
     <p class="hub-cta-hint hub-cta-hint--below" id="hub-primary-hint">Your next step</p>
@@ -1677,10 +1790,15 @@ html[data-player-faction="knights"] #screen-hub.screen.active{box-shadow:inset 0
     </div>
   </div>
   <div id="mystery-reward-overlay" class="mystery-reward-overlay hidden" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="mr-title">
-    <div class="mr-panel">
-      <div class="mr-title" id="mr-title">🎁 Mystery Reward</div>
-      <p class="mr-sub" id="mr-sub">Pick 1 of 3 to reveal your reward</p>
-      <div class="mr-cups" role="group" aria-label="Pick a cup">
+    <div class="mr-panel" id="mr-panel">
+      <div class="mr-title" id="mr-title">Mystery Reward</div>
+      <p class="mr-sub" id="mr-sub">Pick 1 of 3</p>
+      <div class="mr-flash-strip hidden" id="mr-flash-strip" aria-hidden="true">
+        <span class="mr-flash-cell" id="mr-flash-0">🦎</span>
+        <span class="mr-flash-cell" id="mr-flash-1">🦁</span>
+        <span class="mr-flash-cell" id="mr-flash-2">🦅</span>
+      </div>
+      <div class="mr-cups" id="mr-cups" role="group" aria-label="Pick a cup">
         <button type="button" class="mr-cup" id="mr-cup-0" aria-label="Cup 1"><span aria-hidden="true">🥤</span><span class="mr-cup-lbl">1</span></button>
         <button type="button" class="mr-cup" id="mr-cup-1" aria-label="Cup 2"><span aria-hidden="true">🥤</span><span class="mr-cup-lbl">2</span></button>
         <button type="button" class="mr-cup" id="mr-cup-2" aria-label="Cup 3"><span aria-hidden="true">🥤</span><span class="mr-cup-lbl">3</span></button>

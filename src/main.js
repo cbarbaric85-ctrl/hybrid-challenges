@@ -5,9 +5,10 @@ import { showScreen } from './ui/screens.js';
 import { switchTab, handleAuth, logout, setupAuth } from './ui/auth.js';
 import {
   renderHub, hubSpendCoinTune, hubSpendTokenRecruit,
-  hubActionAllegiance, hubActionUnlock, hubActionMysteryReward, hubActionNewFusion,
+  hubActionAllegiance, hubActionTrain, hubActionUnlock, hubActionMysteryReward, hubActionNewFusion,
 } from './ui/hub.js';
 import { initMysteryRewardUi } from './ui/mystery-reward-ui.js';
+import { initHubTooltips } from './ui/hub-tooltips.js';
 import {
   renderFactionSelect, pickFactionAndContinue, openFactionSelectFromHub,
 } from './ui/faction-ui.js';
@@ -65,6 +66,7 @@ Object.assign(window, {
   hubSpendCoinTune,
   hubSpendTokenRecruit,
   hubActionAllegiance,
+  hubActionTrain,
   hubActionUnlock,
   hubActionMysteryReward,
   hubActionNewFusion,
@@ -73,3 +75,4 @@ Object.assign(window, {
 });
 
 initMysteryRewardUi();
+initHubTooltips();
