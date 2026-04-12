@@ -42,6 +42,7 @@ import {
   roll, simulateRound, pickRoundStat, resolveRound, runFullBattle,
 } from '../game/battle.js';
 import { saveUserProgress, persistGameProgress, recordQuizAnswers, computeQuizAccuracy } from '../persistence/save.js';
+import { syncActiveBoostsView } from '../game/mystery-reward.js';
 import { syncLeaderboardEntry } from '../persistence/leaderboard.js';
 import { showScreen, escapeHtml } from './screens.js';
 import { localDateString } from '../game/utils.js';
@@ -634,6 +635,8 @@ function startBattle() {
     eWins: 0,
     phase: 'pre_quiz',
     quizBoosts: EMPTY_STAT_BOOST(),
+    quizBoostsPreMystery: null,
+    mysteryBoostSnapshot: null,
     preQuiz: {
       questions,
       idx: 0,
@@ -731,7 +734,18 @@ function advancePreBattleQuiz() {
   pq.answered = false;
   pq.lastCorrect = null;
   if (pq.idx >= pq.questions.length) {
-    b.quizBoosts = { ...pq.boosts };
+    const pqBoosts = { ...pq.boosts };
+    b.quizBoostsPreMystery = { ...pqBoosts };
+    b.mysteryBoostSnapshot = null;
+    let merged = { ...pqBoosts };
+    const pending = state.progress?.pendingMysteryBattleBoost;
+    if (pending && ['spd', 'agi', 'int', 'str'].some(k => (pending[k] || 0) > 0)) {
+      b.mysteryBoostSnapshot = { spd: pending.spd || 0, agi: pending.agi || 0, int: pending.int || 0, str: pending.str || 0 };
+      merged = mergeStatBoosts(merged, pending);
+      state.progress.pendingMysteryBattleBoost = null;
+      syncActiveBoostsView(state.progress);
+    }
+    b.quizBoosts = merged;
     b.phase = 'boost_summary';
   }
   renderBattleScreen();
@@ -745,11 +759,19 @@ function renderBattleBoostSummaryUI() {
   el.classList.remove('hidden');
   if (quizEl) quizEl.innerHTML = '';
 
-  const boosts = b.quizBoosts || EMPTY_STAT_BOOST();
+  const quizOnly = b.quizBoostsPreMystery || EMPTY_STAT_BOOST();
   const lines = [];
   for (const k of ['spd', 'agi', 'int', 'str']) {
-    const n = boosts[k] || 0;
+    const n = quizOnly[k] || 0;
     if (n > 0) lines.push(`+${n} ${PRE_BATTLE_STAT_WORDS[k]}${n > 1 ? '' : ''} (this battle)`);
+  }
+  const mysterySnap = b.mysteryBoostSnapshot;
+  const mysteryLines = [];
+  if (mysterySnap) {
+    for (const k of ['spd', 'agi', 'int', 'str']) {
+      const n = mysterySnap[k] || 0;
+      if (n > 0) mysteryLines.push(`+${n} ${PRE_BATTLE_STAT_WORDS[k]} (🎁 Mystery gift)`);
+    }
   }
   const streakB = state.progress ? getStreakBattleBoost(state.progress) : EMPTY_STAT_BOOST();
   const streakPts = sumBoostPoints(streakB);
@@ -757,10 +779,15 @@ function renderBattleBoostSummaryUI() {
     streakPts > 0
       ? `<div class="boost-line" style="color:var(--orange)">🔥 +${streakPts} from your daily streak (this battle)</div>`
       : '';
-  const list =
+  const quizList =
     lines.length > 0
       ? lines.map(t => `<div class="boost-line">✓ ${t}</div>`).join('')
       : `<div class="boost-line" style="color:var(--text-dim)">No quiz boosts this time — your base hybrid is ready to fight.</div>`;
+  const mysteryBlock =
+    mysteryLines.length > 0
+      ? `<div class="boost-line" style="color:var(--purple);margin-top:8px">${mysteryLines.map(t => `<div>✓ ${t}</div>`).join('')}</div>`
+      : '';
+  const list = `${quizList}${mysteryBlock}`;
 
   el.innerHTML = `
     <div class="boost-summary-box">

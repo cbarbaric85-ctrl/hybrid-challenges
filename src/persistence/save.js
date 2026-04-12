@@ -6,6 +6,7 @@ import {
   ANIMALS, APEX_IDS, DINO_IDS, STARTER_BASE_IDS,
 } from '../data/animals.js';
 import { state, defaultProgress } from '../game/state.js';
+import { syncActiveBoostsView } from '../game/mystery-reward.js';
 
 // Forward-declare: set by persistence/leaderboard.js to avoid circular dep
 let _syncLeaderboardEntry = async () => { console.warn('syncLeaderboardEntry not wired yet'); return false; };
@@ -33,6 +34,12 @@ function normalizeProgress(p) {
   if (p.factionXP == null) p.factionXP = 0;
   if (!Array.isArray(p.factionUnlocked)) p.factionUnlocked = [];
   if (p.faction != null && typeof p.faction !== 'string') p.faction = null;
+  if (p.lastMysteryRewardDayKey != null && typeof p.lastMysteryRewardDayKey !== 'string') p.lastMysteryRewardDayKey = null;
+  if (p.pendingQuizGrace == null) p.pendingQuizGrace = 0;
+  if (p.pendingMysteryBattleBoost != null && typeof p.pendingMysteryBattleBoost !== 'object') p.pendingMysteryBattleBoost = null;
+  if (!Array.isArray(p.activeBoosts)) p.activeBoosts = [];
+  if (!Array.isArray(p.unlockedRewards)) p.unlockedRewards = [];
+  syncActiveBoostsView(p);
   return p;
 }
 
@@ -117,6 +124,14 @@ function firestoreDataToProgress(data) {
       egyptian: data.stageAccess?.egyptian !== false,
       knights: data.stageAccess?.knights !== false,
     },
+    lastMysteryRewardDayKey: typeof data.lastMysteryRewardDayKey === 'string' ? data.lastMysteryRewardDayKey : null,
+    pendingQuizGrace: data.pendingQuizGrace ?? 0,
+    pendingMysteryBattleBoost:
+      data.pendingMysteryBattleBoost && typeof data.pendingMysteryBattleBoost === 'object'
+        ? { spd: data.pendingMysteryBattleBoost.spd ?? 0, agi: data.pendingMysteryBattleBoost.agi ?? 0, int: data.pendingMysteryBattleBoost.int ?? 0, str: data.pendingMysteryBattleBoost.str ?? 0 }
+        : null,
+    activeBoosts: Array.isArray(data.activeBoosts) ? data.activeBoosts : [],
+    unlockedRewards: Array.isArray(data.unlockedRewards) ? [...data.unlockedRewards] : [],
   };
   normalizeProgress(p);
   applyProgressMigration(p);
@@ -157,16 +172,15 @@ function publicDocShowsAsOptedIn(d) {
   return true;
 }
 
-async function saveUserProgress(progress) {
+async function saveUserProgress(progress, opts = {}) {
   const uid = state.profile?.uid;
   if (!uid || !progress) return;
   const p = progress;
+  syncActiveBoostsView(p);
   const apex = (p.quizUnlocked || []).filter(id => APEX_IDS.includes(id));
   const dinos = (p.quizUnlocked || []).filter(id => DINO_IDS.includes(id));
   const optIn = isLeaderboardOptIn();
-  await setDoc(
-    userDocRef(uid),
-    {
+  const payload = {
       uid,
       username: state.profile.username,
       email: state.profile.email,
@@ -195,8 +209,19 @@ async function saveUserProgress(progress) {
       factionXP: p.factionXP ?? 0,
       factionUnlocked: [...(p.factionUnlocked || [])],
       stageAccess: { ...(p.stageAccess || { base: true, apex: true, dinosaur: true }) },
+      lastMysteryRewardDayKey: p.lastMysteryRewardDayKey ?? null,
+      pendingQuizGrace: p.pendingQuizGrace ?? 0,
+      pendingMysteryBattleBoost: p.pendingMysteryBattleBoost || null,
+      activeBoosts: [...(p.activeBoosts || [])],
+      unlockedRewards: [...(p.unlockedRewards || [])].slice(0, 200),
       updatedAt: serverTimestamp(),
-    },
+    };
+  if (opts.mysteryClaim) {
+    payload.lastMysteryRewardClaimAt = serverTimestamp();
+  }
+  await setDoc(
+    userDocRef(uid),
+    payload,
     { merge: true }
   );
   const lbOk = await _syncLeaderboardEntry(p);

@@ -83,6 +83,16 @@ function defaultProgress() {
     factionXP: 0,
     /** @type {string[]} Unlocked faction ids (future expansion / switching) */
     factionUnlocked: [],
+    /** Mystery Reward — last claim local calendar day (YYYY-MM-DD). */
+    lastMysteryRewardDayKey: null,
+    /** Extra stat boosts from Mystery Reward, merged into next battle pre-quiz summary. */
+    pendingMysteryBattleBoost: null,
+    /** Next creature-unlock quiz: wrong answers that count as correct (Mystery Reward). */
+    pendingQuizGrace: 0,
+    /** Mirror of pending boosts for Firestore (derived in syncActiveBoostsView). */
+    activeBoosts: [],
+    /** Optional analytics ids for mystery pulls. */
+    unlockedRewards: [],
   };
 }
 

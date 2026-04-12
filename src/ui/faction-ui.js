@@ -49,7 +49,7 @@ export function renderFactionSelect() {
   if (sub) {
     sub.textContent = needsFactionSelection(state.progress)
       ? 'The Mythical path is open — pledge your banner to gain faction bonuses in battle.'
-      : 'Choose a different allegiance. Your progress is kept.';
+      : 'Pick another faction any time. Your progress is kept.';
   }
 }
 

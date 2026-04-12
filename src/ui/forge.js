@@ -17,6 +17,7 @@ import {
   STAT_LABELS, pickUnlockSessionQuestions, shuffleQuestionOpts,
 } from '../game/battle.js';
 import { sanitizeHybridName, recordQuizAnswers, saveUserProgress, persistGameProgress } from '../persistence/save.js';
+import { syncActiveBoostsView } from '../game/mystery-reward.js';
 import { showScreen } from './screens.js';
 
 function showBuilder() {
@@ -637,7 +638,15 @@ function answerQuestion(optIdx) {
   const sess = quizState.sessionQuestions;
   const q = sess[quizState.currentQ];
   const tierType = quizUiTierType(quizState.animalId);
-  const isCorrect = optIdx === q.correct;
+  const p = state.progress;
+  let isCorrect = optIdx === q.correct;
+  let usedGrace = false;
+  if (!isCorrect && p && (p.pendingQuizGrace || 0) > 0) {
+    p.pendingQuizGrace = Math.max(0, (p.pendingQuizGrace || 0) - 1);
+    isCorrect = true;
+    usedGrace = true;
+    syncActiveBoostsView(p);
+  }
   const letters = ['A','B','C','D'];
 
   if (isCorrect) quizState.correctCount++;
@@ -651,11 +660,13 @@ function answerQuestion(optIdx) {
 
   // Show feedback
   const feedback = document.getElementById('quiz-feedback-area');
+  const graceHint = usedGrace ? '<div class="qf-grace" style="font-family:var(--fm);font-size:.65rem;color:var(--purple);margin-top:6px">🎁 Mystery boost: that counts as correct!</div>' : '';
   feedback.innerHTML = `
     <div class="quiz-feedback">
       <div class="qf-icon">${isCorrect ? '✅' : '❌'}</div>
-      <div class="qf-verdict ${isCorrect ? 'qpass' : 'qfail'}">${isCorrect ? 'Correct!' : 'Wrong!'}</div>
-      <div class="qf-correct-ans">${isCorrect ? 'Great job!' : `Correct answer: <strong>${letters[q.correct]}. ${q.opts[q.correct]}</strong>`}</div>
+      <div class="qf-verdict ${isCorrect ? 'qpass' : 'qfail'}">${isCorrect ? (usedGrace ? 'Counted!' : 'Correct!') : 'Wrong!'}</div>
+      <div class="qf-correct-ans">${isCorrect ? (usedGrace ? 'Your quiz boost saved this one — nice!' : 'Great job!') : `Correct answer: <strong>${letters[q.correct]}. ${q.opts[q.correct]}</strong>`}</div>
+      ${graceHint}
       <div class="qf-fact"><span class="qf-fact-lbl">💡 Fun Fact</span>${q.fact}</div>
       <button class="btn ${{knights:'btn-knights',egyptian:'btn-egyptian',mythical:'btn-mythical',legendary:'btn-legendary',dino:'btn-dino'}[tierType]||'btn-purple'}" onclick="nextQuizQuestion()">${quizState.currentQ >= sess.length - 1 ? 'See Result →' : 'Next Question →'}</button>
     </div>`;
@@ -691,6 +702,8 @@ function showQuizResult(passed) {
   if (passed) {
     if (!p.quizUnlocked.includes(animalId)) p.quizUnlocked.push(animalId);
   }
+  p.pendingQuizGrace = 0;
+  syncActiveBoostsView(p);
   saveUserProgress(p).catch(e => console.error('[forge] quiz result save failed', e));
 
   const body = document.getElementById('quiz-body');

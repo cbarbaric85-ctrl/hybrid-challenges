@@ -611,10 +611,34 @@ html[data-player-faction="knights"] #screen-hub.screen.active{box-shadow:inset 0
 .hap-unlock{border-color:rgba(255,180,40,.35);color:#ffc355}
 .hap-unlock:hover:not(:disabled){box-shadow:0 0 18px rgba(255,180,40,.3);border-color:rgba(255,180,40,.6)}
 .hap-unlock .hap-rec-tag{background:rgba(255,160,20,.85);color:#000}
-/* Improve – green */
-.hap-improve{border-color:rgba(0,232,122,.3);color:var(--green)}
-.hap-improve:hover:not(:disabled){box-shadow:0 0 18px rgba(0,232,122,.3);border-color:rgba(0,232,122,.55)}
-.hap-improve .hap-rec-tag{background:rgba(0,232,122,.85);color:#000}
+/* Mystery Reward – gift / purple */
+.hap-mystery{border-color:rgba(176,106,255,.4);color:#c9a8ff}
+.hap-mystery:hover:not(:disabled){box-shadow:0 0 18px rgba(176,106,255,.28);border-color:rgba(176,106,255,.65)}
+.hap-mystery .hap-rec-tag{background:rgba(176,106,255,.9);color:#000}
+/* Mystery modal */
+.mystery-reward-overlay{position:fixed;inset:0;z-index:200;display:flex;align-items:center;justify-content:center;padding:16px;background:rgba(5,10,18,.88);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px)}
+.mystery-reward-overlay.hidden{display:none!important}
+.mr-panel{max-width:380px;width:100%;background:var(--surface2);border:1px solid rgba(176,106,255,.35);border-radius:12px;padding:18px 16px 16px;box-shadow:0 0 40px rgba(176,106,255,.15)}
+.mr-title{font-family:var(--fd);font-size:1.25rem;font-weight:700;text-align:center;color:var(--text-bright);margin-bottom:4px}
+.mr-sub{font-family:var(--fb);font-size:.78rem;color:var(--text-dim);text-align:center;margin-bottom:16px;line-height:1.4}
+.mr-cups{display:flex;justify-content:center;gap:10px;margin-bottom:14px}
+.mr-cup{flex:1;min-height:100px;max-width:100px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;border-radius:10px;border:2px solid rgba(176,106,255,.4);background:rgba(0,0,0,.3);cursor:pointer;transition:transform .2s,opacity .35s,box-shadow .25s;font-size:2rem;-webkit-tap-highlight-color:transparent;padding:12px 8px}
+.mr-cup:active{transform:scale(.96)}
+.mr-cup:disabled{cursor:default}
+.mr-cup-lbl{font-family:var(--fm);font-size:.48rem;letter-spacing:.12em;color:var(--text-dim);text-transform:uppercase}
+@keyframes mrCupFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
+@keyframes mrHint{0%,100%{box-shadow:0 0 12px rgba(255,200,80,.2)}50%{box-shadow:0 0 22px rgba(255,200,80,.45)}}
+@keyframes mrShake{0%,100%{transform:translateX(0)}25%{transform:translateX(-3px)}75%{transform:translateX(3px)}}
+.mr-cup:not(:disabled):not(.mr-cup--fade){animation:mrCupFloat 2.2s ease-in-out infinite}
+.mr-cup--hint:not(:disabled){animation:mrCupFloat 2.2s ease-in-out infinite,mrHint 1.5s ease-in-out infinite,mrShake 2.5s ease-in-out infinite}
+.mr-cup--fade{opacity:.2;pointer-events:none;animation:none!important}
+.mr-cup--lift{transform:translateY(-12px) scale(1.06);box-shadow:0 12px 28px rgba(176,106,255,.35);animation:none!important;z-index:2;border-color:rgba(176,106,255,.8)}
+.mr-result{text-align:center;padding:12px 8px;border-radius:8px;background:rgba(0,232,122,.08);border:1px solid rgba(0,232,122,.25);margin-bottom:12px;font-family:var(--fb);font-size:.92rem;line-height:1.45;color:var(--text-bright)}
+.mr-result.hidden{display:none!important}
+.mr-result--ultra{background:linear-gradient(135deg,rgba(255,140,26,.2),rgba(176,106,255,.15));border-color:rgba(255,140,26,.5);animation:mrUltraPop .55s cubic-bezier(.2,1.3,.4,1) both}
+@keyframes mrUltraPop{from{opacity:0;transform:scale(.88)}to{opacity:1;transform:scale(1)}}
+.mr-ultra-txt{display:block;font-family:var(--fd);font-size:1.05rem;font-weight:700;color:var(--orange);text-shadow:0 0 20px rgba(255,140,26,.35)}
+.mr-close-row{text-align:center}
 /* Fusion – cyan */
 .hap-fusion{border-color:rgba(0,210,255,.3);color:#5ae8ff}
 .hap-fusion:hover:not(:disabled){box-shadow:0 0 18px rgba(0,210,255,.3);border-color:rgba(0,210,255,.55)}
@@ -1521,7 +1545,7 @@ html[data-player-faction="knights"] #screen-hub.screen.active{box-shadow:inset 0
         <div class="hub-faction-badge hidden" id="hub-faction-badge" aria-label="Faction"></div>
       </div>
       <nav class="hub-bar-nav" aria-label="Hub navigation">
-        <button class="btn btn-ghost btn-sm hidden" type="button" id="hub-btn-faction" onclick="openFactionSelectFromHub()" title="Change faction allegiance">Allegiance</button>
+        <button class="btn btn-ghost btn-sm hidden" type="button" id="hub-btn-faction" onclick="openFactionSelectFromHub()" title="Pick a faction — switch anytime">Faction</button>
         <button class="btn btn-secondary btn-sm" type="button" onclick="showLeaderboard()">Leaderboard</button>
         <button class="btn btn-logout" type="button" onclick="logout()">Sign out</button>
       </nav>
@@ -1585,20 +1609,20 @@ html[data-player-faction="knights"] #screen-hub.screen.active{box-shadow:inset 0
       <div class="hap-grid" id="hap-grid">
         <button class="hap-btn hap-allegiance" id="hap-allegiance" type="button" onclick="hubActionAllegiance()">
           <span class="hap-icon">🏛️</span>
-          <span class="hap-label" id="hap-allegiance-label">Choose Your Allegiance</span>
-          <span class="hap-sub" id="hap-allegiance-sub">Pick a faction banner for battle bonuses — switch anytime from here.</span>
+          <span class="hap-label" id="hap-allegiance-label">Faction bonus</span>
+          <span class="hap-sub" id="hap-allegiance-sub">Pick a faction to improve your chances of winning battles — switch anytime.</span>
         </button>
         <button class="hap-btn hap-unlock" id="hap-unlock" type="button" onclick="hubActionUnlock()">
           <span class="hap-rec-tag hidden" id="hap-rec-unlock">Recommended</span>
-          <span class="hap-icon">🔓</span>
-          <span class="hap-label" id="hap-unlock-label">Unlock New Creature</span>
-          <span class="hap-sub" id="hap-unlock-sub">Expand your roster</span>
+          <span class="hap-icon">🧠</span>
+          <span class="hap-label" id="hap-unlock-label">Train (Quiz Boost)</span>
+          <span class="hap-sub" id="hap-unlock-sub">Quizzes unlock creatures and train your brain</span>
         </button>
-        <button class="hap-btn hap-improve" id="hap-improve" type="button" onclick="hubActionImprove()">
-          <span class="hap-rec-tag hidden" id="hap-rec-improve">Recommended</span>
-          <span class="hap-icon">🔄</span>
-          <span class="hap-label" id="hap-improve-label">Re-roll Stats</span>
-          <span class="hap-sub" id="hap-improve-sub">Shuffle hybrid stats</span>
+        <button class="hap-btn hap-mystery" id="hap-mystery" type="button" onclick="hubActionMysteryReward()">
+          <span class="hap-rec-tag hidden" id="hap-rec-mystery">Recommended</span>
+          <span class="hap-icon">🎁</span>
+          <span class="hap-label" id="hap-mystery-label">Mystery Reward</span>
+          <span class="hap-sub" id="hap-mystery-sub">Open a surprise once per day</span>
         </button>
         <button class="hap-btn hap-fusion" id="hap-fusion" type="button" onclick="hubActionNewFusion()">
           <span class="hap-rec-tag hidden" id="hap-rec-fusion">Recommended</span>
@@ -1647,6 +1671,21 @@ html[data-player-faction="knights"] #screen-hub.screen.active{box-shadow:inset 0
       <div class="animal-grid" id="hub-animal-grid"></div>
     </div>
   </div>
+  <div id="mystery-reward-overlay" class="mystery-reward-overlay hidden" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="mr-title">
+    <div class="mr-panel">
+      <div class="mr-title" id="mr-title">🎁 Mystery Reward</div>
+      <p class="mr-sub" id="mr-sub">Pick 1 of 3 to reveal your reward</p>
+      <div class="mr-cups" role="group" aria-label="Pick a cup">
+        <button type="button" class="mr-cup" id="mr-cup-0" aria-label="Cup 1"><span aria-hidden="true">🥤</span><span class="mr-cup-lbl">1</span></button>
+        <button type="button" class="mr-cup" id="mr-cup-1" aria-label="Cup 2"><span aria-hidden="true">🥤</span><span class="mr-cup-lbl">2</span></button>
+        <button type="button" class="mr-cup" id="mr-cup-2" aria-label="Cup 3"><span aria-hidden="true">🥤</span><span class="mr-cup-lbl">3</span></button>
+      </div>
+      <div id="mr-result" class="mr-result hidden" aria-live="polite"><span id="mr-result-msg"></span></div>
+      <div class="mr-close-row">
+        <button type="button" class="btn btn-secondary btn-sm" id="mr-close">Close</button>
+      </div>
+    </div>
+  </div>
 </section>
 
 <!-- ══════════════ FACTION SELECT ══════════════ -->
@@ -1654,11 +1693,11 @@ html[data-player-faction="knights"] #screen-hub.screen.active{box-shadow:inset 0
   <div class="faction-select-wrap">
     <div class="faction-select-hdr">
       <div class="faction-select-kicker">Mythical tier</div>
-      <h1 class="faction-select-title">Choose your allegiance</h1>
+      <h1 class="faction-select-title">Pick a faction to improve your chances of winning battles — switch anytime</h1>
       <p class="faction-select-sub" id="faction-select-sub">The Mythical path is open — pledge your banner to gain faction bonuses in battle.</p>
     </div>
     <div class="faction-select-cards" id="faction-select-cards"></div>
-    <p class="faction-select-foot">You can change allegiance later from the Hub. Faction XP builds as you win battles.</p>
+    <p class="faction-select-foot">Switch factions any time from the Hub. Faction XP grows when you win battles.</p>
   </div>
 </section>
 

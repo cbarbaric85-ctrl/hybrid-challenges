@@ -28,14 +28,16 @@ import {
   getAvailableAnimals,
   MAX_LEVEL,
 } from '../game/progression.js';
-import { powerScore, buildPlayerHybrid, buildEnemyHybrid } from '../game/hybrid.js';
+import { powerScore, buildEnemyHybrid } from '../game/hybrid.js';
 import { STAT_LABELS_SIMPLE } from '../game/battle.js';
 import { saveUserProgress, persistGameProgress } from '../persistence/save.js';
 import { backfillLeaderboardIfMissing } from '../persistence/leaderboard.js';
 import { showScreen, escapeHtml } from './screens.js';
-import { localDateString, localYesterdayString } from '../game/utils.js';
+import { localDateString, localYesterdayString, msUntilLocalMidnight } from '../game/utils.js';
 import { needsFactionSelection, getFaction } from '../data/factions.js';
 import { applyFactionThemeToRoot, openFactionSelectFromHub } from './faction-ui.js';
+import { canClaimMysteryRewardToday, formatCountdownShort } from '../game/mystery-reward.js';
+import { hubActionMysteryReward } from './mystery-reward-ui.js';
 
 
 function getCommanderXpSegment(xp) {
@@ -461,23 +463,24 @@ function getFirstQuizEligibleId(p) {
 function getRecommendedAction(p) {
   const unlockTarget = getFirstQuizEligibleId(p);
   const hasHybrid = !!state.playerHybrid;
+  const mysteryOk = state.profile?.uid && canClaimMysteryRewardToday(p);
 
   if (state.lastBattleResult === 'loss') {
     if (unlockTarget) return 'UNLOCK';
-    if (hasHybrid) return 'IMPROVE';
+    if (hasHybrid && mysteryOk) return 'MYSTERY';
     return 'FIGHT';
   }
 
   if (unlockTarget) return 'UNLOCK';
 
-  if (state.playerHybrid && state.enemyHybrid) {
-    if (state.playerHybrid.power < state.enemyHybrid.power) return 'IMPROVE';
-  } else if (state.playerHybrid) {
+  if (mysteryOk && state.playerHybrid && state.enemyHybrid) {
+    if (state.playerHybrid.power < state.enemyHybrid.power) return 'MYSTERY';
+  } else if (mysteryOk && state.playerHybrid) {
     const levelIdx = Math.min(p.level - 1, LEVELS.length - 1);
     const eDef = LEVELS[levelIdx];
     if (eDef) {
       const eH = buildEnemyHybrid(eDef);
-      if (state.playerHybrid.power < eH.power) return 'IMPROVE';
+      if (state.playerHybrid.power < eH.power) return 'MYSTERY';
     }
   }
 
@@ -499,7 +502,7 @@ function renderActionPanel() {
 
   const allegianceBtn = document.getElementById('hap-allegiance');
   const unlockBtn = document.getElementById('hap-unlock');
-  const improveBtn = document.getElementById('hap-improve');
+  const mysteryBtn = document.getElementById('hap-mystery');
   const fusionBtn = document.getElementById('hap-fusion');
 
   const hasHybrid = !!state.playerHybrid;
@@ -521,11 +524,11 @@ function renderActionPanel() {
       [STAGE_KNIGHTS]: 'Knight',
     };
     const tier = tierMap[a?.stage] || 'New';
-    if (unlockLabel) unlockLabel.textContent = `Unlock ${tier} Creature`;
-    if (unlockSub) unlockSub.textContent = `${a?.emoji || ''} ${a?.name || 'Unknown'} — take the quiz`;
+    if (unlockLabel) unlockLabel.textContent = `Train (${tier} quiz)`;
+    if (unlockSub) unlockSub.textContent = `${a?.emoji || ''} ${a?.name || 'Unknown'} — quiz boost & unlock`;
     unlockBtn.disabled = false;
   } else {
-    if (unlockLabel) unlockLabel.textContent = 'Unlock New Creature';
+    if (unlockLabel) unlockLabel.textContent = 'Train (Quiz Boost)';
     const nextGate = !apexLevelGateMet(p) ? 'Beat Level 5 first'
       : !dinoLevelGateMet(p) ? 'Beat Level 8 first'
       : !legendaryLevelGateMet(p) ? 'Beat Level 12 first'
@@ -539,19 +542,25 @@ function renderActionPanel() {
     unlockBtn.disabled = true;
   }
 
-  // Improve — available if hybrid exists
-  improveBtn.disabled = !hasHybrid;
-  const improveSub = document.getElementById('hap-improve-sub');
-  if (improveSub) improveSub.textContent = hasHybrid
-    ? 'Shuffle hybrid stats' : 'Forge a hybrid first';
+  const canMystery = !!state.profile?.uid && canClaimMysteryRewardToday(p);
+  mysteryBtn.disabled = !canMystery;
+  const mysterySub = document.getElementById('hap-mystery-sub');
+  if (mysterySub) {
+    if (!state.profile?.uid) mysterySub.textContent = 'Sign in to play';
+    else if (canMystery) mysterySub.textContent = 'Open a surprise once per day';
+    else {
+      const ms = msUntilLocalMidnight();
+      mysterySub.textContent = `Next gift in ${formatCountdownShort(ms)}`;
+    }
+  }
 
   // Fusion — always available
   fusionBtn.disabled = false;
 
   // Recommended highlight
-  const btnMap = { UNLOCK: unlockBtn, IMPROVE: improveBtn, FIGHT: null };
-  const recMap = { UNLOCK: 'hap-rec-unlock', IMPROVE: 'hap-rec-improve', FUSION: 'hap-rec-fusion' };
-  [allegianceBtn, unlockBtn, improveBtn, fusionBtn].forEach(b => b?.classList.remove('hap-recommended'));
+  const btnMap = { UNLOCK: unlockBtn, MYSTERY: mysteryBtn, FIGHT: null };
+  const recMap = { UNLOCK: 'hap-rec-unlock', MYSTERY: 'hap-rec-mystery', FUSION: 'hap-rec-fusion' };
+  [allegianceBtn, unlockBtn, mysteryBtn, fusionBtn].forEach(b => b?.classList.remove('hap-recommended'));
   for (const id of Object.values(recMap)) {
     document.getElementById(id)?.classList.add('hidden');
   }
@@ -578,17 +587,6 @@ function hubActionUnlock() {
   window.openQuiz(target);
 }
 
-function hubActionImprove() {
-  if (!state.playerHybrid || !state.selectedAnimals.length) {
-    flashHubRewardMsg('Forge a hybrid first, then re-roll here.');
-    return;
-  }
-  state.playerHybrid = buildPlayerHybrid(state.selectedAnimals);
-  persistGameProgress().catch(e => console.error('[hub] reroll save failed', e));
-  flashHubRewardMsg(`Stats re-rolled! New power: ${state.playerHybrid.power} ⚡`);
-  renderHub();
-}
-
 function hubActionNewFusion() {
   state.selectedAnimals = [];
   state.playerHybrid = null;
@@ -609,6 +607,6 @@ export {
   renderActionPanel,
   hubActionAllegiance,
   hubActionUnlock,
-  hubActionImprove,
+  hubActionMysteryReward,
   hubActionNewFusion,
 };
