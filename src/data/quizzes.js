@@ -1,4 +1,6 @@
-export const QUIZZES = {
+import { QUIZZES_EXTRA } from './quizzes-augment.js';
+
+const QUIZZES_BASE = {
   // ── APEX PREDATORS ──
   pbear: {
     intro:'The Arctic\'s supreme predator. Prove you know your stuff!',
@@ -763,6 +765,14 @@ export const QUIZZES = {
     ],
   },
 };
+
+/** Forge unlock: base + four extra questions per creature (see quizzes-augment.js). */
+export const QUIZZES = Object.fromEntries(
+  Object.entries(QUIZZES_BASE).map(([k, v]) => {
+    const extra = QUIZZES_EXTRA[k];
+    return [k, extra?.length ? { ...v, questions: [...v.questions, ...extra] } : v];
+  }),
+);
 
 /** Surprising fact MCQs — one pool per roster animal; boostStat tags which stat gets +1 when correct. */
 export const PRE_BATTLE_QUESTIONS = {

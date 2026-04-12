@@ -359,11 +359,73 @@ function updateForgeMobilePhaseLabel() {
   const n = state.selectedAnimals.length;
   const forged = !!state.playerHybrid;
   if (forged) el.textContent = 'Step 3 · Enter battle when ready';
-  else if (n >= 3) el.textContent = 'Step 2 · Review below — tap Fuse to forge';
+  else if (n >= 3) el.textContent = 'Step 2 · Open hybrid panel — tap Fuse to forge';
   else el.textContent = 'Step 1 · Tap up to 3 animals in the grid';
 }
 
+let forgeModalEscapeBound = false;
+function bindForgeModalEscape() {
+  if (forgeModalEscapeBound) return;
+  forgeModalEscapeBound = true;
+  document.addEventListener('keydown', e => {
+    if (e.key !== 'Escape') return;
+    const m = document.getElementById('forge-hybrid-modal');
+    if (!m || m.classList.contains('hidden')) return;
+    e.preventDefault();
+    closeForgeHybridModal();
+  });
+}
+
+function openForgeHybridModal() {
+  bindForgeModalEscape();
+  const m = document.getElementById('forge-hybrid-modal');
+  if (!m) return;
+  m.classList.remove('hidden');
+  m.setAttribute('aria-hidden', 'false');
+  document.body.classList.add('forge-modal-open');
+  const scrollEl = document.getElementById('forge-hybrid-modal-scroll');
+  if (scrollEl) scrollEl.scrollTop = 0;
+  m.querySelector('.forge-modal-close')?.focus();
+}
+
+function closeForgeHybridModal() {
+  const m = document.getElementById('forge-hybrid-modal');
+  if (!m) return;
+  m.classList.add('hidden');
+  m.setAttribute('aria-hidden', 'true');
+  document.body.classList.remove('forge-modal-open');
+}
+
+function forgeChooseDifferentAnimals() {
+  closeForgeHybridModal();
+  const left = document.querySelector('#screen-builder .builder-left');
+  const tiers = document.getElementById('builder-tiers');
+  if (left) left.scrollTo({ top: 0, behavior: 'smooth' });
+  if (tiers) tiers.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  requestAnimationFrame(() => {
+    document.querySelector('#builder-tiers .bac')?.focus?.();
+  });
+}
+
+function updateForgeRailTeaser() {
+  const el = document.getElementById('forge-rail-teaser');
+  if (!el) return;
+  const n = state.selectedAnimals.length;
+  const forged = !!state.playerHybrid;
+  if (forged) {
+    el.textContent = 'Hybrid ready — open to re-roll stats, rename, or enter battle.';
+  } else if (n === 0) {
+    el.textContent = 'Pick 1–3 animals on the left, then open this panel to fuse, re-roll stats, name your champion, and battle.';
+  } else if (n < 3) {
+    el.textContent = `You have ${n} selected — open the panel to fuse now, or add up to ${3 - n} more first.`;
+  } else {
+    el.textContent = 'Team selected — open the panel to fuse and roll your hybrid stats.';
+  }
+}
+
 function scrollForgeColumnToFusionPanel() {
+  const modal = document.getElementById('forge-hybrid-modal');
+  const modalScroll = document.getElementById('forge-hybrid-modal-scroll');
   const forgeCol = document.getElementById('builder-forge-column');
   const panel = document.getElementById('forge-panel');
   const anchor = document.getElementById('forge-fusion-anchor');
@@ -373,8 +435,15 @@ function scrollForgeColumnToFusionPanel() {
     return;
   }
   const pad = 16;
+  const useModal = modal && !modal.classList.contains('hidden') && modalScroll;
+  const targetEl = anchor || panel;
+  if (useModal) {
+    const top = targetEl.getBoundingClientRect().top - modalScroll.getBoundingClientRect().top + modalScroll.scrollTop - 8;
+    console.log('[forge] fusion section ready — modal scroll', { top });
+    modalScroll.scrollTo({ top: Math.max(0, top), behavior: 'smooth' });
+    return;
+  }
   if (isForgeMobileLayout() && layout && layout.classList.contains('forge-mobile-step-2')) {
-    const targetEl = anchor || panel;
     const col = forgeCol;
     const top = targetEl.getBoundingClientRect().top - col.getBoundingClientRect().top + col.scrollTop - 8;
     console.log('[forge] fusion section ready — mobile forge column scroll', { top, colScrollH: col.scrollHeight });
@@ -394,6 +463,7 @@ function scrollToForgeAndHighlight() {
   console.log('[forge] 3 animals selected — scheduling fusion scroll');
 
   updateForgeMobileStepClass();
+  openForgeHybridModal();
 
   const runScroll = (label) => {
     console.log('[forge] forge scroll triggered', { pass: label });
@@ -471,6 +541,7 @@ function updateSelectionUI() {
   document.getElementById('btn-reroll').disabled = n === 0 || !state.playerHybrid;
   document.getElementById('btn-fight').disabled = !state.playerHybrid;
   updateForgeNextHint();
+  updateForgeRailTeaser();
   updateForgeMobileStepClass();
 }
 
@@ -482,6 +553,7 @@ function forgeHybrid() {
   document.getElementById('btn-reroll').disabled = false;
   document.getElementById('btn-fight').disabled = false;
   updateForgeNextHint();
+  updateForgeRailTeaser();
   persistGameProgress().catch(e => console.error('[forge] forgeHybrid save failed', e));
 }
 
@@ -855,6 +927,9 @@ function exitQuiz() {
 export {
   showBuilder,
   showHub,
+  openForgeHybridModal,
+  closeForgeHybridModal,
+  forgeChooseDifferentAnimals,
   renderBuilder,
   makeAnimalCard,
   makeQuizLockCard,

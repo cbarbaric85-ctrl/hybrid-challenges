@@ -3,8 +3,24 @@ import {
   setDoc, serverTimestamp,
 } from '../firebase.js';
 import {
-  ANIMALS, APEX_IDS, DINO_IDS, STARTER_BASE_IDS,
+  ANIMALS, APEX_IDS, DINO_IDS, LEGENDARY_IDS, MYTHICAL_IDS, EGYPTIAN_IDS, KNIGHT_IDS,
+  STARTER_BASE_IDS,
 } from '../data/animals.js';
+
+/** IDs that can appear in progress.quizUnlocked (forge quiz tiers — not level-gated base roster). */
+const QUIZ_UNLOCK_ROSTER_IDS = new Set([
+  ...APEX_IDS,
+  ...DINO_IDS,
+  ...LEGENDARY_IDS,
+  ...MYTHICAL_IDS,
+  ...EGYPTIAN_IDS,
+  ...KNIGHT_IDS,
+]);
+
+function filterPersistedQuizUnlocked(ids) {
+  if (!Array.isArray(ids)) return [];
+  return [...new Set(ids)].filter(id => typeof id === 'string' && ANIMALS[id] && QUIZ_UNLOCK_ROSTER_IDS.has(id));
+}
 import { state, defaultProgress } from '../game/state.js';
 import { syncActiveBoostsView, normalizeMysteryClaimsForDay } from '../game/mystery-reward.js';
 
@@ -93,9 +109,11 @@ function applyProgressMigration(p) {
 
 function firestoreDataToProgress(data) {
   if (!data) return normalizeProgress(defaultProgress());
-  const apex = data.unlockedApex || [];
-  const dinos = data.unlockedDinosaurs || [];
-  const quizUnlocked = [...new Set([...apex, ...dinos])].filter(id => ANIMALS[id]);
+  const legacyApex = data.unlockedApex || [];
+  const legacyDinos = data.unlockedDinosaurs || [];
+  const legacyQuiz = [...new Set([...legacyApex, ...legacyDinos])].filter(id => ANIMALS[id]);
+  const storedQuiz = filterPersistedQuizUnlocked(data.quizUnlocked);
+  const quizUnlocked = [...new Set([...legacyQuiz, ...storedQuiz])];
   const rawUnlocked = data.unlockedAnimals ? [...data.unlockedAnimals] : [];
   const p = {
     level: data.currentLevel ?? 1,
@@ -182,8 +200,9 @@ async function saveUserProgress(progress, opts = {}) {
   if (!uid || !progress) return;
   const p = progress;
   syncActiveBoostsView(p);
-  const apex = (p.quizUnlocked || []).filter(id => APEX_IDS.includes(id));
-  const dinos = (p.quizUnlocked || []).filter(id => DINO_IDS.includes(id));
+  const quizUnlocked = filterPersistedQuizUnlocked(p.quizUnlocked || []);
+  const apex = quizUnlocked.filter(id => APEX_IDS.includes(id));
+  const dinos = quizUnlocked.filter(id => DINO_IDS.includes(id));
   const optIn = isLeaderboardOptIn();
   const payload = {
       uid,
@@ -194,6 +213,7 @@ async function saveUserProgress(progress, opts = {}) {
       unlockedAnimals: [...(p.unlockedAnimals || [])],
       unlockedApex: apex,
       unlockedDinosaurs: dinos,
+      quizUnlocked,
       selectedHybridAnimals: [...(state.selectedAnimals || [])],
       hybridStats: serializeHybrid(state.playerHybrid),
       totalWins: p.totalWins ?? 0,

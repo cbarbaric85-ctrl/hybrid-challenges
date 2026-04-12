@@ -21,6 +21,7 @@ import {
 import {
   showBuilder, showHub, forgeHybrid,
   applyHybridDisplayName, renderBuilder,
+  openForgeHybridModal, closeForgeHybridModal, forgeChooseDifferentAnimals,
   startQuizQuestions, answerQuestion, nextQuizQuestion,
   returnFromQuiz, returnFromQuizHub, openQuiz, exitQuiz,
   toggleAnimalSelect,
@@ -42,7 +43,6 @@ function creatureIntelReturnToAnimals() {
     showAnimalsLevels();
   }
 }
-import { showLeaderboard, renderLeaderboard } from './ui/leaderboard-ui.js';
 import {
   startBattle, beginBattle,
   answerPreBattleQuestion, advancePreBattleQuiz,
@@ -51,6 +51,15 @@ import {
   goNextLevel, retryLevel, showGameComplete, newGame,
   buildMiniStats,
 } from './ui/battle-ui.js';
+
+/** Lazy-loaded — leaderboard UI + table fetch only when the player opens that screen. */
+function showLeaderboard() {
+  void import('./ui/leaderboard-ui.js').then(m => m.showLeaderboard());
+}
+async function renderLeaderboard() {
+  const m = await import('./ui/leaderboard-ui.js');
+  return m.renderLeaderboard();
+}
 
 Object.assign(window, {
   showScreen,
@@ -72,6 +81,9 @@ Object.assign(window, {
   showHub,
   showLeaderboard,
   forgeHybrid,
+  openForgeHybridModal,
+  closeForgeHybridModal,
+  forgeChooseDifferentAnimals,
   startBattle,
   beginBattle,
   exitQuiz,

@@ -390,6 +390,20 @@ html[data-player-faction] #screen-hub .card::before{background:linear-gradient(9
 #screen-builder .sp-val{font-size:.72rem;min-height:14px}
 #screen-builder .h-stats{margin-bottom:8px}
 #forge-panel{scroll-margin-top:24px}
+/* Forge hybrid modal — full stats / fuse / rename */
+.forge-hybrid-modal{position:fixed;inset:0;z-index:200;display:flex;align-items:center;justify-content:center;padding:max(12px,env(safe-area-inset-top)) max(12px,env(safe-area-inset-right)) max(12px,env(safe-area-inset-bottom)) max(12px,env(safe-area-inset-left));}
+.forge-hybrid-modal.hidden{display:none!important;}
+.forge-hybrid-modal-backdrop{position:absolute;inset:0;background:rgba(3,8,14,.85);backdrop-filter:blur(5px);}
+.forge-hybrid-modal-card{position:relative;z-index:1;width:min(540px,100%);max-height:min(94vh,920px);display:flex;flex-direction:column;background:var(--surface);border:1px solid var(--border);border-radius:10px;box-shadow:0 12px 48px rgba(0,0,0,.55);}
+.forge-hybrid-modal-head{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 16px;border-bottom:1px solid var(--border);flex-shrink:0;}
+.forge-modal-title{font-family:var(--fd);font-size:1rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--orange);margin:0;}
+.forge-hybrid-modal-scroll{flex:1;min-height:0;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:12px 16px 18px;}
+body.forge-modal-open{overflow:hidden;}
+.forge-rail-summary{display:flex;flex-direction:column;gap:12px;align-items:stretch;justify-content:center;text-align:center;flex:1;min-height:0}
+.forge-rail-teaser{font-family:var(--fb);font-size:.78rem;color:var(--text-dim);line-height:1.5;margin:0}
+.forge-rail-open{width:100%;max-width:280px;margin:0 auto}
+.forge-modal-footer{margin-top:14px;padding-top:14px;border-top:1px solid var(--border);text-align:center}
+#forge-hybrid-modal .forge-panel-wrap{margin-bottom:0}
 .section-hdr{font-family:var(--fm);font-size:.68rem;letter-spacing:.22em;color:var(--text-dim);text-transform:uppercase;margin-bottom:14px;display:flex;align-items:center;gap:10px}
 .section-hdr::after{content:'';flex:1;height:1px;background:var(--border)}
 /* Tier section headers inside builder */
@@ -1440,10 +1454,10 @@ html[data-player-faction] #screen-hub .card::before{background:linear-gradient(9
   .builder-layout .builder-right{
     order:2;display:flex!important;flex:1 1 50%;min-height:0;max-height:none;
     border-left:none;border-top:none;padding:10px 10px max(14px,env(safe-area-inset-bottom));
-    overflow-y:auto;-webkit-overflow-scrolling:touch
+    overflow-y:auto;-webkit-overflow-scrolling:touch;justify-content:center
   }
   .builder-layout.forge-mobile-step-2 .builder-left::before{
-    content:'▼ Hybrid preview below — tap Fuse when ready';display:block;text-align:center;
+    content:'▼ Tap “Open hybrid & fuse” below for stats, fuse, and rename';display:block;text-align:center;
     font-family:var(--fm);font-size:.48rem;letter-spacing:.1em;color:var(--text-dim);
     padding:0 0 8px;opacity:.9
   }
@@ -2306,45 +2320,63 @@ html[data-faction-effect="snow"] body::after{animation:factionSnowDrift 22s ease
     <div class="builder-right" id="builder-forge-column">
       <div id="forge-fusion-anchor" class="forge-fusion-anchor" aria-hidden="true"></div>
       <div class="section-hdr">Your Hybrid</div>
-      <div id="forge-next-hint" class="forge-step-hint" aria-live="polite"></div>
-      <div id="forge-ready-msg" class="forge-ready-msg" aria-live="polite"></div>
-      <div class="hybrid-panel forge-panel-wrap" id="forge-panel">
-        <div class="hcard" id="hcard">
-          <div class="h-emojis" id="h-emojis">—</div>
-          <div class="h-name" id="h-name">No Animals Selected</div>
-          <div class="h-sub" id="h-sub">SELECT 1–3 ANIMALS TO FUSE</div>
-          <div class="h-power hidden" id="h-power">
-            <div>
-              <div class="h-power-num" id="h-power-num">0</div>
-              <div class="h-power-lbl">Power Score</div>
+      <div class="forge-rail-summary">
+        <p class="forge-rail-teaser" id="forge-rail-teaser">Pick 1–3 animals on the left, then open this panel to fuse, re-roll stats, name your champion, and battle.</p>
+        <button class="btn btn-primary btn-lg forge-rail-open" type="button" id="btn-open-forge-modal" onclick="openForgeHybridModal()">Open hybrid & fuse</button>
+      </div>
+    </div>
+  </div>
+  <div id="forge-hybrid-modal" class="forge-hybrid-modal hidden" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="forge-modal-title">
+    <div class="forge-hybrid-modal-backdrop" onclick="closeForgeHybridModal()"></div>
+    <div class="forge-hybrid-modal-card">
+      <div class="forge-hybrid-modal-head">
+        <h2 id="forge-modal-title" class="forge-modal-title">Your Hybrid</h2>
+        <button type="button" class="btn btn-ghost btn-sm forge-modal-close" onclick="closeForgeHybridModal()" aria-label="Close hybrid panel">✕</button>
+      </div>
+      <div class="forge-hybrid-modal-scroll" id="forge-hybrid-modal-scroll">
+        <div id="forge-next-hint" class="forge-step-hint" aria-live="polite"></div>
+        <div id="forge-ready-msg" class="forge-ready-msg" aria-live="polite"></div>
+        <div class="hybrid-panel forge-panel-wrap" id="forge-panel">
+          <div class="hcard" id="hcard">
+            <div class="h-emojis" id="h-emojis">—</div>
+            <div class="h-name" id="h-name">No Animals Selected</div>
+            <div class="h-sub" id="h-sub">SELECT 1–3 ANIMALS TO FUSE</div>
+            <div class="h-power hidden" id="h-power">
+              <div>
+                <div class="h-power-num" id="h-power-num">0</div>
+                <div class="h-power-lbl">Power Score</div>
+              </div>
+            </div>
+            <div class="h-stats" id="h-stats">
+              <div class="stat-pillars">
+                <div class="stat-pillar" data-stat="spd"><div class="sp-val" id="hv-spd">—</div><div class="sp-track"><div class="sp-fill sf-spd" id="hs-spd" style="height:0%"></div></div><div class="sp-lbl-row"><span class="sp-lbl">SPD</span><span class="sp-info" data-stat="spd">i</span></div></div>
+                <div class="stat-pillar" data-stat="agi"><div class="sp-val" id="hv-agi">—</div><div class="sp-track"><div class="sp-fill sf-agi" id="hs-agi" style="height:0%"></div></div><div class="sp-lbl-row"><span class="sp-lbl">AGI</span><span class="sp-info" data-stat="agi">i</span></div></div>
+                <div class="stat-pillar" data-stat="int"><div class="sp-val" id="hv-int">—</div><div class="sp-track"><div class="sp-fill sf-int" id="hs-int" style="height:0%"></div></div><div class="sp-lbl-row"><span class="sp-lbl">INT</span><span class="sp-info" data-stat="int">i</span></div></div>
+                <div class="stat-pillar" data-stat="str"><div class="sp-val" id="hv-str">—</div><div class="sp-track"><div class="sp-fill sf-str" id="hs-str" style="height:0%"></div></div><div class="sp-lbl-row"><span class="sp-lbl">STR</span><span class="sp-info" data-stat="str">i</span></div></div>
+              </div>
             </div>
           </div>
-          <div class="h-stats" id="h-stats">
-            <div class="stat-pillars">
-              <div class="stat-pillar" data-stat="spd"><div class="sp-val" id="hv-spd">—</div><div class="sp-track"><div class="sp-fill sf-spd" id="hs-spd" style="height:0%"></div></div><div class="sp-lbl-row"><span class="sp-lbl">SPD</span><span class="sp-info" data-stat="spd">i</span></div></div>
-              <div class="stat-pillar" data-stat="agi"><div class="sp-val" id="hv-agi">—</div><div class="sp-track"><div class="sp-fill sf-agi" id="hs-agi" style="height:0%"></div></div><div class="sp-lbl-row"><span class="sp-lbl">AGI</span><span class="sp-info" data-stat="agi">i</span></div></div>
-              <div class="stat-pillar" data-stat="int"><div class="sp-val" id="hv-int">—</div><div class="sp-track"><div class="sp-fill sf-int" id="hs-int" style="height:0%"></div></div><div class="sp-lbl-row"><span class="sp-lbl">INT</span><span class="sp-info" data-stat="int">i</span></div></div>
-              <div class="stat-pillar" data-stat="str"><div class="sp-val" id="hv-str">—</div><div class="sp-track"><div class="sp-fill sf-str" id="hs-str" style="height:0%"></div></div><div class="sp-lbl-row"><span class="sp-lbl">STR</span><span class="sp-info" data-stat="str">i</span></div></div>
+          <div class="forge-btns">
+            <button class="btn btn-primary btn-lg" type="button" id="btn-forge" onclick="forgeHybrid()" disabled>⚗ Fuse hybrid</button>
+            <button class="btn btn-secondary" type="button" id="btn-reroll" onclick="forgeHybrid()" disabled>↻ Re-roll stats</button>
+            <button class="btn btn-orange btn-lg" type="button" id="btn-fight" onclick="startBattle()" disabled>⚔ Enter battle</button>
+          </div>
+          <div class="forge-hint">Stats roll from your picks — fuse, then step into the arena.</div>
+          <div class="divider"></div>
+          <div style="font-family:var(--fm);font-size:.6rem;color:var(--text-dim);margin-bottom:7px;letter-spacing:.1em;text-transform:uppercase">Next Enemy</div>
+          <div id="builder-enemy-preview" style="background:var(--surface2);border:1px solid var(--border);padding:13px;text-align:center"></div>
+          <div id="hybrid-name-panel" class="hybrid-name-panel hidden" aria-live="polite">
+            <div class="hnr-title">✨ Name your champion</div>
+            <p class="hnr-sub">Pick a cool callsign for the hybrid you just forged — or keep the auto-name. You can change it any time before battle.</p>
+            <div class="hnr-row">
+              <input type="text" id="hybrid-name-input" class="hnr-input" maxlength="24" autocomplete="off" placeholder="Your hybrid name" aria-label="Hybrid name" />
+              <button type="button" class="btn btn-secondary btn-sm" onclick="applyHybridDisplayName()">Save name</button>
             </div>
           </div>
-        </div>
-        <div id="hybrid-name-panel" class="hybrid-name-panel hidden" aria-live="polite">
-          <div class="hnr-title">✨ Name your champion</div>
-          <p class="hnr-sub">Pick a cool callsign for the hybrid you just forged — or keep the auto-name. You can change it any time before battle.</p>
-          <div class="hnr-row">
-            <input type="text" id="hybrid-name-input" class="hnr-input" maxlength="24" autocomplete="off" placeholder="Your hybrid name" aria-label="Hybrid name" />
-            <button type="button" class="btn btn-secondary btn-sm" onclick="applyHybridDisplayName()">Save name</button>
+          <div class="forge-modal-footer">
+            <button type="button" class="btn btn-secondary btn-sm" id="btn-forge-choose-animals" onclick="forgeChooseDifferentAnimals()">← Choose different animals</button>
           </div>
         </div>
-        <div class="forge-btns">
-          <button class="btn btn-primary btn-lg" type="button" id="btn-forge" onclick="forgeHybrid()" disabled>⚗ Fuse hybrid</button>
-          <button class="btn btn-secondary" type="button" id="btn-reroll" onclick="forgeHybrid()" disabled>↻ Re-roll stats</button>
-          <button class="btn btn-orange btn-lg" type="button" id="btn-fight" onclick="startBattle()" disabled>⚔ Enter battle</button>
-        </div>
-        <div class="forge-hint">Stats roll from your picks — fuse, then step into the arena.</div>
-        <div class="divider"></div>
-        <div style="font-family:var(--fm);font-size:.6rem;color:var(--text-dim);margin-bottom:7px;letter-spacing:.1em;text-transform:uppercase">Next Enemy</div>
-        <div id="builder-enemy-preview" style="background:var(--surface2);border:1px solid var(--border);padding:13px;text-align:center"></div>
       </div>
     </div>
   </div>
