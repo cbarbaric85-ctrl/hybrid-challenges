@@ -386,6 +386,9 @@ function openForgeHybridModal() {
   const scrollEl = document.getElementById('forge-hybrid-modal-scroll');
   if (scrollEl) scrollEl.scrollTop = 0;
   m.querySelector('.forge-modal-close')?.focus();
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => scrollForgeColumnToFusionPanel());
+  });
 }
 
 function closeForgeHybridModal() {
