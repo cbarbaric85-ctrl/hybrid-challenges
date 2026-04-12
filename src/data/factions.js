@@ -4,6 +4,7 @@
  */
 
 import { mythicalLevelGateMet } from '../game/progression.js';
+import { getFactionVisualThemeSummary } from '../theme/faction-theme.js';
 
 export const FACTION_EGYPTIAN = 'egyptian_guardians';
 export const FACTION_VIKING = 'viking_raiders';
@@ -44,11 +45,7 @@ export const FACTIONS = {
       lateRoundBonus: 1,
       lateRoundFromIndex: 3,
     },
-    visualTheme: {
-      accent: 'red-ice',
-      glow: 'rgba(255, 60, 60, 0.22)',
-      accent2: 'rgba(120, 200, 255, 0.3)',
-    },
+    visualTheme: getFactionVisualThemeSummary(FACTION_VIKING),
     kidTagline: 'Wild sea raiders who never give up!',
     timePeriod: '⚓ Viking Age — long ago in Northern Europe',
     gameplayKid: '🔥 Fight harder after a tough round — and hit stronger in the final rounds!',
@@ -65,11 +62,7 @@ export const FACTIONS = {
       lateRoundFromIndex: 3,
       lateRoundBonus: 1,
     },
-    visualTheme: {
-      accent: 'silver-blue',
-      glow: 'rgba(180, 200, 230, 0.28)',
-      accent2: 'rgba(61, 120, 200, 0.35)',
-    },
+    visualTheme: getFactionVisualThemeSummary(FACTION_KNIGHTS),
     kidTagline: 'Armor, honor, and castle defenders!',
     timePeriod: '🏰 Medieval times — knights and castles',
     gameplayKid: '🛡️ Tougher defense — enemy hits can count for less, and you get stronger in late rounds!',

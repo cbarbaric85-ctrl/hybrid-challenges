@@ -13,6 +13,7 @@ import {
 } from './persistence/leaderboard.js';
 import { hybridFromSaved } from './game/hybrid.js';
 import { needsFactionSelection } from './data/factions.js';
+import { clearFactionThemeVars } from './theme/faction-theme.js';
 import { showScreen } from './ui/screens.js';
 
 // BOOT
@@ -32,7 +33,7 @@ onAuthStateChanged(auth, async user => {
   if (!user) {
     clearDefeatAutoReturn();
     clearLevelCompleteAutoNav();
-    document.documentElement.removeAttribute('data-player-faction');
+    clearFactionThemeVars();
     state.profile = null;
     state.progress = null;
     state.playerHybrid = null;

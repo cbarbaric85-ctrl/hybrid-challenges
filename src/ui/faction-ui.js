@@ -3,9 +3,8 @@ import {
 } from '../data/factions.js';
 import { state } from '../game/state.js';
 import { saveUserProgress } from '../persistence/save.js';
+import { applyFactionThemeVars, clearFactionThemeVars } from '../theme/faction-theme.js';
 import { showScreen, escapeHtml } from './screens.js';
-
-const ROOT_ATTR = 'data-player-faction';
 
 function ensureFactionUnlockedList(p) {
   const defs = defaultFactionUnlockedList();
@@ -19,9 +18,9 @@ export function applyFactionThemeToRoot() {
   const p = state.progress;
   const id = p?.faction || '';
   if (id && FACTIONS[id]) {
-    document.documentElement.setAttribute(ROOT_ATTR, id);
+    applyFactionThemeVars(id);
   } else {
-    document.documentElement.removeAttribute(ROOT_ATTR);
+    clearFactionThemeVars();
   }
 }
 
