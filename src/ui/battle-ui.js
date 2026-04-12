@@ -77,6 +77,58 @@ const CAP_ANIM_CLASS = { spd: 'cap-anim-spd', agi: 'cap-anim-agi', int: 'cap-ani
 const STAT_RESULT_EMOJI = { spd: '⚡', agi: '✦', int: '🧠', str: '💥' };
 const ROUND_ANNOUNCE_STAT_CLASSES = ['round-announce--spd', 'round-announce--agi', 'round-announce--int', 'round-announce--str'];
 const BATTLE_ROUND_FLASH_CLASSES = ['battle-round-flash-win', 'battle-round-flash-loss', 'battle-round-flash-tie'];
+const CLASH_FEATURED_STATE_CLASSES = ['clash-featured--charge', 'clash-featured--win', 'clash-featured--lose', 'clash-featured--tie'];
+const CLASH_LEADER_LABELS = { spd: 'Top speed', agi: 'Top agility', int: 'INT lead', str: 'Top strength' };
+
+/** Catalogue stat leader among hybrid component animals; ties → first in array order. */
+function getLeadingAnimalForStat(animalIds, statKey) {
+  if (!animalIds?.length || !['spd', 'agi', 'int', 'str'].includes(statKey)) return null;
+  let bestId = null;
+  let bestVal = -Infinity;
+  for (const id of animalIds) {
+    const a = ALL_ANIMALS[id];
+    if (!a) continue;
+    const v = a[statKey];
+    if (typeof v !== 'number') continue;
+    if (v > bestVal) {
+      bestVal = v;
+      bestId = id;
+    }
+  }
+  if (bestId == null) return null;
+  const a = ALL_ANIMALS[bestId];
+  return { id: bestId, emoji: a.emoji, name: a.name };
+}
+
+function clearClashFeaturedState() {
+  ['clash-featured-p', 'clash-featured-e'].forEach((id) => {
+    const el = document.getElementById(id);
+    if (el) CLASH_FEATURED_STATE_CLASSES.forEach((c) => el.classList.remove(c));
+  });
+}
+
+function applyClashFeaturedLeaders(statKey) {
+  const pLead = getLeadingAnimalForStat(state.playerHybrid?.animals, statKey);
+  const eLead = getLeadingAnimalForStat(state.enemyHybrid?.animals, statKey);
+  const pEmoji = document.getElementById('clash-featured-p-emoji');
+  const eEmoji = document.getElementById('clash-featured-e-emoji');
+  const pEl = document.getElementById('clash-featured-p');
+  const eEl = document.getElementById('clash-featured-e');
+  const lbl = document.getElementById('clash-leader-lbl');
+  if (pEmoji) pEmoji.textContent = pLead?.emoji || '—';
+  if (eEmoji) eEmoji.textContent = eLead?.emoji || '—';
+  if (pEl) {
+    pEl.setAttribute('aria-label', pLead ? `${pLead.name} leads for your team` : 'Your team');
+    pEl.title = pLead ? pLead.name : '';
+    pEl.removeAttribute('aria-hidden');
+  }
+  if (eEl) {
+    eEl.setAttribute('aria-label', eLead ? `${eLead.name} leads for rival` : 'Rival team');
+    eEl.title = eLead ? eLead.name : '';
+    eEl.removeAttribute('aria-hidden');
+  }
+  if (lbl) lbl.textContent = CLASH_LEADER_LABELS[statKey] || 'Stat lead';
+}
 
 function setArenaTheme(arenaId) {
   const screen = document.getElementById('screen-battle');
@@ -516,6 +568,7 @@ function animateRoundResult(round, roundIdx, done) {
     document.getElementById('clash-pval')?.classList.remove('clash-winner-n');
     document.getElementById('clash-eval')?.classList.remove('clash-winner-n');
     document.getElementById('clash-box')?.classList.remove('clash-clash-moment');
+    clearClashFeaturedState();
   };
 
   hideRoundAnnounce();
@@ -534,6 +587,7 @@ function animateRoundResult(round, roundIdx, done) {
     nm.textContent = statWord.toUpperCase();
     nm.className = `clash-stat-nm ${round.stat}`;
   }
+  applyClashFeaturedLeaders(round.stat);
   const pval = document.getElementById('clash-pval');
   const eval_ = document.getElementById('clash-eval');
   if (pval) pval.textContent = '?';
@@ -549,6 +603,9 @@ function animateRoundResult(round, roundIdx, done) {
       pval.classList.add('pop');
       setTimeout(() => pval.classList.remove('pop'), 500);
     }
+    const featP = document.getElementById('clash-featured-p');
+    featP?.classList.add('clash-featured--charge');
+    setTimeout(() => featP?.classList.remove('clash-featured--charge'), 450);
     setClashMetersPlayerPortion(round.pTotal, round.eTotal);
   }, 400);
 
@@ -568,6 +625,10 @@ function animateRoundResult(round, roundIdx, done) {
       eval_.classList.add('pop');
       setTimeout(() => eval_.classList.remove('pop'), 500);
     }
+    document.getElementById('clash-featured-p')?.classList.remove('clash-featured--charge');
+    const featE = document.getElementById('clash-featured-e');
+    featE?.classList.add('clash-featured--charge');
+    setTimeout(() => featE?.classList.remove('clash-featured--charge'), 450);
     setClashMetersEnemyPortion(round.pTotal, round.eTotal);
   }, 900);
 
@@ -642,12 +703,28 @@ function animateRoundResult(round, roundIdx, done) {
       lossStage.classList.add('battle-zone-loss-shake');
       setTimeout(() => lossStage.classList.remove('battle-zone-loss-shake'), 520);
     }
+
+    const clashFp = document.getElementById('clash-featured-p');
+    const clashFe = document.getElementById('clash-featured-e');
+    clashFp?.classList.remove('clash-featured--charge');
+    clashFe?.classList.remove('clash-featured--charge');
+    if (round.winner === 'player') {
+      clashFp?.classList.add('clash-featured--win');
+      clashFe?.classList.add('clash-featured--lose');
+    } else if (round.winner === 'enemy') {
+      clashFe?.classList.add('clash-featured--win');
+      clashFp?.classList.add('clash-featured--lose');
+    } else {
+      clashFp?.classList.add('clash-featured--tie');
+      clashFe?.classList.add('clash-featured--tie');
+    }
   }, 1500);
 
   // T+2600: Cleanup → next
   setTimeout(() => {
     if (box) { box.classList.add('hidden'); box.classList.remove('clash-active'); }
     clearClashStatHighlight();
+    clearClashFeaturedState();
     resetClashMeters();
     fp?.classList.remove('f-side-win', 'f-side-lose');
     fe?.classList.remove('f-side-win', 'f-side-lose');
@@ -1741,6 +1818,7 @@ function cleanupBattleVisuals() {
   clearBossMode();
   hideClashQuiz();
   hideFactionBattleHint();
+  clearClashFeaturedState();
   const screen = document.getElementById('screen-battle');
   if (screen) {
     screen.classList.remove('boss-screen-shake', ...BATTLE_ROUND_FLASH_CLASSES);

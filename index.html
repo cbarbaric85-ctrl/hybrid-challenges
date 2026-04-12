@@ -1022,6 +1022,40 @@ html[data-player-faction="knights"] #screen-hub.screen.active{box-shadow:inset 0
 }
 @keyframes clashOrbit{to{transform:rotate(360deg)}}
 .clash-inner{position:relative;z-index:1}
+.clash-main-grid{
+  display:grid;
+  grid-template-columns:minmax(40px,0.85fr) minmax(0,2.5fr) minmax(40px,0.85fr);
+  align-items:start;
+  gap:0 6px;
+  width:100%;
+}
+.clash-middle{min-width:0}
+.clash-featured{
+  display:flex;align-items:flex-start;justify-content:center;
+  padding-top:4px;min-width:0;
+  transition:opacity .3s ease,filter .3s ease;
+}
+.clash-featured-emoji{
+  font-size:clamp(1.65rem,6.5vw,2.65rem);line-height:1;display:block;
+  transition:transform .35s cubic-bezier(.2,1,.3,1),opacity .35s ease,filter .35s ease;
+}
+.clash-featured--p.clash-featured--charge .clash-featured-emoji{transform:scale(1.08) translateX(5px)}
+.clash-featured--e.clash-featured--charge .clash-featured-emoji{transform:scale(1.08) translateX(-5px)}
+.clash-featured--win .clash-featured-emoji{
+  transform:scale(1.1);
+  filter:drop-shadow(0 0 14px rgba(0,232,122,.5));
+}
+.clash-featured--lose .clash-featured-emoji{
+  opacity:.68;
+  filter:grayscale(.2) brightness(.88);
+  transform:scale(.96);
+}
+.clash-featured--tie .clash-featured-emoji{animation:clashFeaturedTie .65s ease-in-out 1}
+@keyframes clashFeaturedTie{0%,100%{transform:scale(1)}50%{transform:scale(1.07)}}
+.clash-leader-lbl{
+  font-family:var(--fm);font-size:.48rem;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--text-dim);text-align:center;margin:-2px 0 8px;min-height:1em;
+}
 .clash-tagline{font-family:var(--fm);font-size:.55rem;letter-spacing:.2em;color:var(--text-dim);text-transform:uppercase;margin-bottom:10px}
 .clash-meters{margin-bottom:14px}
 .clash-meter-row{display:flex;align-items:center;gap:8px;margin-bottom:6px}
@@ -1724,6 +1758,8 @@ html[data-player-faction="knights"] #screen-hub.screen.active{box-shadow:inset 0
   .clash-screen-shake,.battle-zone-loss-shake,#screen-battle.boss-screen-shake{animation:none!important}
   .round-result-flash.tie::after{animation:none!important;opacity:0}
   #screen-battle .btn:active:not(:disabled){transform:none}
+  .clash-featured--charge .clash-featured-emoji,.clash-featured--win .clash-featured-emoji,.clash-featured--lose .clash-featured-emoji{transform:none!important;filter:none!important;opacity:1!important}
+  .clash-featured--tie .clash-featured-emoji{animation:none!important}
 }
 
 /* Battle primary actions — subtle press */
@@ -2211,23 +2247,34 @@ html[data-player-faction="knights"] #screen-hub.screen.active{box-shadow:inset 0
       <div class="clash-box hidden" id="clash-box">
         <div class="clash-orbit" aria-hidden="true"></div>
         <div class="clash-inner">
-          <div class="clash-tagline">This round</div>
-          <div class="clash-stat-nm" id="clash-stat-nm">STRENGTH</div>
-          <div class="clash-marker" id="clash-marker" aria-hidden="true">⚔</div>
-          <div class="clash-meters">
-            <div class="clash-meter-row p" id="clash-meter-row-p">
-              <span class="clash-meter-label p">You</span>
-              <div class="clash-meter-track"><div class="clash-meter-fill p" id="clash-pmeter"></div></div>
+          <div class="clash-main-grid">
+            <div class="clash-featured clash-featured--p" id="clash-featured-p" role="img" aria-hidden="true">
+              <span class="clash-featured-emoji" id="clash-featured-p-emoji"></span>
             </div>
-            <div class="clash-meter-row e" id="clash-meter-row-e">
-              <span class="clash-meter-label e">Rival</span>
-              <div class="clash-meter-track"><div class="clash-meter-fill e" id="clash-emeter"></div></div>
+            <div class="clash-middle">
+              <div class="clash-tagline">This round</div>
+              <div class="clash-stat-nm" id="clash-stat-nm">STRENGTH</div>
+              <div class="clash-leader-lbl" id="clash-leader-lbl" aria-hidden="true"></div>
+              <div class="clash-marker" id="clash-marker" aria-hidden="true">⚔</div>
+              <div class="clash-meters">
+                <div class="clash-meter-row p" id="clash-meter-row-p">
+                  <span class="clash-meter-label p">You</span>
+                  <div class="clash-meter-track"><div class="clash-meter-fill p" id="clash-pmeter"></div></div>
+                </div>
+                <div class="clash-meter-row e" id="clash-meter-row-e">
+                  <span class="clash-meter-label e">Rival</span>
+                  <div class="clash-meter-track"><div class="clash-meter-fill e" id="clash-emeter"></div></div>
+                </div>
+              </div>
+              <div class="clash-row">
+                <div class="cv p" id="clash-pval">—</div>
+                <div class="clash-vs">vs</div>
+                <div class="cv e" id="clash-eval">—</div>
+              </div>
             </div>
-          </div>
-          <div class="clash-row">
-            <div class="cv p" id="clash-pval">—</div>
-            <div class="clash-vs">vs</div>
-            <div class="cv e" id="clash-eval">—</div>
+            <div class="clash-featured clash-featured--e" id="clash-featured-e" role="img" aria-hidden="true">
+              <span class="clash-featured-emoji" id="clash-featured-e-emoji"></span>
+            </div>
           </div>
         </div>
       </div>
