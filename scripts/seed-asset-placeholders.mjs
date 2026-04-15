@@ -47,8 +47,9 @@ const CREST_COPY = [
   ['faction-crests/knights.svg', 'faction_crests/knights.svg'],
 ];
 
+/** Single-quoted family names so the outer SVG attribute can use double quotes. */
 const EMOJI_FONT =
-  'system-ui, "Segoe UI Emoji", "Apple Color Emoji", "Noto Color Emoji", sans-serif';
+  "system-ui, 'Segoe UI Emoji', 'Apple Color Emoji', 'Noto Color Emoji', sans-serif";
 
 function ensureDir(d) {
   fs.mkdirSync(d, { recursive: true });
