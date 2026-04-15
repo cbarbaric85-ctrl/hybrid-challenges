@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" aria-hidden="true">
+  <title>Knights of the Realm</title>
+  <g fill="#e8edf5" stroke="#e8edf5">
+    <path d="M14 18l8 9 10-11 10 11 8-9v10H14V18z"/>
+    <path d="M22 34h20v12c0 7-4 13-10 15-6-2-10-8-10-15V34z" fill="none" stroke-width="3"/>
+    <path d="M32 36v20" stroke-width="3.5" stroke-linecap="round" fill="none"/>
+    <path d="M27 56h10" stroke-width="4" stroke-linecap="round" fill="none"/>
+    <path d="M29 36l3-3 3 3z"/>
+  </g>
+</svg>

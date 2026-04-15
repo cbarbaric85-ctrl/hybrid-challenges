@@ -1,0 +1,14 @@
+Faction character icon reference sheets (5 columns x 2 rows = 10 icons each).
+Style: stylized silhouettes, subtle glow, dark background. Slice cells in an image editor for individual square icons.
+
+Samurai (faction-icons-samurai-sheet.png) — read order left-to-right, top then bottom:
+  Row1: Dragon Spirit | Kitsune | Oni Warrior | Blossom Spirit | Wind Spirit
+  Row2: Fire Kami | Water Kami | Stone Guardian | Shadow Spirit | Thunder Shogun
+
+Viking (faction-icons-viking-sheet.png):
+  Row1: Berserker | Shield Maiden | Longship Captain | Wolf Tamer | Storm Caller
+  Row2: Ice Warrior | Fire Raider | Rune Carver | Raven Seer | Frost Giant Kin
+
+Roman (faction-icons-roman-sheet.png):
+  Row1: Legionary | Centurion | Gladiator | Cavalry Officer | Engineer
+  Row2: Standard Bearer | Strategist | Emperor | Siege Commander | Arena Champion

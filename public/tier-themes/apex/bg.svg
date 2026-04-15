@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 400" preserveAspectRatio="xMidYMid slice">
+  <defs>
+    <linearGradient id="a1" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#120a08"/>
+      <stop offset="50%" style="stop-color:#281810"/>
+      <stop offset="100%" style="stop-color:#140c0a"/>
+    </linearGradient>
+    <linearGradient id="a2" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#ff6a2d;stop-opacity:.2"/>
+      <stop offset="100%" style="stop-color:transparent"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="400" fill="url(#a1)"/>
+  <polygon points="0,280 200,120 400,200 600,80 800,180 1000,100 1200,220 1200,400 0,400" fill="#2a1810" opacity=".5"/>
+  <polygon points="0,320 300,200 500,260 700,160 900,240 1200,140 1200,400 0,400" fill="#1a0e0a" opacity=".45"/>
+  <rect width="1200" height="400" fill="url(#a2)"/>
+</svg>

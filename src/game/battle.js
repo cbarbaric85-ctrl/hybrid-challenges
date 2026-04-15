@@ -265,18 +265,25 @@ function pickRoundStat() {
   return STAT_WEIGHTS[Math.floor(Math.random() * STAT_WEIGHTS.length)];
 }
 
-/** Resolve one round with a known stat and optional player bonus (e.g. +2 from quiz). */
-function resolveRound(player, enemy, stat, playerBonus) {
+/**
+ * Resolve one round with a known stat and optional player bonus (e.g. +2 from quiz).
+ * @param {object} [opts] — optional; `enemyRollDelta` shifts the rival's d6 roll after rolling (tactics / effects).
+ */
+function resolveRound(player, enemy, stat, playerBonus, opts) {
+  const o = opts || {};
+  const enemyRollDelta = typeof o.enemyRollDelta === 'number' ? o.enemyRollDelta : 0;
   const pBase = player.stats[stat];
   const eBase = enemy.stats[stat];
   const pRoll = roll(6);
-  const eRoll = roll(6) + (enemy.diceBonus || 0);
+  let eRoll = roll(6) + (enemy.diceBonus || 0) + enemyRollDelta;
+  if (eRoll < 1) eRoll = 1;
   const pTotal = pBase + (playerBonus || 0) + pRoll;
   const eTotal = eBase + eRoll;
   return {
     stat, statLabel: STAT_LABELS[stat],
     pBase, pBonus: playerBonus || 0, pRoll, pTotal,
     eBase, eRoll, eTotal,
+    enemyRollDelta: enemyRollDelta || 0,
     winner: pTotal > eTotal ? 'player' : pTotal < eTotal ? 'enemy' : 'tie',
   };
 }

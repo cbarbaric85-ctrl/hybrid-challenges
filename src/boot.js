@@ -15,6 +15,9 @@ import { hybridFromSaved } from './game/hybrid.js';
 import { needsFactionSelection } from './data/factions.js';
 import { clearFactionThemeVars } from './theme/faction-theme.js';
 import { showScreen } from './ui/screens.js';
+import { registerAssetImageFallback } from './ui/asset-utils.js';
+
+registerAssetImageFallback();
 
 // BOOT
 // ═══════════════════════════════════════════════════════════════════

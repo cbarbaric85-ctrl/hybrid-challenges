@@ -23,6 +23,8 @@ import { sanitizeHybridName, recordQuizAnswers, saveUserProgress, persistGamePro
 import { syncActiveBoostsView } from '../game/mystery-reward.js';
 import { showScreen } from './screens.js';
 import { openCreatureIntel } from './creature-intel-ui.js';
+import { applyTierThemeToForgeSection, tierBadgeImgHtml } from '../theme/tier-stage-theme.js';
+import { creaturePortraitImgHtml } from './asset-utils.js';
 
 function showBuilder() {
   clearDefeatAutoReturn();
@@ -55,7 +57,8 @@ function renderBuilder() {
   if (baseIds.length) {
     const sec = document.createElement('div');
     sec.className = 'tier-section';
-    sec.innerHTML = `<div class="tier-hdr"><span class="tier-hdr-nm base">◇ Base Animals</span><div class="tier-hdr-line" style="background:var(--border)"></div></div>`;
+    applyTierThemeToForgeSection(sec, 'base');
+    sec.innerHTML = `<div class="tier-hdr">${tierBadgeImgHtml('base')}<span class="tier-hdr-nm base">◇ Base Animals</span><div class="tier-hdr-line" style="background:var(--border)"></div></div>`;
     const grid = document.createElement('div');
     grid.className = 'b-animal-grid';
     baseIds.forEach(id => grid.appendChild(makeAnimalCard(id)));
@@ -67,7 +70,8 @@ function renderBuilder() {
   {
     const sec = document.createElement('div');
     sec.className = 'tier-section';
-    sec.innerHTML = `<div class="tier-hdr"><span class="tier-hdr-nm apex">◈ Apex Predators</span><div class="tier-hdr-line" style="background:rgba(176,106,255,.3)"></div></div>`;
+    applyTierThemeToForgeSection(sec, 'apex');
+    sec.innerHTML = `<div class="tier-hdr">${tierBadgeImgHtml('apex')}<span class="tier-hdr-nm apex">◈ Apex Predators</span><div class="tier-hdr-line" style="background:rgba(176,106,255,.3)"></div></div>`;
 
     if (p.level < 6) {
       sec.innerHTML += `<div class="tier-locked-notice"><strong>Apex Predators</strong><br>
@@ -92,7 +96,8 @@ function renderBuilder() {
   {
     const sec = document.createElement('div');
     sec.className = 'tier-section';
-    sec.innerHTML = `<div class="tier-hdr"><span class="tier-hdr-nm dino">🦖 Dinosaur Tier</span><div class="tier-hdr-line" style="background:rgba(255,68,0,.3)"></div></div>`;
+    applyTierThemeToForgeSection(sec, 'dino');
+    sec.innerHTML = `<div class="tier-hdr">${tierBadgeImgHtml('dino')}<span class="tier-hdr-nm dino">🦖 Dinosaur Tier</span><div class="tier-hdr-line" style="background:rgba(255,68,0,.3)"></div></div>`;
 
     if (p.level < 9) {
       const rem = 9 - p.level;
@@ -118,7 +123,8 @@ function renderBuilder() {
   {
     const sec = document.createElement('div');
     sec.className = 'tier-section';
-    sec.innerHTML = `<div class="tier-hdr"><span class="tier-hdr-nm legendary">🐲 Legendary Beasts</span><div class="tier-hdr-line" style="background:rgba(255,215,0,.3)"></div></div>`;
+    applyTierThemeToForgeSection(sec, 'legendary');
+    sec.innerHTML = `<div class="tier-hdr">${tierBadgeImgHtml('legendary')}<span class="tier-hdr-nm legendary">🐲 Legendary Beasts</span><div class="tier-hdr-line" style="background:rgba(255,215,0,.3)"></div></div>`;
 
     if (p.level < 13) {
       const rem = 13 - p.level;
@@ -145,7 +151,8 @@ function renderBuilder() {
   {
     const sec = document.createElement('div');
     sec.className = 'tier-section';
-    sec.innerHTML = `<div class="tier-hdr"><span class="tier-hdr-nm mythical">⚡ Mythical Gods</span><div class="tier-hdr-line" style="background:rgba(0,200,255,.3)"></div></div>`;
+    applyTierThemeToForgeSection(sec, 'mythical');
+    sec.innerHTML = `<div class="tier-hdr">${tierBadgeImgHtml('mythical')}<span class="tier-hdr-nm mythical">⚡ Mythical Gods</span><div class="tier-hdr-line" style="background:rgba(0,200,255,.3)"></div></div>`;
 
     if (p.level < 17) {
       const rem = 17 - p.level;
@@ -172,7 +179,8 @@ function renderBuilder() {
   {
     const sec = document.createElement('div');
     sec.className = 'tier-section';
-    sec.innerHTML = `<div class="tier-hdr"><span class="tier-hdr-nm egyptian">⚱️ Egyptian Guardians</span><div class="tier-hdr-line" style="background:rgba(212,175,55,.35)"></div></div>`;
+    applyTierThemeToForgeSection(sec, 'egyptian');
+    sec.innerHTML = `<div class="tier-hdr">${tierBadgeImgHtml('egyptian')}<span class="tier-hdr-nm egyptian">⚱️ Egyptian Guardians</span><div class="tier-hdr-line" style="background:rgba(212,175,55,.35)"></div></div>`;
 
     if (!egyptianTierQuizOpen(p)) {
       sec.innerHTML += `<div class="tier-locked-notice"><strong>Egyptian Guardians</strong><br>
@@ -202,7 +210,8 @@ function renderBuilder() {
   {
     const sec = document.createElement('div');
     sec.className = 'tier-section';
-    sec.innerHTML = `<div class="tier-hdr"><span class="tier-hdr-nm knights">🛡️ Knights of the Realm</span><div class="tier-hdr-line" style="background:rgba(140,170,220,.4)"></div></div>`;
+    applyTierThemeToForgeSection(sec, 'knights');
+    sec.innerHTML = `<div class="tier-hdr">${tierBadgeImgHtml('knights')}<span class="tier-hdr-nm knights">🛡️ Knights of the Realm</span><div class="tier-hdr-line" style="background:rgba(140,170,220,.4)"></div></div>`;
 
     if (!knightTierQuizOpen(p)) {
       sec.innerHTML += `<div class="tier-locked-notice"><strong>Knights of the Realm</strong><br>
@@ -232,7 +241,8 @@ function renderBuilder() {
   {
     const sec = document.createElement('div');
     sec.className = 'tier-section';
-    sec.innerHTML = `<div class="tier-hdr"><span class="tier-hdr-nm roman">🏛️ Roman Empire</span><div class="tier-hdr-line" style="background:rgba(201,162,39,.35)"></div></div>`;
+    applyTierThemeToForgeSection(sec, 'roman');
+    sec.innerHTML = `<div class="tier-hdr">${tierBadgeImgHtml('roman')}<span class="tier-hdr-nm roman">🏛️ Roman Empire</span><div class="tier-hdr-line" style="background:rgba(201,162,39,.35)"></div></div>`;
 
     if (!romanTierQuizOpen(p)) {
       sec.innerHTML += `<div class="tier-locked-notice"><strong>Roman Empire</strong><br>
@@ -261,7 +271,8 @@ function renderBuilder() {
   {
     const sec = document.createElement('div');
     sec.className = 'tier-section';
-    sec.innerHTML = `<div class="tier-hdr"><span class="tier-hdr-nm anglo">🌲 Anglo-Saxons</span><div class="tier-hdr-line" style="background:rgba(124,184,120,.35)"></div></div>`;
+    applyTierThemeToForgeSection(sec, 'anglo');
+    sec.innerHTML = `<div class="tier-hdr">${tierBadgeImgHtml('anglo')}<span class="tier-hdr-nm anglo">🌲 Anglo-Saxons</span><div class="tier-hdr-line" style="background:rgba(124,184,120,.35)"></div></div>`;
 
     if (!angloSaxonTierQuizOpen(p)) {
       sec.innerHTML += `<div class="tier-locked-notice"><strong>Anglo-Saxons</strong><br>
@@ -290,7 +301,8 @@ function renderBuilder() {
   {
     const sec = document.createElement('div');
     sec.className = 'tier-section';
-    sec.innerHTML = `<div class="tier-hdr"><span class="tier-hdr-nm samurai">🗾 Samurai Order</span><div class="tier-hdr-line" style="background:rgba(185,28,28,.35)"></div></div>`;
+    applyTierThemeToForgeSection(sec, 'samurai');
+    sec.innerHTML = `<div class="tier-hdr">${tierBadgeImgHtml('samurai')}<span class="tier-hdr-nm samurai">🗾 Samurai Order</span><div class="tier-hdr-line" style="background:rgba(185,28,28,.35)"></div></div>`;
 
     if (!samuraiTierQuizOpen(p)) {
       sec.innerHTML += `<div class="tier-locked-notice"><strong>Samurai Order</strong><br>
@@ -319,7 +331,8 @@ function renderBuilder() {
   {
     const sec = document.createElement('div');
     sec.className = 'tier-section';
-    sec.innerHTML = `<div class="tier-hdr"><span class="tier-hdr-nm viking">⚓ Viking Clans</span><div class="tier-hdr-line" style="background:rgba(100,180,220,.35)"></div></div>`;
+    applyTierThemeToForgeSection(sec, 'viking');
+    sec.innerHTML = `<div class="tier-hdr">${tierBadgeImgHtml('viking')}<span class="tier-hdr-nm viking">⚓ Viking Clans</span><div class="tier-hdr-line" style="background:rgba(100,180,220,.35)"></div></div>`;
 
     if (!vikingTierQuizOpen(p)) {
       sec.innerHTML += `<div class="tier-locked-notice"><strong>Viking Clans</strong><br>
@@ -398,7 +411,7 @@ function makeAnimalCard(id) {
   const [tierLbl, tierCls] = tierMap[a.stage] || ['BASE', ''];
   card.innerHTML = `<div class="bac-row-top">
     <button type="button" class="bac-intel-btn" aria-label="Creature info">ⓘ</button>
-    <div class="bac-em">${a.emoji}</div>
+    <div class="bac-em">${creaturePortraitImgHtml(id, a.emoji, { className: 'bac-em-img', size: 36, loading: 'lazy' })}</div>
   </div>
     <div class="bac-nm">${a.name}</div>
     <div class="bac-tier-tag ${tierCls}">${tierLbl}</div>
@@ -428,7 +441,7 @@ function makeQuizLockCard(id, tierType) {
     .join('');
   card.innerHTML = `<div class="bac-row-top">
     <button type="button" class="bac-intel-btn" aria-label="Creature info">ⓘ</button>
-    <div class="bql-em">${a.emoji}</div>
+    <div class="bql-em">${creaturePortraitImgHtml(id, a.emoji, { className: 'bql-em-img', size: 36, loading: 'lazy', locked: true })}</div>
   </div>
     <div class="bql-nm">${a.name}</div>
     <div class="bql-lbl ${tierType}">🔒 ${eligible ? 'Quiz next' : 'Level first'}</div>
@@ -727,7 +740,7 @@ function renderHybridPreview(h) {
     emEl.innerHTML = h.animals
       .map(
         aid =>
-          `<button type="button" class="h-emoji-btn" data-hybrid-aid="${aid}" aria-label="${ANIMALS[aid]?.name || 'Animal'} info">${ANIMALS[aid]?.emoji || '?'}</button>`
+          `<button type="button" class="h-emoji-btn" data-hybrid-aid="${aid}" aria-label="${ANIMALS[aid]?.name || 'Animal'} info">${creaturePortraitImgHtml(aid, ANIMALS[aid]?.emoji, { className: 'h-emoji-img', size: 40, loading: 'eager' })}</button>`
       )
       .join('');
     emEl.querySelectorAll('.h-emoji-btn').forEach(btn => {
@@ -798,7 +811,7 @@ function renderEnemyPreviewInBuilder() {
   const comps = level.animals.map(id => ALL_ANIMALS[id]).filter(Boolean);
   const enemyHybrid = buildEnemyHybrid(level);
   const el = document.getElementById('builder-enemy-preview');
-  el.innerHTML = `<div style="font-size:1.5rem;margin-bottom:5px">${comps.map(a=>a.emoji).join('')}</div>
+  el.innerHTML = `<div class="builder-enemy-emojis" style="display:flex;align-items:center;gap:4px;margin-bottom:5px">${comps.map(a => creaturePortraitImgHtml(a.id, a.emoji, { className: 'builder-enemy-emoji', size: 28, loading: 'lazy' })).join('')}</div>
     <div style="font-family:var(--fd);font-size:.85rem;font-weight:700;color:var(--red);margin-bottom:2px">${level.name.toUpperCase()}</div>
     <div style="font-family:var(--fm);font-size:.6rem;color:var(--text-dim);margin-bottom:5px">${comps.map(a=>a.name).join(' + ')}</div>
     <div style="font-family:var(--fm);font-size:.65rem;color:var(--orange)">Enemy Power: ${enemyHybrid.power}</div>
@@ -842,7 +855,7 @@ function renderQuizIntro(animalId, tierType, introText) {
 
   body.innerHTML = `
     <div class="quiz-animal-hdr">
-      <span class="quiz-animal-em">${a.emoji}</span>
+      <span class="quiz-animal-em">${creaturePortraitImgHtml(animalId, a.emoji, { className: 'quiz-animal-em-img', size: 36, loading: 'eager' })}</span>
       <div class="quiz-animal-nm ${tierType}">${a.name}</div>
       <div class="quiz-animal-sub ${tierType}">${{viking:'⚓ VIKING CLANS',samurai:'🗾 SAMURAI ORDER',anglo_saxon:'🌲 ANGLO-SAXON',roman:'🏛️ ROMAN EMPIRE',knights:'🛡️ KNIGHT OF THE REALM',egyptian:'⚱️ EGYPTIAN GUARDIAN',mythical:'⚡ MYTHICAL GOD',legendary:'🐲 LEGENDARY BEAST',dino:'◈◈ DINOSAUR TIER'}[tierType]||'◈ APEX PREDATOR'}</div>
       <div class="quiz-animal-bio">${introText}</div>
@@ -897,7 +910,7 @@ function renderQuizQuestion() {
 
   body.innerHTML = `
     <div class="quiz-animal-hdr" style="display:flex;align-items:center;gap:12px;text-align:left">
-      <span style="font-size:3rem">${a.emoji}</span>
+      <span class="quiz-q-animal-portrait">${creaturePortraitImgHtml(quizState.animalId, a.emoji, { className: 'quiz-q-animal-img', size: 56, loading: 'eager' })}</span>
       <div>
         <div class="quiz-animal-nm ${tierType}" style="font-size:1.2rem">${a.name}</div>
         <div class="quiz-animal-sub ${tierType}">UNLOCK CHALLENGE</div>
@@ -1016,7 +1029,7 @@ function showQuizResult(passed) {
         <div class="qr-title qr-pass">${a.name} Unlocked!</div>
         <p class="qr-sub">${nAsked} / ${nAsked} correct — You know your stuff, Commander.</p>
         <div class="unlock-showcase ${tierType}-showcase">
-          <span class="us-em">${a.emoji}</span>
+          <span class="us-em">${creaturePortraitImgHtml(animalId, a.emoji, { className: 'us-em-img', size: 36, loading: 'lazy' })}</span>
           <div class="us-nm ${tierType}">${a.name}</div>
           <div class="us-bio">${a.bio}</div>
           ${window.buildMiniStats(a)}
@@ -1043,7 +1056,7 @@ function showQuizResult(passed) {
         <div class="qr-title qr-fail">Not Quite!</div>
         <p class="qr-sub">You got ${correctCount} / ${nAsked} correct. You need every question right to unlock ${a.name}.</p>
         <div style="background:var(--surface);border:1px solid rgba(255,34,68,.3);padding:20px;margin-bottom:18px;text-align:center">
-          <div style="font-size:2.5rem;margin-bottom:8px">${a.emoji}</div>
+          <div class="quiz-fail-animal">${creaturePortraitImgHtml(animalId, a.emoji, { className: 'quiz-fail-animal-img', size: 56, loading: 'lazy' })}</div>
           <div style="font-family:var(--fd);font-size:1rem;color:var(--text-dim);margin-bottom:6px">${a.name} remains locked.</div>
           <div style="font-family:var(--fm);font-size:.7rem;color:var(--text-dim)">You can attempt the quiz again any time from the Forge or Hub.</div>
         </div>

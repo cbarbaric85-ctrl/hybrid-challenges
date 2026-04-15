@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" aria-hidden="true">
+  <title>Egyptian Guardians</title>
+  <g fill="#e8edf5" stroke="#e8edf5">
+    <circle cx="32" cy="17" r="9"/>
+    <path d="M32 5v4M32 29v4M17 17h4M43 17h4M21 9l3 3M40 9l-3 3M21 25l3-3M40 25l-3-3" stroke-width="3" fill="none" stroke-linecap="round"/>
+    <path d="M14 52h36L32 26 14 52z"/>
+    <path d="M24 52l8-14 8 14" fill-opacity="0.35" stroke="none"/>
+  </g>
+</svg>

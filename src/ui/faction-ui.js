@@ -5,6 +5,7 @@ import { state } from '../game/state.js';
 import { saveUserProgress } from '../persistence/save.js';
 import { applyFactionThemeVars, clearFactionThemeVars } from '../theme/faction-theme.js';
 import { showScreen, escapeHtml } from './screens.js';
+import { factionCrestImgHtml } from './asset-utils.js';
 
 function ensureFactionUnlockedList(p) {
   const defs = defaultFactionUnlockedList();
@@ -35,7 +36,7 @@ function cardHtml(id, selectedId) {
   const selClass = isSel ? ' faction-card--selected' : '';
   return `
     <button type="button" class="faction-card faction-card--${id}${selClass}" data-faction-id="${escapeHtml(id)}" onclick="pickFactionAndContinue('${escapeHtml(id)}')" aria-pressed="${isSel}">
-      <div class="faction-card-head"><span class="faction-card-icon" aria-hidden="true">${f.icon}</span><span class="faction-card-name">${escapeHtml(f.name)}</span></div>
+      <div class="faction-card-head">${factionCrestImgHtml(id, f.icon, { className: 'faction-card-crest', size: 40 })}<span class="faction-card-name">${escapeHtml(f.name)}</span></div>
       <span class="faction-card-kid">${kid}</span>
       ${timeL ? `<span class="faction-card-time">${timeL}</span>` : ''}
       ${benefit ? `<span class="faction-card-benefit">${benefit}</span>` : ''}

@@ -1,6 +1,7 @@
 import { getCreatureIntel } from '../data/creature-intel.js';
 import { state } from '../game/state.js';
 import { escapeHtml } from './screens.js';
+import { creaturePortraitImgHtml, factionCrestImgHtml } from './asset-utils.js';
 
 let _returnScreen = 'hub';
 
@@ -43,19 +44,28 @@ function renderCreatureIntel(id) {
   const pairings = data.pairings
     .map(
       pr => `<button type="button" class="ci-pair-row" data-intel-pair-id="${escapeHtml(pr.id)}">
-        <span class="ci-pair-em">${pr.emoji}</span>
+        <span class="ci-pair-em">${creaturePortraitImgHtml(pr.id, pr.emoji, { className: 'ci-pair-em-img', size: 28, loading: 'lazy' })}</span>
         <span class="ci-pair-txt"><strong>${escapeHtml(pr.name)}</strong><span class="ci-pair-blurb">${escapeHtml(pr.blurb)}</span></span>
       </button>`
     )
     .join('');
 
-  const fav = data.favouredBy.map(f => `<span class="ci-fav">🟢 ${f.icon} ${escapeHtml(f.label)}</span>`).join('<br>');
-  const hunt = data.huntedBy
-    .map(h =>
-      h.type === 'faction'
-        ? `<span class="ci-hunt">🔴 ${h.icon || '⚔️'} ${escapeHtml(h.label)}</span>`
-        : `<span class="ci-hunt">🔴 ${escapeHtml(h.label)}</span>`
+  const fav = data.favouredBy
+    .map(
+      f =>
+        `<span class="ci-fav">🟢 ${factionCrestImgHtml(f.id, f.icon, { className: 'ci-fav-crest', size: 22 })} <span class="ci-fav-lbl">${escapeHtml(f.label)}</span></span>`
     )
+    .join('<br>');
+  const hunt = data.huntedBy
+    .map(h => {
+      if (h.type === 'faction') {
+        return `<span class="ci-hunt">🔴 ${factionCrestImgHtml(h.id, h.icon || '⚔️', { className: 'ci-hunt-crest', size: 22 })} <span class="ci-hunt-lbl">${escapeHtml(h.label)}</span></span>`;
+      }
+      if (h.type === 'creature' && h.id) {
+        return `<span class="ci-hunt">🔴 ${creaturePortraitImgHtml(h.id, h.emoji, { className: 'ci-hunt-em', size: 22, loading: 'lazy' })} <span class="ci-hunt-lbl">${escapeHtml(h.name)}</span></span>`;
+      }
+      return `<span class="ci-hunt">🔴 ${escapeHtml(h.label)}</span>`;
+    })
     .join('<br>');
 
   const fusionNote = data.unlockedForFusion
@@ -66,7 +76,7 @@ function renderCreatureIntel(id) {
 
   body.innerHTML = `
     <div class="ci-header">
-      <span class="ci-emoji" aria-hidden="true">${data.emoji}</span>
+      <span class="ci-emoji" aria-hidden="true">${creaturePortraitImgHtml(id, data.emoji, { className: 'ci-header-portrait', size: 52, loading: 'eager' })}</span>
       <div>
         <div class="ci-name">${escapeHtml(data.name)}</div>
         <div class="ci-tier">${escapeHtml(data.tierLabel)}</div>

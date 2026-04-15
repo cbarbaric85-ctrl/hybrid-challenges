@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" aria-hidden="true">
+  <title>Viking Raiders</title>
+  <g stroke="#e8edf5" fill="#e8edf5">
+    <circle cx="26" cy="36" r="17" fill="none" stroke-width="4"/>
+    <circle cx="26" cy="36" r="5"/>
+    <path d="M44 12v40" stroke-width="4" stroke-linecap="round" fill="none"/>
+    <path d="M44 12c11 2 16 9 16 16H48c0-5-2-9-4-12z"/>
+  </g>
+</svg>

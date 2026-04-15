@@ -46,6 +46,7 @@ import { syncActiveBoostsView } from '../game/mystery-reward.js';
 import { syncLeaderboardEntry } from '../persistence/leaderboard.js';
 import { showScreen, escapeHtml } from './screens.js';
 import { openCreatureIntel } from './creature-intel-ui.js';
+import { creaturePortraitImgHtml } from './asset-utils.js';
 import { localDateString } from '../game/utils.js';
 
 const ARENA_CLASSES = ['arena-ocean','arena-jungle','arena-sky','arena-volcanic','arena-underworld','arena-celestial','arena-desert','arena-castle'];
@@ -60,7 +61,7 @@ function wireBattlePlayerIntelEmojis(disp) {
   el.innerHTML = disp.animals
     .map(
       aid =>
-        `<button type="button" class="f-em-intel" data-bp-aid="${aid}" aria-label="${ANIMALS[aid]?.name || 'Animal'} info">${ANIMALS[aid]?.emoji || '?'}</button>`
+        `<button type="button" class="f-em-intel" data-bp-aid="${aid}" aria-label="${ANIMALS[aid]?.name || 'Animal'} info">${creaturePortraitImgHtml(aid, ANIMALS[aid]?.emoji, { className: 'f-em-intel-img', size: 36, loading: 'eager' })}</button>`
     )
     .join('');
   el.querySelectorAll('.f-em-intel').forEach(btn => {
@@ -138,8 +139,16 @@ function applyClashFeaturedLeaders(statKey) {
   const pEl = document.getElementById('clash-featured-p');
   const eEl = document.getElementById('clash-featured-e');
   const lbl = document.getElementById('clash-leader-lbl');
-  if (pEmoji) pEmoji.textContent = pLead?.emoji || '—';
-  if (eEmoji) eEmoji.textContent = eLead?.emoji || '—';
+  if (pEmoji) {
+    pEmoji.innerHTML = pLead
+      ? creaturePortraitImgHtml(pLead.id, pLead.emoji, { className: 'clash-featured-emoji-img', size: 40, loading: 'eager' })
+      : '—';
+  }
+  if (eEmoji) {
+    eEmoji.innerHTML = eLead
+      ? creaturePortraitImgHtml(eLead.id, eLead.emoji, { className: 'clash-featured-emoji-img', size: 40, loading: 'eager' })
+      : '—';
+  }
   if (pEl) {
     pEl.setAttribute('aria-label', pLead ? `${pLead.name} leads for your team` : 'Your team');
     pEl.title = pLead ? pLead.name : '';
@@ -491,6 +500,103 @@ function hideClashQuiz() {
 // INTERACTIVE ROUND SYSTEM
 // ═══════════════════════════════════════════════════════════════════
 
+const TACTIC_MODS = {
+  push: { id: 'push', playerBonus: 2, enemyRollDelta: 1 },
+  smart: { id: 'smart', playerBonus: 0, enemyRollDelta: 0 },
+  defend: { id: 'defend', playerBonus: 0, enemyRollDelta: -1 },
+};
+
+const BATTLE_BOOST_POINTS = 3;
+const REWARD_PICK_COINS = 8;
+const REWARD_PICK_TOKENS = 1;
+
+let _battleWinCompleteTimer = null;
+let _pendingWinRewardCtx = null;
+
+function clearBattleWinCompleteTimer() {
+  if (_battleWinCompleteTimer) {
+    clearTimeout(_battleWinCompleteTimer);
+    _battleWinCompleteTimer = null;
+  }
+}
+
+function scheduleBattleWinComplete(flowGen) {
+  clearBattleWinCompleteTimer();
+  _battleWinCompleteTimer = setTimeout(() => {
+    _battleWinCompleteTimer = null;
+    if (flowGen !== state.battleFlowGen) return;
+    cleanupBattleVisuals();
+    state.battle = null;
+    showLevelComplete().catch(e => console.error('[battle] showLevelComplete failed', e));
+  }, 2200);
+}
+
+function hideBattleTacticRow() {
+  const el = document.getElementById('battle-tactic-row');
+  if (el) {
+    el.classList.add('hidden');
+    el.innerHTML = '';
+  }
+}
+
+function hideBattleBoostRow() {
+  const el = document.getElementById('battle-boost-row');
+  if (el) {
+    el.classList.add('hidden');
+    el.innerHTML = '';
+  }
+}
+
+function showBattleBoostRow(b) {
+  const row = document.getElementById('battle-boost-row');
+  if (!row) return;
+  if (b.battleBoostUsed) {
+    row.classList.add('hidden');
+    row.innerHTML = '';
+    return;
+  }
+  row.innerHTML =
+    '<button type="button" class="battle-boost-btn" id="battle-boost-use" aria-label="Boost this clash">⚡ Boost this clash!</button>';
+  row.classList.remove('hidden');
+  document.getElementById('battle-boost-use')?.addEventListener('click', () => {
+    if (!state.battle || state.battle !== b || b.battleBoostUsed) return;
+    b.roundBoostPending = true;
+    b.battleBoostUsed = true;
+    const btn = document.getElementById('battle-boost-use');
+    if (btn) btn.disabled = true;
+  });
+}
+
+function showBattleTacticRow(callback) {
+  const row = document.getElementById('battle-tactic-row');
+  if (!row) {
+    callback('smart');
+    return;
+  }
+  row.innerHTML = `
+    <div class="tactic-title">Pick a tactic</div>
+    <div class="tactic-grid" role="group" aria-label="Round tactic">
+      <button type="button" class="tactic-btn" data-tactic="push">
+        <span class="tactic-ic" aria-hidden="true">💥</span>Push<span style="display:block;font-size:.58rem;opacity:.85">Risk + reward</span>
+      </button>
+      <button type="button" class="tactic-btn" data-tactic="smart">
+        <span class="tactic-ic" aria-hidden="true">⚖️</span>Smart<span style="display:block;font-size:.58rem;opacity:.85">Balanced</span>
+      </button>
+      <button type="button" class="tactic-btn" data-tactic="defend">
+        <span class="tactic-ic" aria-hidden="true">🛡</span>Defend<span style="display:block;font-size:.58rem;opacity:.85">Steady</span>
+      </button>
+    </div>`;
+  row.classList.remove('hidden');
+  row.querySelectorAll('[data-tactic]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const t = btn.getAttribute('data-tactic');
+      hideBattleTacticRow();
+      hideBattleBoostRow();
+      callback(t || 'smart');
+    });
+  });
+}
+
 function playInteractiveRound(roundIdx) {
   const b = state.battle;
   if (!b) return;
@@ -509,11 +615,17 @@ function playInteractiveRound(roundIdx) {
     hideRoundResultFlash();
     hideBossAbilityFlash();
     hideClashQuiz();
+    hideBattleTacticRow();
+    hideBattleBoostRow();
     setTimeout(() => finishBattle(result), 720);
     return;
   }
 
-  const stat = pickRoundStat();
+  b.roundBoostPending = false;
+  const stat =
+    roundIdx === 0 && b.openingStat && ['spd', 'agi', 'int', 'str'].includes(b.openingStat)
+      ? b.openingStat
+      : pickRoundStat();
   const statWord = STAT_LABELS_SIMPLE[stat];
   const roundNum = roundIdx + 1;
   const bzf = document.getElementById('battle-zone-focus');
@@ -541,36 +653,48 @@ function playInteractiveRound(roundIdx) {
   setBattleRoundStripProgress(roundIdx);
 
   setTimeout(() => {
-    showClashQuiz(stat, (correct) => {
-      const fid = state.progress?.faction || null;
-      const quizPts = correct ? 2 : 0;
-      const { bonus: fBonus, messages: fMsgs } = getFactionRoundBonus({
-        factionId: fid,
-        stat,
-        roundIdx,
-        playerLostLastRound: !!b.playerLostLastRound,
-      });
-      const hyb = hybridAbilityRoundBonus(state.playerHybrid, stat, !!b.playerLostLastRound, {
-        roundIdx,
-        interactiveEWins: b.interactiveEWins,
-        interactivePWins: b.interactivePWins,
-      });
-      let round = resolveRound(b.pFighter, b.eFighter, stat, quizPts + fBonus + hyb.bonus);
-      round.factionMessages = [...fMsgs, ...hyb.messages];
-      round = applyKnightFactionResilience(round, fid, b, state.playerHybrid?.animals || []);
-      round = trySanctuaryRevive(round, b, {
-        factionId: fid,
-        animalIds: state.playerHybrid?.animals || [],
-      });
-      round = tryKnightBlockStance(round, b, state.playerHybrid?.animals || []);
-      b.roundResults.push(round);
-      if (round.winner === 'player') b.interactivePWins++;
-      else if (round.winner === 'enemy') b.interactiveEWins++;
-      b.playerLostLastRound = round.winner === 'enemy';
-      showFactionBattleHints(round.factionMessages || []);
+    showBattleBoostRow(b);
+    showBattleTacticRow(tacticId => {
+      const tactic = TACTIC_MODS[tacticId] || TACTIC_MODS.smart;
+      showClashQuiz(stat, correct => {
+        const fid = state.progress?.faction || null;
+        const quizPts = correct ? 2 : 0;
+        const { bonus: fBonus, messages: fMsgs } = getFactionRoundBonus({
+          factionId: fid,
+          stat,
+          roundIdx,
+          playerLostLastRound: !!b.playerLostLastRound,
+        });
+        const hyb = hybridAbilityRoundBonus(state.playerHybrid, stat, !!b.playerLostLastRound, {
+          roundIdx,
+          interactiveEWins: b.interactiveEWins,
+          interactivePWins: b.interactivePWins,
+        });
+        const boostBonus = b.roundBoostPending ? BATTLE_BOOST_POINTS : 0;
+        const extraPlayer =
+          quizPts + fBonus + hyb.bonus + tactic.playerBonus + boostBonus;
+        const resolveOpts = { enemyRollDelta: tactic.enemyRollDelta };
+        let round = resolveRound(b.pFighter, b.eFighter, stat, extraPlayer, resolveOpts);
+        round.tacticId = tactic.id;
+        round.tacticPlayerBonus = tactic.playerBonus;
+        round.battleBoostBonus = boostBonus;
+        round.factionMessages = [...fMsgs, ...hyb.messages];
+        round = applyKnightFactionResilience(round, fid, b, state.playerHybrid?.animals || []);
+        round = trySanctuaryRevive(round, b, {
+          factionId: fid,
+          animalIds: state.playerHybrid?.animals || [],
+        });
+        round = tryKnightBlockStance(round, b, state.playerHybrid?.animals || []);
+        b.roundResults.push(round);
+        if (round.winner === 'player') b.interactivePWins++;
+        else if (round.winner === 'enemy') b.interactiveEWins++;
+        b.playerLostLastRound = round.winner === 'enemy';
+        b.roundBoostPending = false;
+        showFactionBattleHints(round.factionMessages || []);
 
-      animateRoundResult(round, roundIdx, () => {
-        playInteractiveRound(roundIdx + 1);
+        animateRoundResult(round, roundIdx, () => {
+          playInteractiveRound(roundIdx + 1);
+        });
       });
     });
   }, 600);
@@ -760,6 +884,8 @@ function animateRoundResult(round, roundIdx, done) {
 function startBattle() {
   if (!state.playerHybrid) return;
   clearDefeatAutoReturn();
+  clearBattleWinCompleteTimer();
+  _pendingWinRewardCtx = null;
   state.battleFlowGen = (state.battleFlowGen || 0) + 1;
   const p = state.progress;
   const levelDef = LEVELS[Math.min(p.level - 1, LEVELS.length - 1)];
@@ -782,6 +908,8 @@ function startBattle() {
     quizBoosts: EMPTY_STAT_BOOST(),
     quizBoostsPreMystery: null,
     mysteryBoostSnapshot: null,
+    openingStat: null,
+    battleBoostUsed: false,
     preQuiz: {
       questions,
       idx: 0,
@@ -949,6 +1077,49 @@ function renderBattleBoostSummaryUI() {
   setTimeout(() => scrollToBattlePreQuiz(), 80);
 }
 
+function renderOpeningMovePicker() {
+  const wrap = document.getElementById('battle-opening-pick');
+  if (!wrap) return;
+  const stats = ['spd', 'agi', 'int', 'str'];
+  wrap.classList.remove('hidden');
+  wrap.innerHTML = `
+    <div class="opening-pick-box">
+      <div class="opening-pick-title">Choose your opening move</div>
+      <p class="opening-pick-sub">Pick the first clash category</p>
+      <div class="opening-pick-grid" role="group" aria-label="Opening clash type">
+        ${stats
+          .map(
+            k =>
+              `<button type="button" class="opening-pick-btn opening-pick-btn--${k}" data-opening-stat="${k}">
+            <span class="opening-pick-ic" aria-hidden="true">${STAT_TRAIL_ICONS[k] || '◆'}</span>
+            <span class="opening-pick-lbl">${STAT_LABELS_SIMPLE[k]}</span>
+          </button>`
+          )
+          .join('')}
+      </div>
+    </div>`;
+  wrap.querySelectorAll('[data-opening-stat]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const k = btn.getAttribute('data-opening-stat');
+      if (k) chooseOpeningStat(k);
+    });
+  });
+  setTimeout(() => scrollToBattlePreQuiz(), 80);
+}
+
+function chooseOpeningStat(statKey) {
+  const b = state.battle;
+  if (!b || b.phase !== 'ready') return;
+  if (!['spd', 'agi', 'int', 'str'].includes(statKey)) return;
+  b.openingStat = statKey;
+  const wrap = document.getElementById('battle-opening-pick');
+  if (wrap) {
+    wrap.classList.add('hidden');
+    wrap.innerHTML = '';
+  }
+  beginBattle();
+}
+
 function confirmPreBattleAndStartFight() {
   const b = state.battle;
   if (!b) return;
@@ -979,7 +1150,7 @@ function confirmPreBattleAndStartFight() {
       : `Power: <strong>${disp.power}</strong>`;
   renderFighterStats('bp-stats', disp.stats);
 
-  beginBattle();
+  renderOpeningMovePicker();
 }
 
 function renderBattleScreen() {
@@ -1001,6 +1172,13 @@ function renderBattleScreen() {
   hideBossAbilityFlash();
   hideClashQuiz();
   hideFactionBattleHint();
+  const op = document.getElementById('battle-opening-pick');
+  if (op) {
+    op.classList.add('hidden');
+    op.innerHTML = '';
+  }
+  hideBattleTacticRow();
+  hideBattleBoostRow();
 
   const disp = getBattleDisplayPlayerHybrid();
   const bpEm = document.getElementById('bp-em');
@@ -1345,24 +1523,57 @@ function showBattleResultOverlay(result, opts) {
   const card = document.getElementById('battle-result-card');
   const emojiEl = document.getElementById('battle-result-emoji');
   const lootEl = document.getElementById('battle-result-loot');
+  const rewardPickEl = document.getElementById('battle-reward-pick');
   card.className = `battle-result-card ${v.brClass} br-moment`;
   if (emojiEl) emojiEl.textContent = '';
   document.getElementById('battle-result-title').textContent = v.title;
   document.getElementById('battle-result-score').textContent = `Final score · ${result.pWins} – ${result.eWins}`;
+  if (rewardPickEl) {
+    if (won && o.needsRewardPick) {
+      rewardPickEl.classList.remove('hidden');
+      rewardPickEl.innerHTML = `
+        <div class="brp-title">Choose your reward</div>
+        <div class="brp-grid">
+          <button type="button" class="brp-btn" onclick="applyBattleRewardChoice('stat')">
+            <span class="brp-ic" aria-hidden="true">📈</span><span>Stat boost next battle</span>
+          </button>
+          <button type="button" class="brp-btn" onclick="applyBattleRewardChoice('coins')">
+            <span class="brp-ic" aria-hidden="true">🪙</span><span>+${REWARD_PICK_COINS} Fusion Coins</span>
+          </button>
+          <button type="button" class="brp-btn" onclick="applyBattleRewardChoice('tokens')">
+            <span class="brp-ic" aria-hidden="true">🎟</span><span>+${REWARD_PICK_TOKENS} Unlock token</span>
+          </button>
+        </div>`;
+    } else {
+      rewardPickEl.classList.add('hidden');
+      rewardPickEl.innerHTML = '';
+    }
+  }
   if (lootEl) {
     lootEl.classList.remove('br-loot-pop');
     const xg = o.xpGained | 0;
     const cg = o.coinsGained | 0;
     const tg = o.tokensGained | 0;
-    if (won && (xg || cg || tg)) {
+    const showLoot = won && (xg || cg || tg || o.needsRewardPick);
+    if (showLoot) {
       lootEl.classList.remove('hidden');
-      lootEl.innerHTML = `
+      if (o.needsRewardPick) {
+        lootEl.innerHTML = `
+        <div class="br-loot-title">You earned</div>
+        <div class="br-loot-pills">
+          ${xg ? `<span class="br-pill br-pill-xp">+${xg} Commander XP</span>` : ''}
+        </div>
+        <p class="br-loot-hint" style="font-family:var(--fm);font-size:.62rem;color:var(--text-dim);margin:10px 0 0">Pick one reward below.</p>`;
+      } else {
+        lootEl.innerHTML = `
         <div class="br-loot-title">You earned</div>
         <div class="br-loot-pills">
           ${xg ? `<span class="br-pill br-pill-xp">+${xg} Commander XP</span>` : ''}
           ${cg ? `<span class="br-pill br-pill-coin">+${cg} Fusion Coins</span>` : ''}
           ${tg ? `<span class="br-pill br-pill-token">+${tg} Unlock Token</span>` : ''}
+          ${o.statBoostPicked ? `<span class="br-pill br-pill-xp">+1 stat (next battle)</span>` : ''}
         </div>`;
+      }
       requestAnimationFrame(() => {
         requestAnimationFrame(() => lootEl.classList.add('br-loot-pop'));
       });
@@ -1403,6 +1614,85 @@ function hideBattleResultOverlay() {
     loot.classList.remove('br-loot-pop');
     loot.innerHTML = '';
   }
+  const rp = document.getElementById('battle-reward-pick');
+  if (rp) {
+    rp.classList.add('hidden');
+    rp.innerHTML = '';
+  }
+}
+
+function applyBattleRewardChoice(kind) {
+  const ctx = _pendingWinRewardCtx;
+  if (!ctx || !state.progress) return;
+  if (ctx.flowGen !== state.battleFlowGen) return;
+  const p = state.progress;
+
+  let coinsGained = 0;
+  let tokensGained = 0;
+  let rewardFlash = '';
+  let statBoostPicked = false;
+
+  if (kind === 'stat') {
+    statBoostPicked = true;
+    const keys = ['spd', 'agi', 'int', 'str'];
+    const k = keys[Math.floor(Math.random() * keys.length)];
+    const nb = EMPTY_STAT_BOOST();
+    nb[k] = 1;
+    p.pendingMysteryBattleBoost = mergeStatBoosts(p.pendingMysteryBattleBoost || EMPTY_STAT_BOOST(), nb);
+    syncActiveBoostsView(p);
+    rewardFlash =
+      '<strong>Stat boost:</strong> +1 to one stat for your <strong>next battle</strong> (shown in the boost screen).';
+  } else if (kind === 'coins') {
+    coinsGained = REWARD_PICK_COINS;
+    p.coins = (p.coins || 0) + REWARD_PICK_COINS;
+  } else if (kind === 'tokens') {
+    tokensGained = REWARD_PICK_TOKENS;
+    p.unlockTokens = (p.unlockTokens || 0) + REWARD_PICK_TOKENS;
+  } else {
+    return;
+  }
+
+  if (ctx.pendingDailyReward) {
+    p.dailyChallengeRewardClaimed = true;
+    p.coins = (p.coins || 0) + ctx.pendingDailyReward.coins;
+    p.unlockTokens = (p.unlockTokens || 0) + ctx.pendingDailyReward.tokens;
+    coinsGained += ctx.pendingDailyReward.coins;
+    tokensGained += ctx.pendingDailyReward.tokens;
+    rewardFlash = rewardFlash
+      ? `${rewardFlash}<br>${ctx.pendingDailyReward.flash}`
+      : ctx.pendingDailyReward.flash;
+  }
+
+  _pendingWinRewardCtx = null;
+
+  saveUserProgress(p)
+    .then(() => {
+      if (ctx.flowGen !== state.battleFlowGen) return;
+      showBattleResultOverlay(ctx.result, {
+        needsRewardPick: false,
+        xpGained: ctx.xpGained,
+        coinsGained,
+        tokensGained,
+        rewardFlash,
+        dailyHint: ctx.dailyHint,
+        statBoostPicked,
+      });
+      scheduleBattleWinComplete(ctx.flowGen);
+    })
+    .catch(e => {
+      console.warn('[battle] save failed after reward pick', e);
+      if (ctx.flowGen !== state.battleFlowGen) return;
+      showBattleResultOverlay(ctx.result, {
+        needsRewardPick: false,
+        xpGained: ctx.xpGained,
+        coinsGained,
+        tokensGained,
+        rewardFlash,
+        dailyHint: ctx.dailyHint,
+        statBoostPicked,
+      });
+      scheduleBattleWinComplete(ctx.flowGen);
+    });
 }
 
 function beginBattle() {
@@ -1431,6 +1721,7 @@ function beginBattle() {
   b.knightPaladinShaveUsed = false;
   b.knightBlockStanceUsed = false;
   b.playerLostLastRound = false;
+  b.battleBoostUsed = false;
 
   const doCountdownAndFight = () => {
     runBattleCountdown(() => {
@@ -1509,23 +1800,21 @@ async function finishBattle(result) {
   let xpGained = 0;
   let coinsGained = 0;
   let tokensGained = 0;
+  let pendingDailyReward = null;
   if (won) {
     xpGained = XP_PER_BATTLE_WIN;
     p.commanderXp = (p.commanderXp || 0) + xpGained;
     if (p.faction) p.factionXP = (p.factionXP || 0) + 2;
     p.totalWins++;
     p.dailyWinsToday = (p.dailyWinsToday || 0) + 1;
-    coinsGained = 5;
-    p.coins = (p.coins || 0) + 5;
     const ch = pickDailyChallenge(localDateString());
     if (!p.dailyChallengeRewardClaimed && dailyChallengeMet(ch, p, state.playerHybrid, true)) {
-      p.dailyChallengeRewardClaimed = true;
-      p.coins += 8;
-      p.unlockTokens = (p.unlockTokens || 0) + 1;
-      coinsGained += 8;
-      tokensGained += 1;
-      rewardFlash =
-        '🎯 Daily challenge complete! +8 Fusion Coins · +1 <strong>Unlock token</strong> (save for future rewards).';
+      pendingDailyReward = {
+        coins: 8,
+        tokens: 1,
+        flash:
+          '🎯 Daily challenge complete! +8 Fusion Coins · +1 <strong>Unlock token</strong> (save for future rewards).',
+      };
     } else if (!p.dailyChallengeRewardClaimed && ch.id === 'double' && (p.dailyWinsToday || 0) < 2) {
       dailyHint = `<strong>Daily:</strong> Win <strong>one more mission today</strong> to finish “${ch.title}”.`;
     } else if (!p.dailyChallengeRewardClaimed) {
@@ -1559,18 +1848,30 @@ async function finishBattle(result) {
 
   setTimeout(() => {
     if (flowGen !== state.battleFlowGen) return;
-    showBattleResultOverlay(result, { rewardFlash, dailyHint, xpGained, coinsGained, tokensGained });
+    if (won) {
+      _pendingWinRewardCtx = {
+        flowGen,
+        result,
+        xpGained,
+        dailyHint,
+        pendingDailyReward,
+      };
+      showBattleResultOverlay(result, {
+        needsRewardPick: true,
+        xpGained,
+        coinsGained: 0,
+        tokensGained: 0,
+        rewardFlash: '',
+        dailyHint,
+      });
+    } else {
+      showBattleResultOverlay(result, { rewardFlash, dailyHint, xpGained, coinsGained, tokensGained });
+    }
     console.log('[battle] result overlay shown', { won });
   }, 520);
 
   if (won) {
-    setTimeout(() => {
-      if (flowGen !== state.battleFlowGen) return;
-      cleanupBattleVisuals();
-      state.battle = null;
-      console.log('[battle] return to victory / level-complete flow');
-      showLevelComplete().catch(e => console.error('[battle] showLevelComplete failed', e));
-    }, 2200);
+    /* Level complete runs after reward pick via scheduleBattleWinComplete */
   } else {
     setTimeout(() => {
       if (flowGen !== state.battleFlowGen) return;
@@ -1604,6 +1905,8 @@ async function finishBattle(result) {
   }
   } catch (fatalErr) {
     console.error('[battle] finishBattle crashed — forcing transition', fatalErr);
+    _pendingWinRewardCtx = null;
+    clearBattleWinCompleteTimer();
     hideBattleResultOverlay();
     cleanupBattleVisuals();
     state.battle = null;
@@ -1660,7 +1963,7 @@ async function showLevelComplete() {
     ub.innerHTML = `
       <div class="unlock-lbl">🔓 New Animal Unlocked!</div>
       <div class="unlock-animal">
-        <span class="unlock-em">${a.emoji}</span>
+        <span class="unlock-em">${creaturePortraitImgHtml(reward, a.emoji, { className: 'unlock-em-img', size: 48, loading: 'lazy' })}</span>
         <div class="unlock-info">
           <h3>${a.name}</h3>
           <p>${a.bio}</p>
@@ -1682,7 +1985,7 @@ async function showLevelComplete() {
       <div class="apex-chips">
         ${APEX_IDS.map(id => {
           const a = ANIMALS[id];
-          return `<div class="apex-chip"><span>${a.emoji}</span><span>${a.name}</span></div>`;
+          return `<div class="apex-chip"><span class="apex-chip-ico">${creaturePortraitImgHtml(id, a.emoji, { className: 'apex-chip-img', size: 26, loading: 'lazy' })}</span><span>${a.name}</span></div>`;
         }).join('')}
       </div>
       <p style="font-size:.7rem;color:var(--text-dim);margin-top:10px;font-family:var(--fm)">Find them in the Forge → Apex Predators section.</p>`;
@@ -1700,7 +2003,7 @@ async function showLevelComplete() {
       <div class="apex-chips" style="gap:14px">
         ${DINO_IDS.map(id => {
           const a = ANIMALS[id];
-          return `<div class="apex-chip"><span>${a.emoji}</span><span style="color:var(--dino)">${a.name}</span></div>`;
+          return `<div class="apex-chip"><span class="apex-chip-ico">${creaturePortraitImgHtml(id, a.emoji, { className: 'apex-chip-img', size: 26, loading: 'lazy' })}</span><span style="color:var(--dino)">${a.name}</span></div>`;
         }).join('')}
       </div>
       <p style="font-size:.7rem;color:var(--text-dim);margin-top:10px;font-family:var(--fm)">Find them in the Forge → Dinosaur Tier section.</p>`;
@@ -1719,7 +2022,7 @@ async function showLevelComplete() {
         <div class="apex-chips" style="gap:14px">
           ${LEGENDARY_IDS.map(id => {
             const a = ANIMALS[id];
-            return `<div class="apex-chip"><span>${a.emoji}</span><span style="color:var(--legendary)">${a.name}</span></div>`;
+            return `<div class="apex-chip"><span class="apex-chip-ico">${creaturePortraitImgHtml(id, a.emoji, { className: 'apex-chip-img', size: 26, loading: 'lazy' })}</span><span style="color:var(--legendary)">${a.name}</span></div>`;
           }).join('')}
         </div>
         <p style="font-size:.7rem;color:var(--text-dim);margin-top:10px;font-family:var(--fm)">Find them in the Forge → Legendary Beasts section.</p>`;
@@ -1739,7 +2042,7 @@ async function showLevelComplete() {
         <div class="apex-chips" style="gap:14px">
           ${MYTHICAL_IDS.map(id => {
             const a = ANIMALS[id];
-            return `<div class="apex-chip"><span>${a.emoji}</span><span style="color:var(--mythical)">${a.name}</span></div>`;
+            return `<div class="apex-chip"><span class="apex-chip-ico">${creaturePortraitImgHtml(id, a.emoji, { className: 'apex-chip-img', size: 26, loading: 'lazy' })}</span><span style="color:var(--mythical)">${a.name}</span></div>`;
           }).join('')}
         </div>
         <p style="font-size:.7rem;color:var(--text-dim);margin-top:10px;font-family:var(--fm)">Find them in the Forge → Mythical Gods section.</p>`;
@@ -1763,7 +2066,7 @@ async function showLevelComplete() {
         <div class="apex-chips" style="gap:14px">
           ${EGYPTIAN_IDS.map(id => {
             const a = ANIMALS[id];
-            return `<div class="apex-chip"><span>${a.emoji}</span><span style="color:var(--egyptian)">${a.name}</span></div>`;
+            return `<div class="apex-chip"><span class="apex-chip-ico">${creaturePortraitImgHtml(id, a.emoji, { className: 'apex-chip-img', size: 26, loading: 'lazy' })}</span><span style="color:var(--egyptian)">${a.name}</span></div>`;
           }).join('')}
         </div>
         <p style="font-size:.7rem;color:var(--text-dim);margin-top:10px;font-family:var(--fm)">Forge → ⚱️ Egyptian Guardians · Arena: Desert · Boss: Duat Overlord</p>`;
@@ -1787,7 +2090,7 @@ async function showLevelComplete() {
         <div class="apex-chips" style="gap:14px">
           ${KNIGHT_IDS.map(id => {
             const a = ANIMALS[id];
-            return `<div class="apex-chip"><span>${a.emoji}</span><span style="color:var(--knights)">${a.name}</span></div>`;
+            return `<div class="apex-chip"><span class="apex-chip-ico">${creaturePortraitImgHtml(id, a.emoji, { className: 'apex-chip-img', size: 26, loading: 'lazy' })}</span><span style="color:var(--knights)">${a.name}</span></div>`;
           }).join('')}
         </div>
         <p style="font-size:.7rem;color:var(--text-dim);margin-top:10px;font-family:var(--fm)">Forge → 🛡️ Knights / Medieval Order · Arena: Castle · Boss: King’s Champion</p>`;
@@ -1840,6 +2143,8 @@ function cleanupBattleVisuals() {
   clearWeatherOverlay();
   clearBossMode();
   hideClashQuiz();
+  hideBattleTacticRow();
+  hideBattleBoostRow();
   hideFactionBattleHint();
   clearClashFeaturedState();
   const screen = document.getElementById('screen-battle');
@@ -1854,6 +2159,8 @@ function cleanupBattleVisuals() {
 function goNextLevel() {
   clearLevelCompleteAutoNav();
   clearDefeatAutoReturn();
+  clearBattleWinCompleteTimer();
+  _pendingWinRewardCtx = null;
   hideBattleResultOverlay();
   cleanupBattleVisuals();
   state.battle = null;
@@ -1865,6 +2172,8 @@ function goNextLevel() {
 function retryLevel() {
   clearLevelCompleteAutoNav();
   clearDefeatAutoReturn();
+  clearBattleWinCompleteTimer();
+  _pendingWinRewardCtx = null;
   hideBattleResultOverlay();
   cleanupBattleVisuals();
   state.battle = null;
@@ -1919,6 +2228,8 @@ export {
   advancePreBattleQuiz,
   renderBattleBoostSummaryUI,
   confirmPreBattleAndStartFight,
+  chooseOpeningStat,
+  applyBattleRewardChoice,
   renderBattleScreen,
   renderFighterStats,
   resetHearts,

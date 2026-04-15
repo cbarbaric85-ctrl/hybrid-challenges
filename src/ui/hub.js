@@ -40,9 +40,11 @@ import { backfillLeaderboardIfMissing } from '../persistence/leaderboard.js';
 import { showScreen, escapeHtml } from './screens.js';
 import { showBuilder } from './forge.js';
 import { openCreatureIntel } from './creature-intel-ui.js';
+import { creaturePortraitImgHtml } from './asset-utils.js';
 import { localDateString, localYesterdayString, msUntilLocalMidnight } from '../game/utils.js';
 import { needsFactionSelection, getFaction } from '../data/factions.js';
 import { applyFactionThemeToRoot, openFactionSelectFromHub } from './faction-ui.js';
+import { applyHubTierAtmosphere, clearHubTierAtmosphere } from '../theme/tier-stage-theme.js';
 import { canClaimMysteryRewardToday, formatCountdownShort, getMysteryRewardStatus } from '../game/mystery-reward.js';
 import { hubActionMysteryReward } from './mystery-reward-ui.js';
 
@@ -162,7 +164,15 @@ function syncHubTuneIdentity() {
     nmEl.textContent = '—';
     return;
   }
-  emEl.textContent = h.emojis || '';
+  if (h.animals?.length) {
+    emEl.innerHTML = h.animals
+      .map(aid =>
+        creaturePortraitImgHtml(aid, ANIMALS[aid]?.emoji, { className: 'hub-tune-em-img', size: 32, loading: 'eager' })
+      )
+      .join('');
+  } else {
+    emEl.textContent = h.emojis || '';
+  }
   nmEl.textContent = h.name || 'Hybrid';
 }
 
@@ -294,7 +304,7 @@ function renderAnimalsTierRoster() {
     });
     const em = document.createElement('span');
     em.className = 'al-troster-em';
-    em.textContent = a.emoji;
+    em.innerHTML = creaturePortraitImgHtml(id, a.emoji, { className: 'al-troster-em-img', size: 28, loading: 'lazy' });
     em.setAttribute('aria-hidden', 'true');
     cell.appendChild(intelBtn);
     cell.appendChild(em);
@@ -337,7 +347,13 @@ function renderAnimalsLevelsTierCards(containerId) {
   const samuraiOpen = samuraiTierQuizOpen(p);
   const vikingOpen = vikingTierQuizOpen(p);
 
-  const peek = ids => ids.slice(0, 3).map(id => ANIMALS[id]?.emoji || '').join(' ');
+  const peek = ids =>
+    ids
+      .slice(0, 3)
+      .map(id =>
+        creaturePortraitImgHtml(id, ANIMALS[id]?.emoji, { className: 'al-tier-peek-img', size: 22, loading: 'lazy' })
+      )
+      .join('');
 
   function tierCard(key, name, ids, unlocked, gate, lockLine) {
     const total = ids.length;
@@ -553,7 +569,9 @@ function fillMissionDetail(p, ids) {
   if (level) {
     const comps = level.animals.map(id => ALL_ANIMALS[id]).filter(Boolean);
     const ep = document.getElementById(ids.enemyPreview);
-    if (ep) ep.innerHTML = `Enemy: <span>${comps.map(a => a.emoji + ' ' + a.name).join(' + ')}</span>`;
+    if (ep) {
+      ep.innerHTML = `Enemy: <span class="hub-enemy-line">${comps.map(a => `${creaturePortraitImgHtml(a.id, a.emoji, { className: 'hub-enemy-ico', size: 22, loading: 'lazy' })} ${escapeHtml(a.name)}`).join(' + ')}</span>`;
+    }
   }
 
   const tierSummaryEl = document.getElementById(ids.tierSummary);
@@ -591,11 +609,11 @@ function fillMissionDetail(p, ids) {
       const emojiRow = (h.animals || [])
         .map(
           aid =>
-            `<button type="button" class="h-emoji-btn hub-mission-hybrid-emoji" data-mission-aid="${aid}" aria-label="${ANIMALS[aid]?.name || 'Animal'} info">${ANIMALS[aid]?.emoji || '?'}</button>`
+            `<button type="button" class="h-emoji-btn hub-mission-hybrid-emoji" data-mission-aid="${aid}" aria-label="${ANIMALS[aid]?.name || 'Animal'} info">${creaturePortraitImgHtml(aid, ANIMALS[aid]?.emoji, { className: 'hub-mission-hybrid-img', size: 40, loading: 'eager' })}</button>`
         )
         .join('');
       hd.innerHTML = `
-      <div style="font-size:1.9rem;margin-bottom:4px">${emojiRow}</div>
+      <div class="hub-mission-hybrid-row" style="display:flex;justify-content:center;align-items:center;gap:4px;margin-bottom:4px">${emojiRow}</div>
       <div style="font-family:var(--fd);font-size:1rem;font-weight:700;color:var(--text-bright);margin-bottom:2px">${h.name}</div>
       <div style="font-size:.6rem;font-family:var(--fm);color:var(--text-dim);margin-bottom:8px">${h.composition}</div>
       <div class="hub-power-row" style="justify-content:center;gap:16px">
@@ -691,10 +709,12 @@ function renderHub() {
   const p = state.progress;
   if (!p) return;
   if (needsFactionSelection(p)) {
+    clearHubTierAtmosphere();
     showScreen('faction-select');
     return;
   }
   applyFactionThemeToRoot();
+  applyHubTierAtmosphere(p.level);
   if (touchDailyStreakIfNeeded(p)) persistGameProgress().catch(e => console.error('[hub] streak save failed', e));
   backfillLeaderboardIfMissing().catch(e => console.error('[hub] lb backfill failed', e));
   const levelIdx = Math.min(p.level - 1, LEVELS.length - 1);
@@ -810,7 +830,7 @@ function renderHubAnimalGrid(gridId = 'hub-animal-grid', quizReturnTarget = 'hub
     if (premiumPreview) chip.classList.add('premium-preview');
     const intelReturn = gridId === 'al-animal-grid' ? 'animals-levels' : 'hub';
     chip.innerHTML = `<button type="button" class="a-chip-intel" aria-label="Creature info">ⓘ</button>
-      <span class="a-chip-em">${a.emoji}</span>
+      <span class="a-chip-em">${creaturePortraitImgHtml(id, a.emoji, { className: 'a-chip-em-img', size: 32, loading: 'lazy' })}</span>
       <span class="a-chip-nm">${a.name}</span>
       <span class="a-chip-tier ${tierClass}">${isLL ? '🔒' : isQL ? '📝' : tierLbl}</span>${premiumPreview}`;
 

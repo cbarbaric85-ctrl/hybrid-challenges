@@ -1,0 +1,11 @@
+Faction crest SVGs — 64×64 viewBox, bold shapes for small UI.
+Filenames match playable faction ids in src/data/factions.js.
+
+egyptian_guardians.svg  — sun + pyramid
+viking_raiders.svg      — round shield + axe
+roman_empire.svg        — eagle + laurel
+anglo_saxons.svg        — heater shield + knot + pine
+samurai_order.svg       — mon circle + katana + blossom
+knights.svg             — crown + shield + sword
+
+Public URLs: /faction-crests/<id>.svg
