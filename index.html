@@ -18,6 +18,10 @@
   --mythical:#00c8ff;--mythical-g:rgba(0,200,255,.25);
   --egyptian:#d4af37;--egyptian-g:rgba(212,175,55,.28);
   --knights:#a8c4e8;--knights-g:rgba(140,180,230,.32);--knights-deep:#4a6fa5;
+  --roman:#d4a85c;--roman-g:rgba(212,168,92,.3);--roman-deep:#8b5a2b;
+  --anglo:#7aab6a;--anglo-g:rgba(122,171,106,.28);--anglo-deep:#3d5a3a;
+  --samurai:#c9364e;--samurai-g:rgba(201,54,78,.28);--samurai-deep:#6b1420;
+  --viking:#5eb8e8;--viking-g:rgba(94,184,232,.28);--viking-deep:#1a4a6a;
   --text:#c8dff5;--text-dim:#3d6080;--text-bright:#fff;
   --fd:'Rajdhani',sans-serif;--fb:'Exo 2',sans-serif;--fm:'Share Tech Mono',monospace;
   --stat-max:18;
@@ -66,6 +70,14 @@ html[data-player-faction] body::after{opacity:1}
 .btn-egyptian:hover{filter:brightness(1.08);box-shadow:0 0 36px rgba(212,175,55,.45)}
 .btn-knights{background:linear-gradient(135deg,var(--knights-deep),#2a4a78);color:#e8f0ff;border-color:var(--knights);box-shadow:0 0 22px var(--knights-g)}
 .btn-knights:hover{filter:brightness(1.1);box-shadow:0 0 34px rgba(140,180,230,.45)}
+.btn-roman{background:linear-gradient(135deg,var(--roman-deep),#5c3d1a);color:#fff8e8;border-color:var(--roman);box-shadow:0 0 22px var(--roman-g)}
+.btn-roman:hover{filter:brightness(1.08);box-shadow:0 0 34px rgba(212,168,92,.42)}
+.btn-anglo{background:linear-gradient(135deg,var(--anglo-deep),#2a4a32);color:#eef8ea;border-color:var(--anglo);box-shadow:0 0 22px var(--anglo-g)}
+.btn-anglo:hover{filter:brightness(1.08);box-shadow:0 0 34px rgba(122,171,106,.4)}
+.btn-samurai{background:linear-gradient(135deg,var(--samurai-deep),#3a1018);color:#ffeef0;border-color:var(--samurai);box-shadow:0 0 22px var(--samurai-g)}
+.btn-samurai:hover{filter:brightness(1.08);box-shadow:0 0 34px rgba(201,54,78,.42)}
+.btn-viking{background:linear-gradient(135deg,var(--viking-deep),#0d2838);color:#e8f6ff;border-color:var(--viking);box-shadow:0 0 22px var(--viking-g)}
+.btn-viking:hover{filter:brightness(1.08);box-shadow:0 0 34px rgba(94,184,232,.42)}
 .btn:disabled{opacity:.4;cursor:not-allowed;transform:none!important}
 .btn-lg{padding:16px 40px;font-size:1.15rem;clip-path:polygon(12px 0%,100% 0%,calc(100% - 12px) 100%,0% 100%)}
 .btn-sm{padding:8px 16px;font-size:.78rem;clip-path:polygon(6px 0%,100% 0%,calc(100% - 6px) 100%,0% 100%)}
@@ -81,7 +93,7 @@ html[data-player-faction] body::after{opacity:1}
 .stat-track{flex:1;height:8px;background:rgba(255,255,255,.05);border-radius:4px;overflow:hidden;border:1px solid rgba(255,255,255,.04);box-shadow:inset 0 1px 3px rgba(0,0,0,.3)}
 .stat-fill{height:100%;border-radius:3px;transition:width .8s cubic-bezier(.4,0,.2,1);position:relative;overflow:hidden}
 .stat-fill::after{content:'';position:absolute;right:0;top:0;bottom:0;width:4px;background:rgba(255,255,255,.85);border-radius:2px;box-shadow:0 0 6px rgba(255,255,255,.4),0 0 12px rgba(255,255,255,.15)}
-.hcard.ready .stat-fill,.hcard.apex-ready .stat-fill,.hcard.dino-ready .stat-fill,.hcard.legendary-ready .stat-fill,.hcard.mythical-ready .stat-fill{animation:statShimmer 2.5s ease-in-out infinite}
+.hcard.ready .stat-fill,.hcard.apex-ready .stat-fill,.hcard.dino-ready .stat-fill,.hcard.legendary-ready .stat-fill,.hcard.mythical-ready .stat-fill,.hcard.roman-ready .stat-fill,.hcard.anglo-ready .stat-fill,.hcard.samurai-ready .stat-fill,.hcard.viking-ready .stat-fill{animation:statShimmer 2.5s ease-in-out infinite}
 .sf-spd{background:linear-gradient(90deg,#004a80,#00d4ff);box-shadow:0 0 8px rgba(0,212,255,.15)}
 .sf-agi{background:linear-gradient(90deg,#006838,var(--green));box-shadow:0 0 8px rgba(0,232,122,.15)}
 .sf-int{background:linear-gradient(90deg,#5020a0,var(--purple));box-shadow:0 0 8px rgba(176,106,255,.15)}
@@ -183,6 +195,9 @@ html[data-player-faction] #screen-hub .card::before{background:linear-gradient(9
 .faction-card--egyptian_guardians:hover,.faction-card--egyptian_guardians:focus-visible{border-color:rgba(212,175,55,.55);box-shadow:0 0 20px rgba(61,158,255,.18),0 0 14px rgba(212,175,55,.12)}
 .faction-card--viking_raiders:hover,.faction-card--viking_raiders:focus-visible{border-color:rgba(255,80,80,.45);box-shadow:0 0 20px rgba(255,60,60,.15),0 0 14px rgba(120,200,255,.1)}
 .faction-card--knights:hover,.faction-card--knights:focus-visible{border-color:rgba(140,180,230,.55);box-shadow:0 0 20px rgba(74,111,165,.18),0 0 14px rgba(180,200,230,.1)}
+.faction-card--roman_empire:hover,.faction-card--roman_empire:focus-visible{border-color:rgba(212,168,92,.55);box-shadow:0 0 20px rgba(139,90,43,.2),0 0 14px rgba(212,168,92,.12)}
+.faction-card--anglo_saxons:hover,.faction-card--anglo_saxons:focus-visible{border-color:rgba(122,171,106,.55);box-shadow:0 0 20px rgba(61,90,58,.18),0 0 14px rgba(122,171,106,.12)}
+.faction-card--samurai_order:hover,.faction-card--samurai_order:focus-visible{border-color:rgba(201,54,78,.55);box-shadow:0 0 20px rgba(107,20,32,.2),0 0 14px rgba(201,54,78,.12)}
 .faction-select-foot{font-family:var(--fm);font-size:.55rem;color:var(--text-dim);text-align:center;line-height:1.45;margin:0;padding-bottom:8px}
 /* Battle faction flash */
 .battle-faction-hint{font-family:var(--fm);font-size:.62rem;text-align:center;color:var(--green);text-shadow:0 0 14px var(--green-g);padding:6px 10px;margin:0 auto 8px;max-width:92%;line-height:1.35;animation:factionHintPop .35s ease}
@@ -316,6 +331,10 @@ html[data-player-faction] #screen-hub .card::before{background:linear-gradient(9
 .hub-mission-tier-summary.hub-tier-mythical{color:var(--mythical)}
 .hub-mission-tier-summary.hub-tier-egyptian{color:var(--egyptian)}
 .hub-mission-tier-summary.hub-tier-knights{color:var(--knights)}
+.hub-mission-tier-summary.hub-tier-roman{color:var(--roman)}
+.hub-mission-tier-summary.hub-tier-anglo{color:var(--anglo)}
+.hub-mission-tier-summary.hub-tier-samurai{color:var(--samurai)}
+.hub-mission-tier-summary.hub-tier-viking{color:var(--viking)}
 .hub-mission-section .level-banner .btn-primary{width:100%;max-width:100%;font-size:1.12rem;padding:16px 22px;box-shadow:0 0 24px rgba(0,232,122,.18)}
 .level-banner .btn-primary{font-size:1.05rem;padding:14px 28px}
 .level-banner{background:var(--surface);border:1px solid var(--border);padding:22px 26px;margin-bottom:0;display:flex;align-items:center;gap:22px;position:relative;overflow:hidden}
@@ -365,8 +384,20 @@ html[data-player-faction] #screen-hub .card::before{background:linear-gradient(9
 .a-chip-tier.t6{color:var(--mythical)}
 .a-chip-tier.t7{color:var(--egyptian)}
 .a-chip-tier.t8{color:var(--knights)}
+.a-chip-tier.t9{color:var(--roman)}
+.a-chip-tier.t10{color:var(--anglo)}
+.a-chip-tier.t11{color:var(--samurai)}
+.a-chip-tier.t12{color:var(--viking)}
+.a-chip.viking-chip{border-color:rgba(94,184,232,.38)}
+.a-chip.viking-chip:hover{border-color:var(--viking);background:rgba(26,74,106,.12)}
 .a-chip.knights-chip{border-color:rgba(140,180,230,.35)}
 .a-chip.knights-chip:hover{border-color:var(--knights);background:rgba(74,111,165,.08)}
+.a-chip.roman-chip{border-color:rgba(201,162,39,.38)}
+.a-chip.roman-chip:hover{border-color:var(--roman);background:rgba(139,90,43,.1)}
+.a-chip.anglo-chip{border-color:rgba(124,184,120,.38)}
+.a-chip.anglo-chip:hover{border-color:var(--anglo);background:rgba(61,90,58,.1)}
+.a-chip.samurai-chip{border-color:rgba(185,28,28,.38)}
+.a-chip.samurai-chip:hover{border-color:var(--samurai);background:rgba(107,20,32,.12)}
 
 /* ─── BUILDER ─── */
 #screen-builder{padding:0}
@@ -417,6 +448,10 @@ body.forge-modal-open{overflow:hidden;}
 .tier-hdr-nm.legendary{color:var(--legendary)}
 .tier-hdr-nm.mythical{color:var(--mythical)}
 .tier-hdr-nm.knights{color:var(--knights);text-shadow:0 0 14px var(--knights-g)}
+.tier-hdr-nm.roman{color:var(--roman);text-shadow:0 0 14px var(--roman-g)}
+.tier-hdr-nm.anglo{color:var(--anglo);text-shadow:0 0 14px var(--anglo-g)}
+.tier-hdr-nm.samurai{color:var(--samurai);text-shadow:0 0 14px var(--samurai-g)}
+.tier-hdr-nm.viking{color:var(--viking);text-shadow:0 0 14px var(--viking-g)}
 .tier-locked-notice{background:var(--surface2);border:1px dashed var(--border);padding:10px 14px;text-align:center;font-family:var(--fm);font-size:.65rem;color:var(--text-dim);margin-bottom:8px;line-height:1.7}
 .sel-counter{display:flex;align-items:center;gap:8px;margin-bottom:12px;font-family:var(--fm);font-size:.72rem;color:var(--text-dim)}
 .sel-pip{width:11px;height:11px;border-radius:50%;border:1px solid var(--border);background:var(--surface2);transition:all .2s}
@@ -480,6 +515,10 @@ body.forge-modal-open{overflow:hidden;}
 .bac-tier-tag.t6{color:var(--mythical);opacity:.85}
 .bac-tier-tag.t7{color:var(--egyptian);opacity:.9}
 .bac-tier-tag.t8{color:var(--knights);opacity:.9}
+.bac-tier-tag.t9{color:var(--roman);opacity:.92}
+.bac-tier-tag.t10{color:var(--anglo);opacity:.92}
+.bac-tier-tag.t11{color:var(--samurai);opacity:.92}
+.bac-tier-tag.t12{color:var(--viking);opacity:.92}
 .tier-hdr-nm.egyptian{color:var(--egyptian);text-shadow:0 0 14px var(--egyptian-g)}
 .bac.knights-card{border-color:rgba(140,180,230,.4);box-shadow:0 0 16px rgba(74,111,165,.15)}
 .bac.knights-card:hover{border-color:var(--knights);background:linear-gradient(180deg,rgba(74,111,165,.1) 0%,rgba(5,10,18,.92) 100%)}
@@ -488,12 +527,48 @@ body.forge-modal-open{overflow:hidden;}
 .bac.knights-card.sel::after{color:var(--knights);text-shadow:0 0 8px var(--knights-g)}
 .bac.knights-card.sel .bac-nm{color:var(--knights)}
 @keyframes selPulseKnights{0%,100%{box-shadow:0 0 24px rgba(140,180,230,.2)}50%{box-shadow:0 0 34px rgba(140,180,230,.32)}}
+.bac.roman-card{border-color:rgba(201,162,39,.42);box-shadow:0 0 16px rgba(139,90,43,.14)}
+.bac.roman-card:hover{border-color:var(--roman);background:linear-gradient(180deg,rgba(139,90,43,.1) 0%,rgba(5,10,18,.92) 100%)}
+.bac.roman-card.sel{border-color:var(--roman);box-shadow:0 0 24px rgba(212,168,92,.22),inset 0 0 0 1px rgba(212,168,92,.22);animation:selPulseRoman 2s ease-in-out infinite}
+.bac.roman-card.sel::before{background:linear-gradient(90deg,transparent,rgba(212,168,92,.45),transparent)}
+.bac.roman-card.sel::after{color:var(--roman);text-shadow:0 0 8px var(--roman-g)}
+.bac.roman-card.sel .bac-nm{color:var(--roman)}
+@keyframes selPulseRoman{0%,100%{box-shadow:0 0 24px rgba(212,168,92,.2)}50%{box-shadow:0 0 34px rgba(212,168,92,.32)}}
+.bac.anglo-card{border-color:rgba(124,184,120,.4);box-shadow:0 0 16px rgba(61,90,58,.12)}
+.bac.anglo-card:hover{border-color:var(--anglo);background:linear-gradient(180deg,rgba(61,90,58,.1) 0%,rgba(5,10,18,.92) 100%)}
+.bac.anglo-card.sel{border-color:var(--anglo);box-shadow:0 0 24px rgba(122,171,106,.2),inset 0 0 0 1px rgba(122,171,106,.2);animation:selPulseAnglo 2s ease-in-out infinite}
+.bac.anglo-card.sel::before{background:linear-gradient(90deg,transparent,rgba(122,171,106,.45),transparent)}
+.bac.anglo-card.sel::after{color:var(--anglo);text-shadow:0 0 8px var(--anglo-g)}
+.bac.anglo-card.sel .bac-nm{color:var(--anglo)}
+@keyframes selPulseAnglo{0%,100%{box-shadow:0 0 24px rgba(122,171,106,.2)}50%{box-shadow:0 0 34px rgba(122,171,106,.32)}}
+.bac.samurai-card{border-color:rgba(185,28,28,.42);box-shadow:0 0 16px rgba(107,20,32,.14)}
+.bac.samurai-card:hover{border-color:var(--samurai);background:linear-gradient(180deg,rgba(107,20,32,.1) 0%,rgba(5,10,18,.92) 100%)}
+.bac.samurai-card.sel{border-color:var(--samurai);box-shadow:0 0 24px rgba(201,54,78,.22),inset 0 0 0 1px rgba(201,54,78,.22);animation:selPulseSamurai 2s ease-in-out infinite}
+.bac.samurai-card.sel::before{background:linear-gradient(90deg,transparent,rgba(201,54,78,.45),transparent)}
+.bac.samurai-card.sel::after{color:var(--samurai);text-shadow:0 0 8px var(--samurai-g)}
+.bac.samurai-card.sel .bac-nm{color:var(--samurai)}
+@keyframes selPulseSamurai{0%,100%{box-shadow:0 0 24px rgba(201,54,78,.2)}50%{box-shadow:0 0 34px rgba(201,54,78,.32)}}
+.bac.viking-card{border-color:rgba(94,184,232,.42);box-shadow:0 0 16px rgba(26,74,106,.14)}
+.bac.viking-card:hover{border-color:var(--viking);background:linear-gradient(180deg,rgba(26,74,106,.1) 0%,rgba(5,10,18,.92) 100%)}
+.bac.viking-card.sel{border-color:var(--viking);box-shadow:0 0 24px rgba(94,184,232,.22),inset 0 0 0 1px rgba(94,184,232,.22);animation:selPulseViking 2s ease-in-out infinite}
+.bac.viking-card.sel::before{background:linear-gradient(90deg,transparent,rgba(94,184,232,.45),transparent)}
+.bac.viking-card.sel::after{color:var(--viking);text-shadow:0 0 8px var(--viking-g)}
+.bac.viking-card.sel .bac-nm{color:var(--viking)}
+@keyframes selPulseViking{0%,100%{box-shadow:0 0 24px rgba(94,184,232,.2)}50%{box-shadow:0 0 34px rgba(94,184,232,.32)}}
 .bac.egyptian-card{border-color:rgba(212,175,55,.45);box-shadow:0 0 16px rgba(212,175,55,.12)}
 .a-chip.egyptian-chip{border-color:rgba(212,175,55,.4)}
 .hsb-val.egyptian{color:var(--egyptian)}
 .badge-egyptian{background:linear-gradient(90deg,rgba(212,175,55,.25),rgba(61,158,255,.15));border:1px solid rgba(212,175,55,.5);color:var(--egyptian)!important}
 .badge-knights{background:linear-gradient(90deg,rgba(74,111,165,.35),rgba(180,200,230,.12));border:1px solid rgba(140,180,230,.5);color:var(--knights)!important}
+.badge-roman{background:linear-gradient(90deg,rgba(139,90,43,.35),rgba(212,168,92,.15));border:1px solid rgba(212,168,92,.55);color:var(--roman)!important}
+.badge-anglo{background:linear-gradient(90deg,rgba(61,90,58,.35),rgba(122,171,106,.15));border:1px solid rgba(122,171,106,.5);color:var(--anglo)!important}
+.badge-samurai{background:linear-gradient(90deg,rgba(107,20,32,.4),rgba(201,54,78,.15));border:1px solid rgba(201,54,78,.5);color:var(--samurai)!important}
+.badge-viking{background:linear-gradient(90deg,rgba(26,74,106,.45),rgba(94,184,232,.15));border:1px solid rgba(94,184,232,.5);color:var(--viking)!important}
 .hsb-val.knights{color:var(--knights)}
+.hsb-val.roman{color:var(--roman)}
+.hsb-val.anglo{color:var(--anglo)}
+.hsb-val.samurai{color:var(--samurai)}
+.hsb-val.viking{color:var(--viking)}
 .h-name.egyptian-glow{text-shadow:0 0 20px var(--egyptian-g),0 0 40px rgba(61,158,255,.15)}
 .hcard.egyptian-ready{border-color:rgba(212,175,55,.35);box-shadow:0 0 24px rgba(212,175,55,.1)}
 .quiz-animal-nm.egyptian,.quiz-animal-sub.egyptian{color:var(--egyptian)}
@@ -512,6 +587,45 @@ body.forge-modal-open{overflow:hidden;}
 .unlock-showcase.knights-showcase{border-color:rgba(140,180,230,.4)}
 .quiz-pip.current.knights{background:var(--knights-deep);border-color:var(--knights);box-shadow:0 0 10px var(--knights-g);animation:pulsePip 1.5s ease-in-out infinite}
 .bql-lbl.knights{color:var(--knights)}
+.bql-lbl.roman{color:var(--roman)}
+.bql-lbl.anglo_saxon{color:var(--anglo)}
+.bql-lbl.samurai{color:var(--samurai)}
+.bql-lbl.viking{color:var(--viking)}
+.bac-quizlock.roman-quizlock{border-color:rgba(201,162,39,.35)}
+.bac-quizlock.anglo_saxon-quizlock{border-color:rgba(124,184,120,.35)}
+.bac-quizlock.samurai-quizlock{border-color:rgba(185,28,28,.35)}
+.bac-quizlock.viking-quizlock{border-color:rgba(94,184,232,.35)}
+.quiz-animal-nm.roman,.quiz-animal-sub.roman{color:var(--roman)}
+.quiz-qcard.roman{border-color:rgba(201,162,39,.35)}
+.quiz-opt.roman-opt{border-color:rgba(201,162,39,.25)}
+.quiz-opt.roman-opt:hover:not(.qdisabled){border-color:var(--roman);background:rgba(139,90,43,.08)}
+.tier-badge-topbar.roman{background:rgba(139,90,43,.16);border:1px solid rgba(212,168,92,.42);color:var(--roman)}
+.unlock-showcase.roman-showcase{border-color:rgba(212,168,92,.4)}
+.quiz-pip.current.roman{background:var(--roman-deep);border-color:var(--roman);box-shadow:0 0 10px var(--roman-g);animation:pulsePip 1.5s ease-in-out infinite}
+.quiz-animal-nm.anglo_saxon,.quiz-animal-sub.anglo_saxon{color:var(--anglo)}
+.quiz-qcard.anglo_saxon{border-color:rgba(124,184,120,.35)}
+.quiz-opt.anglo_saxon-opt{border-color:rgba(124,184,120,.25)}
+.quiz-opt.anglo_saxon-opt:hover:not(.qdisabled){border-color:var(--anglo);background:rgba(61,90,58,.08)}
+.tier-badge-topbar.anglo_saxon{background:rgba(61,90,58,.16);border:1px solid rgba(122,171,106,.42);color:var(--anglo)}
+.unlock-showcase.anglo_saxon-showcase{border-color:rgba(122,171,106,.4)}
+.quiz-pip.current.anglo_saxon{background:var(--anglo-deep);border-color:var(--anglo);box-shadow:0 0 10px var(--anglo-g);animation:pulsePip 1.5s ease-in-out infinite}
+.quiz-animal-nm.samurai,.quiz-animal-sub.samurai{color:var(--samurai)}
+.quiz-qcard.samurai{border-color:rgba(185,28,28,.35)}
+.quiz-qcard.samurai::before{background:linear-gradient(90deg,transparent,var(--samurai-deep),transparent)}
+.quiz-opt.samurai-opt{border-color:rgba(185,28,28,.25)}
+.quiz-opt.samurai-opt:hover:not(.qdisabled){border-color:var(--samurai);background:rgba(107,20,32,.1)}
+.tier-badge-topbar.samurai{background:rgba(107,20,32,.18);border:1px solid rgba(201,54,78,.42);color:var(--samurai)}
+.unlock-showcase.samurai-showcase{border-color:rgba(201,54,78,.42)}
+.quiz-pip.current.samurai{background:var(--samurai-deep);border-color:var(--samurai);box-shadow:0 0 10px var(--samurai-g);animation:pulsePip 1.5s ease-in-out infinite}
+.quiz-animal-nm.viking,.quiz-animal-sub.viking{color:var(--viking)}
+.quiz-qcard.viking{border-color:rgba(94,184,232,.35)}
+.quiz-qcard.viking::before{background:linear-gradient(90deg,transparent,var(--viking-deep),transparent)}
+.quiz-opt.viking-opt{border-color:rgba(94,184,232,.25)}
+.quiz-opt.viking-opt:hover:not(.qdisabled){border-color:var(--viking);background:rgba(26,74,106,.1)}
+.tier-badge-topbar.viking{background:rgba(26,74,106,.2);border:1px solid rgba(94,184,232,.42);color:var(--viking)}
+.unlock-showcase.viking-showcase{border-color:rgba(94,184,232,.42)}
+.quiz-pip.current.viking{background:var(--viking-deep);border-color:var(--viking);box-shadow:0 0 10px var(--viking-g);animation:pulsePip 1.5s ease-in-out infinite}
+.bql-lbl.egyptian{color:var(--egyptian)}
 .egyptian-bonus-box{background:linear-gradient(135deg,rgba(212,175,55,.1),rgba(61,158,255,.06));border:1px solid rgba(212,175,55,.45);padding:18px;margin-bottom:14px;animation:fadeUp .6s ease .95s both}
 .egyptian-bonus-title{font-family:var(--fd);font-size:1.05rem;color:var(--egyptian);margin-bottom:8px;letter-spacing:.08em;text-transform:uppercase}
 .knights-bonus-box{background:linear-gradient(135deg,rgba(74,111,165,.14),rgba(180,200,230,.06));border:1px solid rgba(140,180,230,.45);padding:18px;margin-bottom:14px;animation:fadeUp .6s ease .95s both}
@@ -571,9 +685,21 @@ body.forge-modal-open{overflow:hidden;}
 .hcard.mythical-ready{border-color:var(--mythical);box-shadow:0 0 40px rgba(0,200,255,.3),0 0 90px rgba(0,200,255,.1),0 2px 0 rgba(0,200,255,.35),inset 0 0 0 1px rgba(0,200,255,.18)}
 .hcard.mythical-ready::before{opacity:1;background:radial-gradient(ellipse at 50% 25%,rgba(0,200,255,.16) 0%,transparent 60%)}
 .hcard.mythical-ready::after{opacity:1;background:conic-gradient(from 0deg,transparent 0%,rgba(0,200,255,.06) 25%,transparent 50%,rgba(0,200,255,.04) 75%,transparent 100%);animation:energyRing 12s linear infinite}
+.hcard.roman-ready{border-color:var(--roman);box-shadow:0 0 40px rgba(212,168,92,.26),0 0 90px rgba(139,90,43,.08),0 2px 0 rgba(212,168,92,.32),inset 0 0 0 1px rgba(212,168,92,.18)}
+.hcard.roman-ready::before{opacity:1;background:radial-gradient(ellipse at 50% 25%,rgba(212,168,92,.14) 0%,transparent 60%)}
+.hcard.roman-ready::after{opacity:1;background:conic-gradient(from 0deg,transparent 0%,rgba(212,168,92,.06) 25%,transparent 50%,rgba(139,90,43,.04) 75%,transparent 100%);animation:energyRing 12s linear infinite}
+.hcard.anglo-ready{border-color:var(--anglo);box-shadow:0 0 40px rgba(122,171,106,.26),0 0 90px rgba(61,90,58,.08),0 2px 0 rgba(122,171,106,.32),inset 0 0 0 1px rgba(122,171,106,.18)}
+.hcard.anglo-ready::before{opacity:1;background:radial-gradient(ellipse at 50% 25%,rgba(122,171,106,.14) 0%,transparent 60%)}
+.hcard.anglo-ready::after{opacity:1;background:conic-gradient(from 0deg,transparent 0%,rgba(122,171,106,.06) 25%,transparent 50%,rgba(61,90,58,.04) 75%,transparent 100%);animation:energyRing 12s linear infinite}
+.hcard.samurai-ready{border-color:var(--samurai);box-shadow:0 0 40px rgba(201,54,78,.28),0 0 90px rgba(107,20,32,.1),0 2px 0 rgba(201,54,78,.34),inset 0 0 0 1px rgba(201,54,78,.18)}
+.hcard.samurai-ready::before{opacity:1;background:radial-gradient(ellipse at 50% 25%,rgba(201,54,78,.14) 0%,transparent 60%)}
+.hcard.samurai-ready::after{opacity:1;background:conic-gradient(from 0deg,transparent 0%,rgba(201,54,78,.06) 25%,transparent 50%,rgba(107,20,32,.04) 75%,transparent 100%);animation:energyRing 12s linear infinite}
+.hcard.viking-ready{border-color:var(--viking);box-shadow:0 0 40px rgba(94,184,232,.28),0 0 90px rgba(26,74,106,.1),0 2px 0 rgba(94,184,232,.34),inset 0 0 0 1px rgba(94,184,232,.18)}
+.hcard.viking-ready::before{opacity:1;background:radial-gradient(ellipse at 50% 25%,rgba(94,184,232,.14) 0%,transparent 60%)}
+.hcard.viking-ready::after{opacity:1;background:conic-gradient(from 0deg,transparent 0%,rgba(94,184,232,.06) 25%,transparent 50%,rgba(26,74,106,.04) 75%,transparent 100%);animation:energyRing 12s linear infinite}
 /* Hybrid emojis: bold, outlined, floating */
 .h-emojis{font-size:2.8rem;margin-bottom:6px;min-height:50px;display:flex;align-items:center;justify-content:center;gap:8px;letter-spacing:4px;filter:contrast(1.25) saturate(1.35) drop-shadow(0 2px 0 rgba(0,0,0,.6)) drop-shadow(0 0 4px rgba(0,0,0,.3));position:relative;z-index:1}
-.hcard.ready .h-emojis,.hcard.apex-ready .h-emojis,.hcard.dino-ready .h-emojis,.hcard.legendary-ready .h-emojis,.hcard.mythical-ready .h-emojis{animation:hybridFloat 3s ease-in-out infinite}
+.hcard.ready .h-emojis,.hcard.apex-ready .h-emojis,.hcard.dino-ready .h-emojis,.hcard.legendary-ready .h-emojis,.hcard.mythical-ready .h-emojis,.hcard.roman-ready .h-emojis,.hcard.anglo-ready .h-emojis,.hcard.samurai-ready .h-emojis,.hcard.viking-ready .h-emojis{animation:hybridFloat 3s ease-in-out infinite}
 /* Hybrid name: hero treatment */
 .h-name{font-family:var(--fd);font-size:1.7rem;font-weight:800;letter-spacing:.14em;color:var(--text-bright);margin-bottom:3px;min-height:30px;text-transform:uppercase;position:relative;z-index:1}
 .h-name.glow{color:var(--green);text-shadow:0 0 24px var(--green-g),0 0 60px rgba(0,232,122,.18),0 2px 6px rgba(0,0,0,.5)}
@@ -581,6 +707,10 @@ body.forge-modal-open{overflow:hidden;}
 .h-name.dino-glow{color:var(--dino);text-shadow:0 0 24px var(--dino-g),0 0 60px rgba(255,68,0,.18),0 2px 6px rgba(0,0,0,.5)}
 .h-name.legendary-glow{color:var(--legendary);text-shadow:0 0 24px var(--legendary-g),0 0 60px rgba(255,215,0,.18),0 2px 6px rgba(0,0,0,.5)}
 .h-name.mythical-glow{color:var(--mythical);text-shadow:0 0 24px var(--mythical-g),0 0 60px rgba(0,200,255,.18),0 2px 6px rgba(0,0,0,.5)}
+.h-name.roman-glow{color:var(--roman);text-shadow:0 0 24px var(--roman-g),0 0 60px rgba(139,90,43,.14),0 2px 6px rgba(0,0,0,.5)}
+.h-name.anglo-glow{color:var(--anglo);text-shadow:0 0 24px var(--anglo-g),0 0 60px rgba(61,90,58,.12),0 2px 6px rgba(0,0,0,.5)}
+.h-name.samurai-glow{color:var(--samurai);text-shadow:0 0 24px var(--samurai-g),0 0 60px rgba(107,20,32,.14),0 2px 6px rgba(0,0,0,.5)}
+.h-name.viking-glow{color:var(--viking);text-shadow:0 0 24px var(--viking-g),0 0 60px rgba(26,74,106,.14),0 2px 6px rgba(0,0,0,.5)}
 .h-sub{font-family:var(--fm);font-size:.56rem;color:var(--text-dim);margin-bottom:6px;letter-spacing:.14em;position:relative;z-index:1}
 /* Power score: badge feel */
 .h-power{display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:8px;padding:6px 12px;background:rgba(255,140,26,.06);border:1px solid rgba(255,140,26,.25);position:relative;z-index:1;box-shadow:inset 0 0 20px rgba(255,140,26,.04)}
@@ -607,7 +737,7 @@ body.forge-modal-open{overflow:hidden;}
   line-height:1;transition:border-color .15s,color .15s;flex-shrink:0;-webkit-tap-highlight-color:transparent;
 }
 .sp-info:hover,.sp-info:active{border-color:var(--green);color:var(--green)}
-.hcard.ready .sp-fill,.hcard.apex-ready .sp-fill,.hcard.dino-ready .sp-fill,.hcard.legendary-ready .sp-fill,.hcard.mythical-ready .sp-fill{animation:statShimmer 2.5s ease-in-out infinite}
+.hcard.ready .sp-fill,.hcard.apex-ready .sp-fill,.hcard.dino-ready .sp-fill,.hcard.legendary-ready .sp-fill,.hcard.mythical-ready .sp-fill,.hcard.roman-ready .sp-fill,.hcard.anglo-ready .sp-fill,.hcard.samurai-ready .sp-fill,.hcard.viking-ready .sp-fill{animation:statShimmer 2.5s ease-in-out infinite}
 
 /* Stat tooltip */
 .stat-tooltip{

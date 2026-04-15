@@ -9,8 +9,14 @@ import { getFactionVisualThemeSummary } from '../theme/faction-theme.js';
 export const FACTION_EGYPTIAN = 'egyptian_guardians';
 export const FACTION_VIKING = 'viking_raiders';
 export const FACTION_KNIGHTS = 'knights';
+export const FACTION_ROMAN = 'roman_empire';
+export const FACTION_ANGLO_SAXON = 'anglo_saxons';
+export const FACTION_SAMURAI = 'samurai_order';
 
-export const FACTION_ORDER = [FACTION_EGYPTIAN, FACTION_VIKING, FACTION_KNIGHTS];
+export const FACTION_ORDER = [
+  FACTION_EGYPTIAN, FACTION_VIKING, FACTION_KNIGHTS,
+  FACTION_ROMAN, FACTION_ANGLO_SAXON, FACTION_SAMURAI,
+];
 
 export const FACTIONS = {
   [FACTION_EGYPTIAN]: {
@@ -68,6 +74,51 @@ export const FACTIONS = {
     gameplayKid: '🛡️ Tougher defense — enemy hits can count for less, and you get stronger in late rounds!',
     meetLine: 'Meet: Shield Knight 🪖 • Templar ✝️ • Paladin ⚔️',
   },
+  [FACTION_ROMAN]: {
+    id: FACTION_ROMAN,
+    name: 'Roman Empire',
+    shortName: 'Roman',
+    description: 'Legion discipline and divine favor — strike with rhythm when the crowd roars.',
+    icon: '🏛️',
+    passiveBonus: {
+      legionRhythm: true,
+    },
+    visualTheme: getFactionVisualThemeSummary(FACTION_ROMAN),
+    kidTagline: 'Gods, eagles, and arena legends!',
+    timePeriod: '🏛️ Ancient Rome — republic and empire',
+    gameplayKid: '💪 Extra strength on every other strength round — feel the legion beat!',
+    meetLine: 'Meet: Mars Warrior ⚔️ • Imperial Eagle 🦅 • Stone Colossus 🗿',
+  },
+  [FACTION_ANGLO_SAXON]: {
+    id: FACTION_ANGLO_SAXON,
+    name: 'Anglo-Saxons',
+    shortName: 'Anglo-Saxon',
+    description: 'Hearth, wild wood, and moonlit wards — wisdom deepens when the battle runs long.',
+    icon: '🌲',
+    passiveBonus: {
+      hallWisdomFromRound: 3,
+    },
+    visualTheme: getFactionVisualThemeSummary(FACTION_ANGLO_SAXON),
+    kidTagline: 'Forests, halls, and brave spirit heroes!',
+    timePeriod: '🌲 Early medieval Britain — halls and heaths',
+    gameplayKid: '🧠 Bonus smarts on mind rounds in the late fight — the hall remembers!',
+    meetLine: 'Meet: Owl Seer 🦉 • Boar Spirit 🐗 • Hearth Spirit 🔥',
+  },
+  [FACTION_SAMURAI]: {
+    id: FACTION_SAMURAI,
+    name: 'Samurai Order',
+    shortName: 'Samurai',
+    description: 'First-strike spirit — speed and focus flash before the dust settles.',
+    icon: '🗾',
+    passiveBonus: {
+      firstStrikeRound: 0,
+    },
+    visualTheme: getFactionVisualThemeSummary(FACTION_SAMURAI),
+    kidTagline: 'Kami spirits, blades, and cherry-blossom courage!',
+    timePeriod: '🗾 Feudal Japan — warriors and honor',
+    gameplayKid: '⚡ Bonus agility on the first agility round of each battle — draw first!',
+    meetLine: 'Meet: Kitsune 🦊 • Thunder Shogun ⛈️ • Dragon Spirit 🐉',
+  },
 };
 
 export function getFaction(id) {
@@ -116,6 +167,21 @@ export function getFactionRoundBonus(ctx) {
       bonus += 1;
       messages.push('🛡️ Knight endurance — you hold the line!');
     }
+  }
+
+  if (factionId === FACTION_ROMAN && stat === 'str' && roundIdx % 2 === 0) {
+    bonus += 1;
+    messages.push('🏛️ Legion rhythm — strength in formation!');
+  }
+
+  if (factionId === FACTION_ANGLO_SAXON && stat === 'int' && roundIdx >= 3) {
+    bonus += 1;
+    messages.push('🌲 Hall wisdom — the old tales guide you!');
+  }
+
+  if (factionId === FACTION_SAMURAI && stat === 'agi' && roundIdx === 0) {
+    bonus += 1;
+    messages.push('🗾 First cut — samurai focus!');
   }
 
   return { bonus, messages };

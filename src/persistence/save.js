@@ -4,6 +4,7 @@ import {
 } from '../firebase.js';
 import {
   ANIMALS, APEX_IDS, DINO_IDS, LEGENDARY_IDS, MYTHICAL_IDS, EGYPTIAN_IDS, KNIGHT_IDS,
+  ROMAN_IDS, ANGLO_SAXON_IDS, SAMURAI_IDS, VIKING_IDS,
   STARTER_BASE_IDS,
 } from '../data/animals.js';
 
@@ -15,6 +16,10 @@ const QUIZ_UNLOCK_ROSTER_IDS = new Set([
   ...MYTHICAL_IDS,
   ...EGYPTIAN_IDS,
   ...KNIGHT_IDS,
+  ...ROMAN_IDS,
+  ...ANGLO_SAXON_IDS,
+  ...SAMURAI_IDS,
+  ...VIKING_IDS,
 ]);
 
 function filterPersistedQuizUnlocked(ids) {
@@ -32,12 +37,19 @@ function normalizeProgress(p) {
   if (!p.quizUnlocked) p.quizUnlocked = [];
   if (p.highestLevelReached == null) p.highestLevelReached = 0;
   if (p.streakCount == null) p.streakCount = 0;
-  if (!p.stageAccess) p.stageAccess = { base: true, apex: true, dinosaur: true, legendary: true, mythical: true, egyptian: true, knights: true };
-  else {
+  if (!p.stageAccess) {
+    p.stageAccess = {
+      base: true, apex: true, dinosaur: true, legendary: true, mythical: true, egyptian: true, knights: true,
+      roman: true, anglo_saxon: true, samurai: true,
+    };
+  } else {
     if (p.stageAccess.legendary == null) p.stageAccess.legendary = true;
     if (p.stageAccess.mythical == null) p.stageAccess.mythical = true;
     if (p.stageAccess.egyptian == null) p.stageAccess.egyptian = true;
     if (p.stageAccess.knights == null) p.stageAccess.knights = true;
+    if (p.stageAccess.roman == null) p.stageAccess.roman = true;
+    if (p.stageAccess.anglo_saxon == null) p.stageAccess.anglo_saxon = true;
+    if (p.stageAccess.samurai == null) p.stageAccess.samurai = true;
   }
   if (p.progressSchemaVersion == null) p.progressSchemaVersion = 0;
   if (p.coins == null) p.coins = 0;
@@ -144,6 +156,10 @@ function firestoreDataToProgress(data) {
       mythical: data.stageAccess?.mythical !== false,
       egyptian: data.stageAccess?.egyptian !== false,
       knights: data.stageAccess?.knights !== false,
+      roman: data.stageAccess?.roman !== false,
+      anglo_saxon: data.stageAccess?.anglo_saxon !== false,
+      samurai: data.stageAccess?.samurai !== false,
+      viking: data.stageAccess?.viking !== false,
     },
     lastMysteryRewardDayKey: typeof data.lastMysteryRewardDayKey === 'string' ? data.lastMysteryRewardDayKey : null,
     mysteryRewardClaimsDayKey: typeof data.mysteryRewardClaimsDayKey === 'string' ? data.mysteryRewardClaimsDayKey : null,

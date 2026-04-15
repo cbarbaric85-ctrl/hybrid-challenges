@@ -1,6 +1,8 @@
 import {
   STAT_MAX, STAGE_BASE, STAGE_APEX, STAGE_DINO, STAGE_LEGENDARY, STAGE_MYTHICAL, STAGE_EGYPTIAN, STAGE_KNIGHTS,
+  STAGE_ROMAN, STAGE_ANGLO_SAXON, STAGE_SAMURAI, STAGE_VIKING,
   ANIMALS, ALL_ANIMALS, BASE_IDS, APEX_IDS, DINO_IDS, LEGENDARY_IDS, MYTHICAL_IDS, EGYPTIAN_IDS, KNIGHT_IDS,
+  ROMAN_IDS, ANGLO_SAXON_IDS, SAMURAI_IDS, VIKING_IDS,
 } from '../data/animals.js';
 import { LEVELS } from '../data/levels.js';
 import {
@@ -9,7 +11,9 @@ import {
 } from '../game/state.js';
 import {
   countBaseUnlocked, countApexUnlocked, countDinoUnlocked,
-  countLegendaryUnlocked, countMythicalUnlocked, countEgyptianUnlocked, countKnightsUnlocked, egyptianTierQuizOpen, knightTierQuizOpen,
+  countLegendaryUnlocked, countMythicalUnlocked, countEgyptianUnlocked, countKnightsUnlocked,
+  countRomanUnlocked, countAngloSaxonUnlocked, countSamuraiUnlocked, countVikingUnlocked,
+  egyptianTierQuizOpen, knightTierQuizOpen, romanTierQuizOpen, angloSaxonTierQuizOpen, samuraiTierQuizOpen, vikingTierQuizOpen,
   apexLevelGateMet, dinoLevelGateMet,
   legendaryLevelGateMet, mythicalLevelGateMet,
   getPlayerStageLabel, getProgressionNextLines,
@@ -20,6 +24,7 @@ import {
   getRetentionShopTeasers,
   getNextBaseAnimalId, getNextApexAnimalId, getNextDinoAnimalId,
   getNextLegendaryAnimalId, getNextMythicalAnimalId, getNextEgyptianAnimalId, getNextKnightAnimalId,
+  getNextRomanAnimalId, getNextAngloSaxonAnimalId, getNextSamuraiAnimalId, getNextVikingAnimalId,
   formatMiniStatPreview,
   getStreakBattleBoost, sumBoostPoints,
   unlockGateLinesForAnimal,
@@ -52,6 +57,10 @@ const TIER_IDS_MAP = {
   mythical: MYTHICAL_IDS,
   egyptian: EGYPTIAN_IDS,
   knights: KNIGHT_IDS,
+  roman: ROMAN_IDS,
+  anglo_saxon: ANGLO_SAXON_IDS,
+  samurai: SAMURAI_IDS,
+  viking: VIKING_IDS,
 };
 
 const TIER_LABELS = {
@@ -62,7 +71,10 @@ const TIER_LABELS = {
   mythical: 'Mythical Gods',
   egyptian: 'Egyptian Guardians',
   knights: 'Knights of the Realm',
-  future: 'Future tiers',
+  roman: 'Roman Empire',
+  anglo_saxon: 'Anglo-Saxons',
+  samurai: 'Samurai Order',
+  viking: 'Viking Clans',
 };
 
 function getCommanderXpSegment(xp) {
@@ -84,6 +96,14 @@ function findNextTokenRecruitTarget(p) {
   if (ne) return { id: ne, mode: 'quiz' };
   const nk = getNextKnightAnimalId(p);
   if (nk) return { id: nk, mode: 'quiz' };
+  const nro = getNextRomanAnimalId(p);
+  if (nro) return { id: nro, mode: 'quiz' };
+  const nan = getNextAngloSaxonAnimalId(p);
+  if (nan) return { id: nan, mode: 'quiz' };
+  const nsa = getNextSamuraiAnimalId(p);
+  if (nsa) return { id: nsa, mode: 'quiz' };
+  const nv = getNextVikingAnimalId(p);
+  if (nv) return { id: nv, mode: 'quiz' };
   return null;
 }
 
@@ -302,12 +322,20 @@ function renderAnimalsLevelsTierCards(containerId) {
   const mU = countMythicalUnlocked(p);
   const eU = countEgyptianUnlocked(p);
   const kU = countKnightsUnlocked(p);
+  const roU = countRomanUnlocked(p);
+  const anU = countAngloSaxonUnlocked(p);
+  const saU = countSamuraiUnlocked(p);
+  const viU = countVikingUnlocked(p);
   const apexOpen = apexLevelGateMet(p);
   const dinoOpen = dinoLevelGateMet(p);
   const legendOpen = legendaryLevelGateMet(p);
   const mythOpen = mythicalLevelGateMet(p);
   const egyptOpen = egyptianTierQuizOpen(p);
   const knightOpen = knightTierQuizOpen(p);
+  const romanOpen = romanTierQuizOpen(p);
+  const angloOpen = angloSaxonTierQuizOpen(p);
+  const samuraiOpen = samuraiTierQuizOpen(p);
+  const vikingOpen = vikingTierQuizOpen(p);
 
   const peek = ids => ids.slice(0, 3).map(id => ANIMALS[id]?.emoji || '').join(' ');
 
@@ -318,7 +346,7 @@ function renderAnimalsLevelsTierCards(containerId) {
     const complete = !locked && unlocked >= total;
     const fillCls = locked ? 'al-tier-fill al-tier-fill--locked' : complete ? 'al-tier-fill al-tier-fill--complete' : 'al-tier-fill al-tier-fill--partial';
     const cardCls = locked ? 'al-tier-card al-tier--locked' : 'al-tier-card';
-    const dataAttr = key === 'future' ? '' : ` data-al-tier="${key}"`;
+    const dataAttr = ` data-al-tier="${key}"`;
     return `
       <div class="${cardCls}"${dataAttr} role="button" tabindex="0" aria-label="${escapeHtml(name)}">
         <div class="al-tier-hdr">
@@ -338,14 +366,10 @@ function renderAnimalsLevelsTierCards(containerId) {
     tierCard('mythical', TIER_LABELS.mythical, MYTHICAL_IDS, mU, mythOpen, mythOpen ? null : 'Unlock after Level 16'),
     tierCard('egyptian', TIER_LABELS.egyptian, EGYPTIAN_IDS, eU, egyptOpen, egyptOpen ? null : 'Recruit all Mythical Gods first'),
     tierCard('knights', TIER_LABELS.knights, KNIGHT_IDS, kU, knightOpen, knightOpen ? null : 'Recruit all Egyptian Guardians first'),
-    `<div class="al-tier-card al-tier--locked" aria-label="Future tiers">
-      <div class="al-tier-hdr">
-        <span class="al-tier-name">${TIER_LABELS.future}</span>
-        <span class="al-tier-peek" aria-hidden="true">✨</span>
-      </div>
-      <div class="al-tier-bar"><div class="al-tier-fill al-tier-fill--locked" style="width:0%"></div></div>
-      <div class="al-tier-lock">More creatures coming in updates</div>
-    </div>`,
+    tierCard('roman', TIER_LABELS.roman, ROMAN_IDS, roU, romanOpen, romanOpen ? null : 'Recruit all Knights of the Realm first'),
+    tierCard('anglo_saxon', TIER_LABELS.anglo_saxon, ANGLO_SAXON_IDS, anU, angloOpen, angloOpen ? null : 'Recruit all Roman Empire spirits first'),
+    tierCard('samurai', TIER_LABELS.samurai, SAMURAI_IDS, saU, samuraiOpen, samuraiOpen ? null : 'Recruit all Anglo-Saxon spirits first'),
+    tierCard('viking', TIER_LABELS.viking, VIKING_IDS, viU, vikingOpen, vikingOpen ? null : 'Recruit all Samurai Order spirits first'),
   ].join('');
 
   el.innerHTML = `
@@ -475,6 +499,10 @@ function fillMissionDetail(p, ids) {
   const mythCount = MYTHICAL_IDS.filter(id => p.quizUnlocked.includes(id)).length;
   const egyptCount = EGYPTIAN_IDS.filter(id => p.quizUnlocked.includes(id)).length;
   const knightCount = KNIGHT_IDS.filter(id => p.quizUnlocked.includes(id)).length;
+  const romanCount = ROMAN_IDS.filter(id => p.quizUnlocked.includes(id)).length;
+  const angloCount = ANGLO_SAXON_IDS.filter(id => p.quizUnlocked.includes(id)).length;
+  const samuraiCount = SAMURAI_IDS.filter(id => p.quizUnlocked.includes(id)).length;
+  const vikingCount = VIKING_IDS.filter(id => p.quizUnlocked.includes(id)).length;
   const baseU = countBaseUnlocked(p);
   let tierTxt = `B ${baseU}/10`;
   if (apexLevelGateMet(p)) tierTxt += ` · A ${apexCount}/10`;
@@ -483,6 +511,10 @@ function fillMissionDetail(p, ids) {
   if (mythicalLevelGateMet(p)) tierTxt += ` · M ${mythCount}/10`;
   if (egyptianTierQuizOpen(p)) tierTxt += ` · Eg ${egyptCount}/10`;
   if (knightTierQuizOpen(p)) tierTxt += ` · K ${knightCount}/10`;
+  if (romanTierQuizOpen(p)) tierTxt += ` · Ro ${romanCount}/10`;
+  if (angloSaxonTierQuizOpen(p)) tierTxt += ` · As ${angloCount}/10`;
+  if (samuraiTierQuizOpen(p)) tierTxt += ` · Sa ${samuraiCount}/10`;
+  if (vikingTierQuizOpen(p)) tierTxt += ` · Vi ${vikingCount}/10`;
 
   const nameEl = document.getElementById(ids.levelName);
   const descEl = document.getElementById(ids.levelDesc);
@@ -496,6 +528,10 @@ function fillMissionDetail(p, ids) {
     else if (level && level.isBoss) ba.innerHTML += '<span class="lv-badge badge-final">⚠ BOSS BATTLE</span>';
     else if (level && level.isHard) ba.innerHTML += '<span class="lv-badge badge-hard">DANGER ZONE</span>';
     if (p.level > MAX_LEVEL) ba.innerHTML += '<span class="lv-badge badge-knights">🛡️ REALM CONQUEROR</span>';
+    else if (vikingCount > 0) ba.innerHTML += '<span class="lv-badge badge-viking">⚓ VIKING ACTIVE</span>';
+    else if (samuraiCount > 0) ba.innerHTML += '<span class="lv-badge badge-samurai">🗾 SAMURAI ACTIVE</span>';
+    else if (angloCount > 0) ba.innerHTML += '<span class="lv-badge badge-anglo">🌲 ANGLO-SAXON ACTIVE</span>';
+    else if (romanCount > 0) ba.innerHTML += '<span class="lv-badge badge-roman">🏛️ ROMAN ACTIVE</span>';
     else if (knightCount > 0) ba.innerHTML += '<span class="lv-badge badge-knights">🛡️ KNIGHTS ACTIVE</span>';
     else if (egyptCount > 0) ba.innerHTML += '<span class="lv-badge badge-egyptian">⚱️ EGYPTIAN ACTIVE</span>';
     else if (mythCount > 0) ba.innerHTML += '<span class="lv-badge badge-mythical">⚡ MYTHICAL ACTIVE</span>';
@@ -523,7 +559,28 @@ function fillMissionDetail(p, ids) {
   const tierSummaryEl = document.getElementById(ids.tierSummary);
   if (tierSummaryEl) {
     tierSummaryEl.textContent = `Roster progress: ${tierTxt}`;
-    const tierColor = knightCount > 0 ? 'knights' : egyptCount > 0 ? 'egyptian' : mythCount > 0 ? 'mythical' : legCount > 0 ? 'legendary' : dinoCount > 0 ? 'dino' : apexCount > 0 ? 'purple' : '';
+    const tierColor =
+      vikingCount > 0
+        ? 'viking'
+        : samuraiCount > 0
+        ? 'samurai'
+        : angloCount > 0
+          ? 'anglo'
+          : romanCount > 0
+            ? 'roman'
+            : knightCount > 0
+              ? 'knights'
+              : egyptCount > 0
+                ? 'egyptian'
+                : mythCount > 0
+                  ? 'mythical'
+                  : legCount > 0
+                    ? 'legendary'
+                    : dinoCount > 0
+                      ? 'dino'
+                      : apexCount > 0
+                        ? 'purple'
+                        : '';
     tierSummaryEl.className = 'hub-mission-tier-summary' + (tierColor ? ` hub-tier-${tierColor}` : '');
   }
 
@@ -701,6 +758,10 @@ function renderHubAnimalGrid(gridId = 'hub-animal-grid', quizReturnTarget = 'hub
 
     const chip = document.createElement('div');
     const stageChipMap = {
+      [STAGE_VIKING]: 'viking-chip',
+      [STAGE_SAMURAI]: 'samurai-chip',
+      [STAGE_ANGLO_SAXON]: 'anglo-chip',
+      [STAGE_ROMAN]: 'roman-chip',
       [STAGE_KNIGHTS]: 'knights-chip',
       [STAGE_EGYPTIAN]: 'egyptian-chip',
       [STAGE_MYTHICAL]: 'mythical-chip',
@@ -716,6 +777,10 @@ function renderHubAnimalGrid(gridId = 'hub-animal-grid', quizReturnTarget = 'hub
     chip.className = cls;
 
     const tierLblMap = {
+      [STAGE_VIKING]: 'VIK',
+      [STAGE_SAMURAI]: 'SAM',
+      [STAGE_ANGLO_SAXON]: 'ANGLO',
+      [STAGE_ROMAN]: 'ROME',
       [STAGE_KNIGHTS]: 'KNIGHT',
       [STAGE_EGYPTIAN]: 'EGYPT',
       [STAGE_MYTHICAL]: 'MYTHICAL',
@@ -724,6 +789,10 @@ function renderHubAnimalGrid(gridId = 'hub-animal-grid', quizReturnTarget = 'hub
       [STAGE_APEX]: 'APEX',
     };
     const tierClsMap = {
+      [STAGE_VIKING]: 't12',
+      [STAGE_SAMURAI]: 't11',
+      [STAGE_ANGLO_SAXON]: 't10',
+      [STAGE_ROMAN]: 't9',
       [STAGE_KNIGHTS]: 't8',
       [STAGE_EGYPTIAN]: 't7',
       [STAGE_MYTHICAL]: 't6',
@@ -783,7 +852,7 @@ function renderHubAnimalGrid(gridId = 'hub-animal-grid', quizReturnTarget = 'hub
 /* ── Action Panel: "Choose Your Next Move" ── */
 
 function getFirstQuizEligibleId(p) {
-  for (const id of [...APEX_IDS, ...DINO_IDS, ...LEGENDARY_IDS, ...MYTHICAL_IDS, ...EGYPTIAN_IDS, ...KNIGHT_IDS]) {
+  for (const id of [...APEX_IDS, ...DINO_IDS, ...LEGENDARY_IDS, ...MYTHICAL_IDS, ...EGYPTIAN_IDS, ...KNIGHT_IDS, ...ROMAN_IDS, ...ANGLO_SAXON_IDS, ...SAMURAI_IDS, ...VIKING_IDS]) {
     if (isQuizEligible(id, p)) return id;
   }
   return null;
@@ -864,6 +933,10 @@ function renderActionPanel() {
       [STAGE_MYTHICAL]: 'Mythical',
       [STAGE_EGYPTIAN]: 'Egyptian',
       [STAGE_KNIGHTS]: 'Knight',
+      [STAGE_ROMAN]: 'Roman',
+      [STAGE_ANGLO_SAXON]: 'Anglo-Saxon',
+      [STAGE_SAMURAI]: 'Samurai',
+      [STAGE_VIKING]: 'Viking Clans',
     };
     const tier = tierMap[a?.stage] || 'New';
     if (trainLabel) trainLabel.textContent = `Train (${tier})`;
@@ -879,6 +952,14 @@ function renderActionPanel() {
       : countEgyptianUnlocked(p) < EGYPTIAN_IDS.length ? 'Finish Egyptian quizzes'
       : !knightTierQuizOpen(p) ? 'Recruit all Egyptian Guardians first'
       : countKnightsUnlocked(p) < KNIGHT_IDS.length ? 'Finish Knight quizzes'
+      : !romanTierQuizOpen(p) ? 'Recruit all Knights first'
+      : countRomanUnlocked(p) < ROMAN_IDS.length ? 'Finish Roman quizzes'
+      : !angloSaxonTierQuizOpen(p) ? 'Recruit all Roman spirits first'
+      : countAngloSaxonUnlocked(p) < ANGLO_SAXON_IDS.length ? 'Finish Anglo-Saxon quizzes'
+      : !samuraiTierQuizOpen(p) ? 'Recruit all Anglo-Saxon spirits first'
+      : countSamuraiUnlocked(p) < SAMURAI_IDS.length ? 'Finish Samurai quizzes'
+      : !vikingTierQuizOpen(p) ? 'Recruit all Samurai spirits first'
+      : countVikingUnlocked(p) < VIKING_IDS.length ? 'Finish Viking Clans quizzes'
       : 'All creatures unlocked!';
     if (trainSub) trainSub.textContent = nextGate;
     if (trainBtn) trainBtn.disabled = true;
@@ -895,9 +976,14 @@ function renderActionPanel() {
     if (tokenBtn) tokenBtn.disabled = !tokCan;
   } else {
     if (tokenLabel) tokenLabel.textContent = 'Unlock';
-    const knightsDone = countKnightsUnlocked(p) >= KNIGHT_IDS.length;
+    const allDone =
+      countKnightsUnlocked(p) >= KNIGHT_IDS.length
+      && countRomanUnlocked(p) >= ROMAN_IDS.length
+      && countAngloSaxonUnlocked(p) >= ANGLO_SAXON_IDS.length
+      && countSamuraiUnlocked(p) >= SAMURAI_IDS.length
+      && countVikingUnlocked(p) >= VIKING_IDS.length;
     if (tokenSub) {
-      tokenSub.textContent = knightsDone ? 'All creatures unlocked 🎉' : 'More creatures coming soon…';
+      tokenSub.textContent = allDone ? 'All creatures unlocked 🎉' : 'More creatures coming soon…';
     }
     if (tokenBtn) tokenBtn.disabled = true;
   }

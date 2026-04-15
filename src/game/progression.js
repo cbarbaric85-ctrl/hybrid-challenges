@@ -1,6 +1,8 @@
 import {
   STAGE_BASE, STAGE_APEX, STAGE_DINO, STAGE_LEGENDARY, STAGE_MYTHICAL, STAGE_EGYPTIAN, STAGE_KNIGHTS,
-  ANIMALS, BASE_IDS, APEX_IDS, DINO_IDS, LEGENDARY_IDS, MYTHICAL_IDS, EGYPTIAN_IDS, KNIGHT_IDS, STARTER_BASE_IDS,
+  STAGE_ROMAN, STAGE_ANGLO_SAXON, STAGE_SAMURAI, STAGE_VIKING,
+  ANIMALS, BASE_IDS, APEX_IDS, DINO_IDS, LEGENDARY_IDS, MYTHICAL_IDS, EGYPTIAN_IDS, KNIGHT_IDS,
+  ROMAN_IDS, ANGLO_SAXON_IDS, SAMURAI_IDS, VIKING_IDS, STARTER_BASE_IDS,
 } from '../data/animals.js';
 import { LEVEL_REWARDS } from '../data/levels.js';
 import { state, MONETIZE_PLACEHOLDER } from './state.js';
@@ -55,6 +57,22 @@ function countKnightsUnlocked(progress) {
   return KNIGHT_IDS.filter(id => progress.quizUnlocked.includes(id)).length;
 }
 
+function countRomanUnlocked(progress) {
+  return ROMAN_IDS.filter(id => progress.quizUnlocked.includes(id)).length;
+}
+
+function countAngloSaxonUnlocked(progress) {
+  return ANGLO_SAXON_IDS.filter(id => progress.quizUnlocked.includes(id)).length;
+}
+
+function countSamuraiUnlocked(progress) {
+  return SAMURAI_IDS.filter(id => progress.quizUnlocked.includes(id)).length;
+}
+
+function countVikingUnlocked(progress) {
+  return VIKING_IDS.filter(id => progress.quizUnlocked.includes(id)).length;
+}
+
 /** All Mythical God quizzes cleared — Egyptian Guardian quizzes open. */
 function egyptianTierQuizOpen(progress) {
   return countMythicalUnlocked(progress) >= MYTHICAL_IDS.length;
@@ -63,6 +81,26 @@ function egyptianTierQuizOpen(progress) {
 /** All Egyptian Guardian quizzes cleared — Knights of the Realm quizzes open. */
 function knightTierQuizOpen(progress) {
   return countEgyptianUnlocked(progress) >= EGYPTIAN_IDS.length;
+}
+
+/** All recruitable Knights recruited — Roman Empire quizzes open. */
+function romanTierQuizOpen(progress) {
+  return countKnightsUnlocked(progress) >= KNIGHT_IDS.length;
+}
+
+/** All Roman recruits — Anglo-Saxon quizzes open. */
+function angloSaxonTierQuizOpen(progress) {
+  return countRomanUnlocked(progress) >= ROMAN_IDS.length;
+}
+
+/** All Anglo-Saxon recruits — Samurai Order quizzes open. */
+function samuraiTierQuizOpen(progress) {
+  return countAngloSaxonUnlocked(progress) >= ANGLO_SAXON_IDS.length;
+}
+
+/** All Samurai recruits — Viking Clans quizzes open. */
+function vikingTierQuizOpen(progress) {
+  return countSamuraiUnlocked(progress) >= SAMURAI_IDS.length;
 }
 
 /** Beat level 5 (campaign level 6+) → apex quizzes open. */
@@ -86,6 +124,10 @@ function mythicalLevelGateMet(progress) {
 }
 
 function getPlayerStageLabel(progress) {
+  if (vikingTierQuizOpen(progress) && countVikingUnlocked(progress) > 0) return 'Viking Clans';
+  if (samuraiTierQuizOpen(progress) && countSamuraiUnlocked(progress) > 0) return 'Samurai Order';
+  if (angloSaxonTierQuizOpen(progress) && countAngloSaxonUnlocked(progress) > 0) return 'Anglo-Saxons';
+  if (romanTierQuizOpen(progress) && countRomanUnlocked(progress) > 0) return 'Roman Empire';
   if (knightTierQuizOpen(progress) && countKnightsUnlocked(progress) > 0) return 'Knights of the Realm';
   if (egyptianTierQuizOpen(progress) && countEgyptianUnlocked(progress) > 0) return 'Egyptian Guardians';
   if (mythicalLevelGateMet(progress) && countMythicalUnlocked(progress) > 0) return 'Mythical Gods';
@@ -138,6 +180,26 @@ function getNextKnightAnimalId(progress) {
   return KNIGHT_IDS.find(id => !progress.quizUnlocked.includes(id)) || null;
 }
 
+function getNextRomanAnimalId(progress) {
+  if (!romanTierQuizOpen(progress)) return null;
+  return ROMAN_IDS.find(id => !progress.quizUnlocked.includes(id)) || null;
+}
+
+function getNextAngloSaxonAnimalId(progress) {
+  if (!angloSaxonTierQuizOpen(progress)) return null;
+  return ANGLO_SAXON_IDS.find(id => !progress.quizUnlocked.includes(id)) || null;
+}
+
+function getNextSamuraiAnimalId(progress) {
+  if (!samuraiTierQuizOpen(progress)) return null;
+  return SAMURAI_IDS.find(id => !progress.quizUnlocked.includes(id)) || null;
+}
+
+function getNextVikingAnimalId(progress) {
+  if (!vikingTierQuizOpen(progress)) return null;
+  return VIKING_IDS.find(id => !progress.quizUnlocked.includes(id)) || null;
+}
+
 const MAX_LEVEL = 30;
 
 /** One-line hints for hub / battle overlay (short, kid-friendly). */
@@ -184,6 +246,26 @@ function getProgressionNextLines(progress) {
   } else if (getNextKnightAnimalId(p)) {
     const id = getNextKnightAnimalId(p);
     lines.push(`<strong>🛡️ Knights of the Realm Unlocked!</strong> Pass the <strong>${ANIMALS[id].name}</strong> quiz in the Forge.`);
+  } else if (!romanTierQuizOpen(p)) {
+    lines.push(`<strong>🏛️ Almost there:</strong> Recruit every <strong>Knights of the Realm</strong> recruit to unlock the <strong>Roman Empire</strong>.`);
+  } else if (getNextRomanAnimalId(p)) {
+    const id = getNextRomanAnimalId(p);
+    lines.push(`<strong>🏛️ Roman Empire Unlocked!</strong> Pass the <strong>${ANIMALS[id].name}</strong> quiz in the Forge.`);
+  } else if (!angloSaxonTierQuizOpen(p)) {
+    lines.push(`<strong>🌲 Almost there:</strong> Recruit every <strong>Roman Empire</strong> spirit to unlock <strong>Anglo-Saxons</strong>.`);
+  } else if (getNextAngloSaxonAnimalId(p)) {
+    const id = getNextAngloSaxonAnimalId(p);
+    lines.push(`<strong>🌲 Anglo-Saxons Unlocked!</strong> Pass the <strong>${ANIMALS[id].name}</strong> quiz in the Forge.`);
+  } else if (!samuraiTierQuizOpen(p)) {
+    lines.push(`<strong>🗾 Almost there:</strong> Recruit every <strong>Anglo-Saxon</strong> spirit to unlock the <strong>Samurai Order</strong>.`);
+  } else if (getNextSamuraiAnimalId(p)) {
+    const id = getNextSamuraiAnimalId(p);
+    lines.push(`<strong>🗾 Samurai Order Unlocked!</strong> Pass the <strong>${ANIMALS[id].name}</strong> quiz in the Forge.`);
+  } else if (!vikingTierQuizOpen(p)) {
+    lines.push(`<strong>🛡️ Almost there:</strong> Recruit every <strong>Samurai Order</strong> spirit to unlock <strong>Viking Clans</strong>.`);
+  } else if (getNextVikingAnimalId(p)) {
+    const id = getNextVikingAnimalId(p);
+    lines.push(`<strong>⚓ Viking Clans Unlocked!</strong> Pass the <strong>${ANIMALS[id].name}</strong> quiz in the Forge.`);
   } else {
     lines.push(`<strong>You cleared the full roster!</strong> Push levels, coins, and leaderboard rank.`);
   }
@@ -214,6 +296,18 @@ function getAvailableAnimals(progress) {
     if (a.stage === STAGE_KNIGHTS) {
       return canAccessStage(progress, STAGE_KNIGHTS) && knightTierQuizOpen(progress) && progress.quizUnlocked.includes(id);
     }
+    if (a.stage === STAGE_ROMAN) {
+      return canAccessStage(progress, STAGE_ROMAN) && romanTierQuizOpen(progress) && progress.quizUnlocked.includes(id);
+    }
+    if (a.stage === STAGE_ANGLO_SAXON) {
+      return canAccessStage(progress, STAGE_ANGLO_SAXON) && angloSaxonTierQuizOpen(progress) && progress.quizUnlocked.includes(id);
+    }
+    if (a.stage === STAGE_SAMURAI) {
+      return canAccessStage(progress, STAGE_SAMURAI) && samuraiTierQuizOpen(progress) && progress.quizUnlocked.includes(id);
+    }
+    if (a.stage === STAGE_VIKING) {
+      return canAccessStage(progress, STAGE_VIKING) && vikingTierQuizOpen(progress) && progress.quizUnlocked.includes(id);
+    }
     return false;
   });
 }
@@ -228,6 +322,10 @@ function isQuizEligible(id, progress) {
   if (a.stage === STAGE_MYTHICAL) return canAccessStage(progress, STAGE_MYTHICAL) && mythicalLevelGateMet(progress);
   if (a.stage === STAGE_EGYPTIAN) return canAccessStage(progress, STAGE_EGYPTIAN) && egyptianTierQuizOpen(progress);
   if (a.stage === STAGE_KNIGHTS) return canAccessStage(progress, STAGE_KNIGHTS) && knightTierQuizOpen(progress);
+  if (a.stage === STAGE_ROMAN) return canAccessStage(progress, STAGE_ROMAN) && romanTierQuizOpen(progress);
+  if (a.stage === STAGE_ANGLO_SAXON) return canAccessStage(progress, STAGE_ANGLO_SAXON) && angloSaxonTierQuizOpen(progress);
+  if (a.stage === STAGE_SAMURAI) return canAccessStage(progress, STAGE_SAMURAI) && samuraiTierQuizOpen(progress);
+  if (a.stage === STAGE_VIKING) return canAccessStage(progress, STAGE_VIKING) && vikingTierQuizOpen(progress);
   return false;
 }
 
@@ -239,6 +337,10 @@ function isLevelLocked(id, progress) {
   if (a.stage === STAGE_MYTHICAL) return progress.level < 17;
   if (a.stage === STAGE_EGYPTIAN) return !egyptianTierQuizOpen(progress);
   if (a.stage === STAGE_KNIGHTS) return !knightTierQuizOpen(progress);
+  if (a.stage === STAGE_ROMAN) return !romanTierQuizOpen(progress);
+  if (a.stage === STAGE_ANGLO_SAXON) return !angloSaxonTierQuizOpen(progress);
+  if (a.stage === STAGE_SAMURAI) return !samuraiTierQuizOpen(progress);
+  if (a.stage === STAGE_VIKING) return !vikingTierQuizOpen(progress);
   return false;
 }
 
@@ -285,11 +387,39 @@ function unlockGateLinesForAnimal(id, progress) {
       { ok: progress.quizUnlocked.includes(id), text: 'Pass Knight quiz' },
     ];
   }
+  if (a.stage === STAGE_ROMAN) {
+    return [
+      { ok: romanTierQuizOpen(progress), text: 'Recruit every Knight of the Realm (quizzes)' },
+      { ok: progress.quizUnlocked.includes(id), text: 'Pass Roman quiz' },
+    ];
+  }
+  if (a.stage === STAGE_ANGLO_SAXON) {
+    return [
+      { ok: angloSaxonTierQuizOpen(progress), text: 'Recruit every Roman Empire spirit (quizzes)' },
+      { ok: progress.quizUnlocked.includes(id), text: 'Pass Anglo-Saxon quiz' },
+    ];
+  }
+  if (a.stage === STAGE_SAMURAI) {
+    return [
+      { ok: samuraiTierQuizOpen(progress), text: 'Recruit every Anglo-Saxon spirit (quizzes)' },
+      { ok: progress.quizUnlocked.includes(id), text: 'Pass Samurai quiz' },
+    ];
+  }
+  if (a.stage === STAGE_VIKING) {
+    return [
+      { ok: vikingTierQuizOpen(progress), text: 'Recruit every Samurai Order spirit (quizzes)' },
+      { ok: progress.quizUnlocked.includes(id), text: 'Pass Viking Clans quiz' },
+    ];
+  }
   return null;
 }
 
 function quizUiTierType(animalId) {
   const stage = ANIMALS[animalId]?.stage;
+  if (stage === STAGE_VIKING) return 'viking';
+  if (stage === STAGE_SAMURAI) return 'samurai';
+  if (stage === STAGE_ANGLO_SAXON) return 'anglo_saxon';
+  if (stage === STAGE_ROMAN) return 'roman';
   if (stage === STAGE_KNIGHTS) return 'knights';
   if (stage === STAGE_EGYPTIAN) return 'egyptian';
   if (stage === STAGE_MYTHICAL) return 'mythical';
@@ -411,6 +541,18 @@ function getSoftMonetisationHintLines(progress) {
   if (!MONETIZE_PLACEHOLDER.knightsStageOwned && knightTierQuizOpen(progress) && countKnightsUnlocked(progress) < KNIGHT_IDS.length) {
     lines.push('<span class="soft-gate-pill">Unlock Knights</span> Or earn each knight with <strong>Knights quizzes</strong>.');
   }
+  if (!MONETIZE_PLACEHOLDER.romanStageOwned && romanTierQuizOpen(progress) && countRomanUnlocked(progress) < ROMAN_IDS.length) {
+    lines.push('<span class="soft-gate-pill">Unlock Roman Empire</span> Or earn each spirit with <strong>Roman quizzes</strong>.');
+  }
+  if (!MONETIZE_PLACEHOLDER.angloSaxonStageOwned && angloSaxonTierQuizOpen(progress) && countAngloSaxonUnlocked(progress) < ANGLO_SAXON_IDS.length) {
+    lines.push('<span class="soft-gate-pill">Unlock Anglo-Saxons</span> Or earn each spirit with <strong>Anglo-Saxon quizzes</strong>.');
+  }
+  if (!MONETIZE_PLACEHOLDER.samuraiStageOwned && samuraiTierQuizOpen(progress) && countSamuraiUnlocked(progress) < SAMURAI_IDS.length) {
+    lines.push('<span class="soft-gate-pill">Unlock Samurai Order</span> Or earn each spirit with <strong>Samurai quizzes</strong>.');
+  }
+  if (!MONETIZE_PLACEHOLDER.vikingStageOwned && vikingTierQuizOpen(progress) && countVikingUnlocked(progress) < VIKING_IDS.length) {
+    lines.push('<span class="soft-gate-pill">Unlock Viking Clans</span> Or earn each spirit with <strong>Viking Clans quizzes</strong>.');
+  }
   return lines;
 }
 
@@ -428,8 +570,16 @@ export {
   countMythicalUnlocked,
   countEgyptianUnlocked,
   countKnightsUnlocked,
+  countRomanUnlocked,
+  countAngloSaxonUnlocked,
+  countSamuraiUnlocked,
+  countVikingUnlocked,
   egyptianTierQuizOpen,
   knightTierQuizOpen,
+  romanTierQuizOpen,
+  angloSaxonTierQuizOpen,
+  samuraiTierQuizOpen,
+  vikingTierQuizOpen,
   apexLevelGateMet,
   dinoLevelGateMet,
   legendaryLevelGateMet,
@@ -444,6 +594,10 @@ export {
   getNextMythicalAnimalId,
   getNextEgyptianAnimalId,
   getNextKnightAnimalId,
+  getNextRomanAnimalId,
+  getNextAngloSaxonAnimalId,
+  getNextSamuraiAnimalId,
+  getNextVikingAnimalId,
   getProgressionNextLines,
   getAvailableAnimals,
   isQuizEligible,

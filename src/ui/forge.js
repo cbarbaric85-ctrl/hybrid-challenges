@@ -1,13 +1,16 @@
 import {
   STAT_MAX, STAGE_BASE, STAGE_APEX, STAGE_DINO, STAGE_LEGENDARY, STAGE_MYTHICAL, STAGE_EGYPTIAN, STAGE_KNIGHTS,
+  STAGE_ROMAN, STAGE_ANGLO_SAXON, STAGE_SAMURAI, STAGE_VIKING,
   ANIMALS, ALL_ANIMALS, APEX_IDS, DINO_IDS, LEGENDARY_IDS, MYTHICAL_IDS, EGYPTIAN_IDS, KNIGHT_IDS,
+  ROMAN_IDS, ANGLO_SAXON_IDS, SAMURAI_IDS, VIKING_IDS,
 } from '../data/animals.js';
 import { LEVELS } from '../data/levels.js';
 import { QUIZZES } from '../data/quizzes.js';
 import { state, quizState, resetQuizState, UNLOCK_QUIZ_SESSION_LEN, clearDefeatAutoReturn, clearLevelCompleteAutoNav } from '../game/state.js';
 import {
-  getAvailableAnimals, isQuizEligible, unlockGateLinesForAnimal,
+  getAvailableAnimals,   isQuizEligible, unlockGateLinesForAnimal,
   quizUiTierType, canAccessStage, egyptianTierQuizOpen, knightTierQuizOpen,
+  romanTierQuizOpen, angloSaxonTierQuizOpen, samuraiTierQuizOpen, vikingTierQuizOpen,
 } from '../game/progression.js';
 import {
   hybridName, powerScore, hybridTierClass,
@@ -225,6 +228,122 @@ function renderBuilder() {
     container.appendChild(sec);
   }
 
+  // ── SECTION 8: ROMAN EMPIRE ──
+  {
+    const sec = document.createElement('div');
+    sec.className = 'tier-section';
+    sec.innerHTML = `<div class="tier-hdr"><span class="tier-hdr-nm roman">🏛️ Roman Empire</span><div class="tier-hdr-line" style="background:rgba(201,162,39,.35)"></div></div>`;
+
+    if (!romanTierQuizOpen(p)) {
+      sec.innerHTML += `<div class="tier-locked-notice"><strong>Roman Empire</strong><br>
+        <em style="font-size:.55rem;color:var(--roman)">"Spirits of the eternal city — thunder, sea, and iron will."</em><br>
+        <span class="unlock-gate-row"><span class="unlock-gate-no">○</span> Recruit <strong>every Knights of the Realm</strong> recruit (pass all Knight quizzes)</span></div>`;
+      const gridR = document.createElement('div');
+      gridR.className = 'b-animal-grid';
+      ROMAN_IDS.forEach(id => gridR.appendChild(makeQuizLockCard(id, 'roman')));
+      sec.appendChild(gridR);
+    } else {
+      const grid = document.createElement('div');
+      grid.className = 'b-animal-grid';
+      ROMAN_IDS.forEach(id => {
+        if (available.includes(id)) {
+          grid.appendChild(makeAnimalCard(id));
+        } else {
+          grid.appendChild(makeQuizLockCard(id, 'roman'));
+        }
+      });
+      sec.appendChild(grid);
+    }
+    container.appendChild(sec);
+  }
+
+  // ── SECTION 9: ANGLO-SAXONS ──
+  {
+    const sec = document.createElement('div');
+    sec.className = 'tier-section';
+    sec.innerHTML = `<div class="tier-hdr"><span class="tier-hdr-nm anglo">🌲 Anglo-Saxons</span><div class="tier-hdr-line" style="background:rgba(124,184,120,.35)"></div></div>`;
+
+    if (!angloSaxonTierQuizOpen(p)) {
+      sec.innerHTML += `<div class="tier-locked-notice"><strong>Anglo-Saxons</strong><br>
+        <em style="font-size:.55rem;color:var(--anglo)">"Spirits of fen, hall, and wild wood — hearth and oaths."</em><br>
+        <span class="unlock-gate-row"><span class="unlock-gate-no">○</span> Recruit <strong>every Roman Empire</strong> spirit (pass all Roman quizzes)</span></div>`;
+      const gridA = document.createElement('div');
+      gridA.className = 'b-animal-grid';
+      ANGLO_SAXON_IDS.forEach(id => gridA.appendChild(makeQuizLockCard(id, 'anglo_saxon')));
+      sec.appendChild(gridA);
+    } else {
+      const grid = document.createElement('div');
+      grid.className = 'b-animal-grid';
+      ANGLO_SAXON_IDS.forEach(id => {
+        if (available.includes(id)) {
+          grid.appendChild(makeAnimalCard(id));
+        } else {
+          grid.appendChild(makeQuizLockCard(id, 'anglo_saxon'));
+        }
+      });
+      sec.appendChild(grid);
+    }
+    container.appendChild(sec);
+  }
+
+  // ── SECTION 10: SAMURAI ORDER ──
+  {
+    const sec = document.createElement('div');
+    sec.className = 'tier-section';
+    sec.innerHTML = `<div class="tier-hdr"><span class="tier-hdr-nm samurai">🗾 Samurai Order</span><div class="tier-hdr-line" style="background:rgba(185,28,28,.35)"></div></div>`;
+
+    if (!samuraiTierQuizOpen(p)) {
+      sec.innerHTML += `<div class="tier-locked-notice"><strong>Samurai Order</strong><br>
+        <em style="font-size:.55rem;color:var(--samurai)">"Kami-spirits and shadow — blade, blossom, and storm."</em><br>
+        <span class="unlock-gate-row"><span class="unlock-gate-no">○</span> Recruit <strong>every Anglo-Saxon</strong> spirit (pass all Anglo-Saxon quizzes)</span></div>`;
+      const gridS = document.createElement('div');
+      gridS.className = 'b-animal-grid';
+      SAMURAI_IDS.forEach(id => gridS.appendChild(makeQuizLockCard(id, 'samurai')));
+      sec.appendChild(gridS);
+    } else {
+      const grid = document.createElement('div');
+      grid.className = 'b-animal-grid';
+      SAMURAI_IDS.forEach(id => {
+        if (available.includes(id)) {
+          grid.appendChild(makeAnimalCard(id));
+        } else {
+          grid.appendChild(makeQuizLockCard(id, 'samurai'));
+        }
+      });
+      sec.appendChild(grid);
+    }
+    container.appendChild(sec);
+  }
+
+  // ── SECTION 11: VIKING CLANS ──
+  {
+    const sec = document.createElement('div');
+    sec.className = 'tier-section';
+    sec.innerHTML = `<div class="tier-hdr"><span class="tier-hdr-nm viking">⚓ Viking Clans</span><div class="tier-hdr-line" style="background:rgba(100,180,220,.35)"></div></div>`;
+
+    if (!vikingTierQuizOpen(p)) {
+      sec.innerHTML += `<div class="tier-locked-notice"><strong>Viking Clans</strong><br>
+        <em style="font-size:.55rem;color:var(--viking)">"Sea-raiders and saga spirits — longships, runes, and northern fire."</em><br>
+        <span class="unlock-gate-row"><span class="unlock-gate-no">○</span> Recruit <strong>every Samurai Order</strong> spirit (pass all Samurai quizzes)</span></div>`;
+      const gridV = document.createElement('div');
+      gridV.className = 'b-animal-grid';
+      VIKING_IDS.forEach(id => gridV.appendChild(makeQuizLockCard(id, 'viking')));
+      sec.appendChild(gridV);
+    } else {
+      const grid = document.createElement('div');
+      grid.className = 'b-animal-grid';
+      VIKING_IDS.forEach(id => {
+        if (available.includes(id)) {
+          grid.appendChild(makeAnimalCard(id));
+        } else {
+          grid.appendChild(makeQuizLockCard(id, 'viking'));
+        }
+      });
+      sec.appendChild(grid);
+    }
+    container.appendChild(sec);
+  }
+
   updateSelectionUI();
   renderEnemyPreviewInBuilder();
   if (state.playerHybrid) renderHybridPreview(state.playerHybrid);
@@ -248,12 +367,16 @@ function makeAnimalCard(id) {
   const a = ANIMALS[id];
   const card = document.createElement('div');
   const isSelected = state.selectedAnimals.includes(id);
-  const stageCls = a.stage === STAGE_KNIGHTS ? ' knights-card'
-    : a.stage === STAGE_EGYPTIAN ? ' egyptian-card'
-    : a.stage === STAGE_MYTHICAL ? ' mythical-card'
-      : a.stage === STAGE_LEGENDARY ? ' legendary-card'
-        : a.stage === STAGE_DINO ? ' dino-card'
-          : a.stage === STAGE_APEX ? ' apex-card' : '';
+  const stageCls = a.stage === STAGE_VIKING ? ' viking-card'
+    : a.stage === STAGE_SAMURAI ? ' samurai-card'
+    : a.stage === STAGE_ANGLO_SAXON ? ' anglo-card'
+      : a.stage === STAGE_ROMAN ? ' roman-card'
+        : a.stage === STAGE_KNIGHTS ? ' knights-card'
+          : a.stage === STAGE_EGYPTIAN ? ' egyptian-card'
+            : a.stage === STAGE_MYTHICAL ? ' mythical-card'
+              : a.stage === STAGE_LEGENDARY ? ' legendary-card'
+                : a.stage === STAGE_DINO ? ' dino-card'
+                  : a.stage === STAGE_APEX ? ' apex-card' : '';
   card.id = `bac-${id}`;
   card.className = `bac${stageCls}${isSelected?' sel':''}`;
   card.addEventListener('click', e => {
@@ -261,6 +384,10 @@ function makeAnimalCard(id) {
     toggleAnimalSelect(id);
   });
   const tierMap = {
+    [STAGE_VIKING]: ['⚓ VIKING', 't12'],
+    [STAGE_SAMURAI]: ['🗾 SAMURAI', 't11'],
+    [STAGE_ANGLO_SAXON]: ['🌲 ANGLO-SAXON', 't10'],
+    [STAGE_ROMAN]: ['🏛️ ROMAN', 't9'],
     [STAGE_KNIGHTS]: ['🛡️ KNIGHT', 't8'],
     [STAGE_EGYPTIAN]: ['⚱️ EGYPTIAN', 't7'],
     [STAGE_MYTHICAL]: ['⚡ MYTHICAL', 't6'],
@@ -321,7 +448,17 @@ function makeQuizLockCard(id, tierType) {
   }
   if (eligible) {
     const btn = document.createElement('button');
-    const quizBtnCls = {knights:'btn-knights',egyptian:'btn-egyptian',mythical:'btn-mythical',legendary:'btn-legendary',dino:'btn-dino'}[tierType] || 'btn-purple';
+    const quizBtnCls = {
+      viking: 'btn-viking',
+      samurai: 'btn-samurai',
+      anglo_saxon: 'btn-anglo',
+      roman: 'btn-roman',
+      knights: 'btn-knights',
+      egyptian: 'btn-egyptian',
+      mythical: 'btn-mythical',
+      legendary: 'btn-legendary',
+      dino: 'btn-dino',
+    }[tierType] || 'btn-purple';
     btn.className = `btn btn-sm bac-quiz-btn ${quizBtnCls}`;
     btn.textContent = '📝 quiz';
     btn.style.width = '100%';
@@ -604,6 +741,10 @@ function renderHybridPreview(h) {
     emEl.textContent = h.emojis;
   }
   const nameGlowMap = {
+    viking: 'viking-glow',
+    samurai: 'samurai-glow',
+    anglo_saxon: 'anglo-glow',
+    roman: 'roman-glow',
     knights: 'knights-glow', egyptian: 'egyptian-glow', mythical: 'mythical-glow', legendary: 'legendary-glow', dino: 'dino-glow', apex: 'apex-glow',
   };
   const nameCls = 'h-name ' + (nameGlowMap[h.tierClass] || 'glow');
@@ -611,6 +752,10 @@ function renderHybridPreview(h) {
   document.getElementById('h-name').textContent = h.name;
   document.getElementById('h-sub').textContent = h.composition.toUpperCase();
   const readyMap = {
+    viking: 'viking-ready',
+    samurai: 'samurai-ready',
+    anglo_saxon: 'anglo-ready',
+    roman: 'roman-ready',
     knights: 'knights-ready', egyptian: 'egyptian-ready', mythical: 'mythical-ready', legendary: 'legendary-ready', dino: 'dino-ready', apex: 'apex-ready',
   };
   const hcardCls = 'hcard ' + (readyMap[h.tierClass] || 'ready');
@@ -676,6 +821,10 @@ function openQuiz(animalId) {
   const tierType = quizUiTierType(animalId);
 
   const tierBadgeText = {
+    viking: '⚓ VIKING CLANS',
+    samurai: '🗾 SAMURAI ORDER',
+    anglo_saxon: '🌲 ANGLO-SAXON',
+    roman: '🏛️ ROMAN EMPIRE',
     knights: '🛡️ KNIGHT OF THE REALM', egyptian: '⚱️ EGYPTIAN GUARDIAN', mythical: '⚡ MYTHICAL GOD', legendary: '🐲 LEGENDARY BEAST', dino: '🦖 DINOSAUR TIER',
   };
   document.getElementById('quiz-tier-badge').innerHTML =
@@ -695,15 +844,15 @@ function renderQuizIntro(animalId, tierType, introText) {
     <div class="quiz-animal-hdr">
       <span class="quiz-animal-em">${a.emoji}</span>
       <div class="quiz-animal-nm ${tierType}">${a.name}</div>
-      <div class="quiz-animal-sub ${tierType}">${{knights:'🛡️ KNIGHT OF THE REALM',egyptian:'⚱️ EGYPTIAN GUARDIAN',mythical:'⚡ MYTHICAL GOD',legendary:'🐲 LEGENDARY BEAST',dino:'◈◈ DINOSAUR TIER'}[tierType]||'◈ APEX PREDATOR'}</div>
+      <div class="quiz-animal-sub ${tierType}">${{viking:'⚓ VIKING CLANS',samurai:'🗾 SAMURAI ORDER',anglo_saxon:'🌲 ANGLO-SAXON',roman:'🏛️ ROMAN EMPIRE',knights:'🛡️ KNIGHT OF THE REALM',egyptian:'⚱️ EGYPTIAN GUARDIAN',mythical:'⚡ MYTHICAL GOD',legendary:'🐲 LEGENDARY BEAST',dino:'◈◈ DINOSAUR TIER'}[tierType]||'◈ APEX PREDATOR'}</div>
       <div class="quiz-animal-bio">${introText}</div>
     </div>
     <div style="background:var(--surface);border:1px solid var(--border);padding:18px;text-align:center;width:100%">
       <div style="font-family:var(--fm);font-size:.68rem;color:var(--text-dim);letter-spacing:.15em;text-transform:uppercase;margin-bottom:10px">Challenge Rules</div>
-      <p style="font-size:.9rem;color:var(--text);margin-bottom:8px">Answer all <strong style="color:var(--${{knights:'knights',egyptian:'egyptian',mythical:'mythical',legendary:'legendary',dino:'dino'}[tierType]||'purple'})">${UNLOCK_QUIZ_SESSION_LEN} questions</strong> correctly to unlock ${a.name}. Each run picks a fresh mix from a bigger fact deck.</p>
+      <p style="font-size:.9rem;color:var(--text);margin-bottom:8px">Answer all <strong style="color:var(--${{viking:'viking',samurai:'samurai',anglo_saxon:'anglo',roman:'roman',knights:'knights',egyptian:'egyptian',mythical:'mythical',legendary:'legendary',dino:'dino'}[tierType]||'purple'})">${UNLOCK_QUIZ_SESSION_LEN} questions</strong> correctly to unlock ${a.name}. Each run picks a fresh mix from a bigger fact deck.</p>
       <p style="font-size:.82rem;color:var(--text-dim);margin-bottom:16px">Miss any question and you can try again — the deck shuffles each time.</p>
       <div style="display:flex;gap:10px;justify-content:center">
-        <button class="btn ${{knights:'btn-knights',egyptian:'btn-egyptian',mythical:'btn-mythical',legendary:'btn-legendary',dino:'btn-dino'}[tierType]||'btn-purple'}" onclick="startQuizQuestions()">Begin Challenge →</button>
+        <button class="btn ${{viking:'btn-viking',samurai:'btn-samurai',anglo_saxon:'btn-anglo',roman:'btn-roman',knights:'btn-knights',egyptian:'btn-egyptian',mythical:'btn-mythical',legendary:'btn-legendary',dino:'btn-dino'}[tierType]||'btn-purple'}" onclick="startQuizQuestions()">Begin Challenge →</button>
         <button class="btn btn-ghost btn-sm" onclick="exitQuiz()">Back</button>
       </div>
     </div>`;
@@ -804,7 +953,7 @@ function answerQuestion(optIdx) {
       <div class="qf-correct-ans">${isCorrect ? (usedGrace ? 'Your quiz boost saved this one — nice!' : 'Great job!') : `Correct answer: <strong>${letters[q.correct]}. ${q.opts[q.correct]}</strong>`}</div>
       ${graceHint}
       <div class="qf-fact"><span class="qf-fact-lbl">💡 Fun Fact</span>${q.fact}</div>
-      <button class="btn ${{knights:'btn-knights',egyptian:'btn-egyptian',mythical:'btn-mythical',legendary:'btn-legendary',dino:'btn-dino'}[tierType]||'btn-purple'}" onclick="nextQuizQuestion()">${quizState.currentQ >= sess.length - 1 ? 'See Result →' : 'Next Question →'}</button>
+      <button class="btn ${{viking:'btn-viking',samurai:'btn-samurai',anglo_saxon:'btn-anglo',roman:'btn-roman',knights:'btn-knights',egyptian:'btn-egyptian',mythical:'btn-mythical',legendary:'btn-legendary',dino:'btn-dino'}[tierType]||'btn-purple'}" onclick="nextQuizQuestion()">${quizState.currentQ >= sess.length - 1 ? 'See Result →' : 'Next Question →'}</button>
     </div>`;
 
   // Scroll to feedback

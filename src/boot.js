@@ -70,7 +70,10 @@ onAuthStateChanged(auth, async user => {
           lastPlayedDate: null,
           leaderboardOptIn: true,
           progressSchemaVersion: 1,
-          stageAccess: { base: true, apex: true, dinosaur: true, legendary: true, mythical: true, egyptian: true, knights: true },
+          stageAccess: {
+            base: true, apex: true, dinosaur: true, legendary: true, mythical: true, egyptian: true, knights: true,
+            roman: true, anglo_saxon: true, samurai: true, viking: true,
+          },
           coins: 0,
           unlockTokens: 0,
           dailyChallengeDayKey: null,

@@ -9,9 +9,18 @@ export const STAGE_MYTHICAL = 'mythical';
 export const STAGE_EGYPTIAN = 'egyptian';
 /** Knights / Medieval Order — unlock roster after all Egyptian Guardian quizzes; missions from Level 26+. */
 export const STAGE_KNIGHTS = 'knights';
+/** Roman Empire — unlock after all recruitable Knights are recruited. */
+export const STAGE_ROMAN = 'roman';
+/** Anglo-Saxons — unlock after all Roman Empire recruits. */
+export const STAGE_ANGLO_SAXON = 'anglo_saxon';
+/** Samurai Order — unlock after all Anglo-Saxon recruits. */
+export const STAGE_SAMURAI = 'samurai';
+/** Viking Clans — unlock after all Samurai Order recruits. */
+export const STAGE_VIKING = 'viking';
 
 export const STAGE_RANK = {
   [STAGE_BASE]: 1, [STAGE_APEX]: 2, [STAGE_DINO]: 3, [STAGE_LEGENDARY]: 4, [STAGE_MYTHICAL]: 5, [STAGE_EGYPTIAN]: 6, [STAGE_KNIGHTS]: 7,
+  [STAGE_ROMAN]: 8, [STAGE_ANGLO_SAXON]: 9, [STAGE_SAMURAI]: 10, [STAGE_VIKING]: 11,
 };
 
 /**
@@ -216,6 +225,234 @@ export const TIER_REGISTRY = {
       },
     },
   },
+  roman_empire: {
+    label: 'Roman Empire',
+    stage: STAGE_ROMAN,
+    intro: 'Spirits of the eternal city — thunder, sea, and iron will.',
+    animals: {
+      jupiters_champion: {
+        id: 'jupiters_champion', name: 'Jupiter’s Champion', icon: '⚡', emoji: '⚡', spd: 19, agi: 18, int: 23, str: 21, stage: STAGE_ROMAN,
+        bio: 'Lightning-backed hero — Roman sky-father’s chosen strikes first.',
+        battleAbility: { type: 'stat_bonus', stat: 'int', amount: 1, flash: '⚡ Jupiter’s favor — mind sharp!' },
+      },
+      neptune_guardian: {
+        id: 'neptune_guardian', name: 'Neptune Guardian', icon: '🌊', emoji: '🌊', spd: 18, agi: 20, int: 22, str: 20, stage: STAGE_ROMAN,
+        bio: 'Salt and tide given form — the sea’s watchful spirit.',
+        battleAbility: { type: 'stat_pair_bonus', stats: ['agi', 'int'], amount: 1, flash: '🌊 Neptune’s tide reads the clash!' },
+      },
+      mars_warrior: {
+        id: 'mars_warrior', name: 'Mars Warrior', icon: '⚔️', emoji: '⚔️', spd: 17, agi: 19, int: 20, str: 24, stage: STAGE_ROMAN,
+        bio: 'The red god’s fury — discipline and raw power as one.',
+        battleAbility: { type: 'stat_bonus', stat: 'str', amount: 1, flash: '⚔️ Mars drives the blade!' },
+      },
+      imperial_eagle: {
+        id: 'imperial_eagle', name: 'Imperial Eagle', icon: '🦅', emoji: '🦅', spd: 22, agi: 21, int: 21, str: 18, stage: STAGE_ROMAN,
+        bio: 'Wings of the legion — sees the line before the crowd does.',
+        battleAbility: { type: 'stat_bonus', stat: 'spd', amount: 1, flash: '🦅 Eagle sight — first to the mark!' },
+      },
+      legion_titan: {
+        id: 'legion_titan', name: 'Legion Titan', icon: '🛡️', emoji: '🛡️', spd: 16, agi: 17, int: 20, str: 25, stage: STAGE_ROMAN,
+        bio: 'Shield-wall made flesh — many hearts, one formation.',
+        battleAbility: { type: 'stat_bonus', stat: 'str', amount: 1, flash: '🛡️ Legion holds!' },
+      },
+      colosseum_beast: {
+        id: 'colosseum_beast', name: 'Colosseum Beast', icon: '🦁', emoji: '🦁', spd: 18, agi: 18, int: 18, str: 23, stage: STAGE_ROMAN,
+        bio: 'Arena legend — the crowd’s roar becomes its strength.',
+        battleAbility: { type: 'bonus_after_loss', amount: 1, flash: '🦁 The arena roars you back!' },
+      },
+      arena_sand_spirit: {
+        id: 'arena_sand_spirit', name: 'Arena Sand Spirit', icon: '🏟️', emoji: '🏟️', spd: 20, agi: 23, int: 21, str: 18, stage: STAGE_ROMAN,
+        bio: 'Heat shimmer and grit — flickers where rivals aim.',
+        battleAbility: { type: 'stat_bonus', stat: 'agi', amount: 1, flash: '🏟️ Sand veils your step!' },
+      },
+      shadow_consul: {
+        id: 'shadow_consul', name: 'Shadow Consul', icon: '🌑', emoji: '🌑', spd: 18, agi: 20, int: 24, str: 19, stage: STAGE_ROMAN,
+        bio: 'Whispers in the Senate — truth and rumor as weapons.',
+        battleAbility: { type: 'stat_pair_bonus', stats: ['int', 'spd'], amount: 1, flash: '🌑 Shadow consul outmaneuvers!' },
+      },
+      divine_judge: {
+        id: 'divine_judge', name: 'Divine Judge', icon: '⚖️', emoji: '⚖️', spd: 17, agi: 19, int: 25, str: 20, stage: STAGE_ROMAN,
+        bio: 'Scales of fate — weighs intent before the final blow.',
+        battleAbility: { type: 'stat_bonus', stat: 'int', amount: 1, flash: '⚖️ Judgment finds the flaw!' },
+      },
+      stone_colossus: {
+        id: 'stone_colossus', name: 'Stone Colossus', icon: '🗿', emoji: '🗿', spd: 15, agi: 16, int: 21, str: 25, stage: STAGE_ROMAN,
+        bio: 'Marble giant — the empire carved in stillness and weight.',
+        battleAbility: { type: 'last_stand', minEnemyWins: 2, stat: 'str', amount: 1, flash: '🗿 Colossus will not fall!' },
+      },
+    },
+  },
+  anglo_saxons: {
+    label: 'Anglo-Saxons',
+    stage: STAGE_ANGLO_SAXON,
+    intro: 'Spirits of fen, hall, and wild wood — hearth and oaths.',
+    animals: {
+      forest_guardian: {
+        id: 'forest_guardian', name: 'Forest Guardian', icon: '🌲', emoji: '🌲', spd: 18, agi: 22, int: 21, str: 19, stage: STAGE_ANGLO_SAXON,
+        bio: 'Old trees remember every step — roots hold the line.',
+        battleAbility: { type: 'stat_bonus', stat: 'agi', amount: 1, flash: '🌲 Forest roots steady you!' },
+      },
+      wild_spirit: {
+        id: 'wild_spirit', name: 'Wild Spirit', icon: '🐺', emoji: '🐺', spd: 21, agi: 22, int: 19, str: 20, stage: STAGE_ANGLO_SAXON,
+        bio: 'Heath-wolf soul — hunts with wind and instinct.',
+        battleAbility: { type: 'stat_bonus', stat: 'spd', amount: 1, flash: '🐺 Wild spirit surges!' },
+      },
+      hearth_spirit: {
+        id: 'hearth_spirit', name: 'Hearth Spirit', icon: '🔥', emoji: '🔥', spd: 17, agi: 18, int: 22, str: 21, stage: STAGE_ANGLO_SAXON,
+        bio: 'Warmth of the long hall — courage when the storm howls.',
+        battleAbility: { type: 'inspire_round', roundIndex: 2, amount: 1, flash: '🔥 Hearth rally — stand together!' },
+      },
+      night_watcher: {
+        id: 'night_watcher', name: 'Night Watcher', icon: '🌙', emoji: '🌙', spd: 19, agi: 21, int: 23, str: 18, stage: STAGE_ANGLO_SAXON,
+        bio: 'Moonlit ward — sees threats the sun never catches.',
+        battleAbility: { type: 'stat_pair_bonus', stats: ['int', 'agi'], amount: 1, flash: '🌙 Night eyes pierce the dark!' },
+      },
+      boar_spirit: {
+        id: 'boar_spirit', name: 'Boar Spirit', icon: '🐗', emoji: '🐗', spd: 18, agi: 19, int: 18, str: 24, stage: STAGE_ANGLO_SAXON,
+        bio: 'Shield-boar fury — charges through fear itself.',
+        battleAbility: { type: 'stat_bonus', stat: 'str', amount: 1, flash: '🐗 Boar charge!' },
+      },
+      wood_warden: {
+        id: 'wood_warden', name: 'Wood Warden', icon: '🪵', emoji: '🪵', spd: 17, agi: 20, int: 22, str: 21, stage: STAGE_ANGLO_SAXON,
+        bio: 'Speaks with oak and ash — paths open for friends, close for foes.',
+        battleAbility: { type: 'stat_bonus', stat: 'int', amount: 1, flash: '🪵 Wood wisdom guides!' },
+      },
+      mist_walker: {
+        id: 'mist_walker', name: 'Mist Walker', icon: '🌫️', emoji: '🌫️', spd: 20, agi: 24, int: 20, str: 18, stage: STAGE_ANGLO_SAXON,
+        bio: 'Fen-mist cloak — here, then nowhere.',
+        battleAbility: { type: 'stat_bonus', stat: 'agi', amount: 1, flash: '🌫️ Mist hides your move!' },
+      },
+      owl_seer: {
+        id: 'owl_seer', name: 'Owl Seer', icon: '🦉', emoji: '🦉', spd: 18, agi: 20, int: 25, str: 17, stage: STAGE_ANGLO_SAXON,
+        bio: 'Silent wings, sharp mind — reads omens in every clash.',
+        battleAbility: { type: 'stat_bonus', stat: 'int', amount: 1, flash: '🦉 Owl sees the pattern!' },
+      },
+      iron_spirit: {
+        id: 'iron_spirit', name: 'Iron Spirit', icon: '⚙️', emoji: '⚙️', spd: 16, agi: 18, int: 20, str: 24, stage: STAGE_ANGLO_SAXON,
+        bio: 'Smith-song and ring-mail — endurance older than kings.',
+        battleAbility: { type: 'stat_bonus', stat: 'str', amount: 1, flash: '⚙️ Iron does not yield!' },
+      },
+      nature_caller: {
+        id: 'nature_caller', name: 'Nature Caller', icon: '🍃', emoji: '🍃', spd: 19, agi: 21, int: 22, str: 19, stage: STAGE_ANGLO_SAXON,
+        bio: 'Wind in the leaves — calls allies and confusion alike.',
+        battleAbility: { type: 'bonus_after_loss', amount: 1, flash: '🍃 Nature answers your call!' },
+      },
+    },
+  },
+  samurai_order: {
+    label: 'Samurai Order',
+    stage: STAGE_SAMURAI,
+    intro: 'Kami-spirits and shadow — blade, blossom, and storm.',
+    animals: {
+      dragon_spirit: {
+        id: 'dragon_spirit', name: 'Dragon Spirit', icon: '🐉', emoji: '🐉', spd: 20, agi: 19, int: 23, str: 23, stage: STAGE_SAMURAI,
+        bio: 'River-dragon soul — power that bends before it breaks.',
+        battleAbility: { type: 'royal_command' },
+      },
+      kitsune: {
+        id: 'kitsune', name: 'Kitsune', icon: '🦊', emoji: '🦊', spd: 21, agi: 23, int: 24, str: 16, stage: STAGE_SAMURAI,
+        bio: 'Fox of nine tales — clever paths where others see walls.',
+        battleAbility: { type: 'stat_pair_bonus', stats: ['int', 'agi'], amount: 1, flash: '🦊 Kitsune slips the trap!' },
+      },
+      oni_warrior: {
+        id: 'oni_warrior', name: 'Oni Warrior', icon: '👹', emoji: '👹', spd: 17, agi: 18, int: 19, str: 25, stage: STAGE_SAMURAI,
+        bio: 'Horned terror of legend — turns fear into a weapon.',
+        battleAbility: { type: 'stat_bonus', stat: 'str', amount: 1, flash: '👹 Oni strength crashes down!' },
+      },
+      blossom_spirit: {
+        id: 'blossom_spirit', name: 'Blossom Spirit', icon: '🌸', emoji: '🌸', spd: 19, agi: 22, int: 23, str: 18, stage: STAGE_SAMURAI,
+        bio: 'Sakura calm — beauty that hides a razor edge.',
+        battleAbility: { type: 'stat_bonus', stat: 'agi', amount: 1, flash: '🌸 Blossom feints — too fast!' },
+      },
+      wind_spirit: {
+        id: 'wind_spirit', name: 'Wind Spirit', icon: '💨', emoji: '💨', spd: 24, agi: 23, int: 20, str: 17, stage: STAGE_SAMURAI,
+        bio: 'Fujin’s whisper — speed that leaves no shadow.',
+        battleAbility: { type: 'stat_bonus', stat: 'spd', amount: 1, flash: '💨 Wind carries the strike!' },
+      },
+      fire_kami: {
+        id: 'fire_kami', name: 'Fire Kami', icon: '🔥', emoji: '🔥', spd: 20, agi: 21, int: 22, str: 20, stage: STAGE_SAMURAI,
+        bio: 'Sacred flame — burns clean, decides true.',
+        battleAbility: { type: 'stat_bonus', stat: 'int', amount: 1, flash: '🔥 Fire kami judges true!' },
+      },
+      water_kami: {
+        id: 'water_kami', name: 'Water Kami', icon: '💧', emoji: '💧', spd: 19, agi: 22, int: 23, str: 19, stage: STAGE_SAMURAI,
+        bio: 'Stream and rain — adapts, surrounds, outlasts.',
+        battleAbility: { type: 'stat_pair_bonus', stats: ['int', 'spd'], amount: 1, flash: '💧 Water finds the gap!' },
+      },
+      stone_guardian: {
+        id: 'stone_guardian', name: 'Stone Guardian', icon: '⛰️', emoji: '⛰️', spd: 16, agi: 17, int: 21, str: 25, stage: STAGE_SAMURAI,
+        bio: 'Mountain kami — stillness that breaks charges.',
+        battleAbility: { type: 'stat_bonus', stat: 'str', amount: 1, flash: '⛰️ Stone does not flinch!' },
+      },
+      shadow_spirit: {
+        id: 'shadow_spirit', name: 'Shadow Spirit', icon: '🥷', emoji: '🥷', spd: 22, agi: 24, int: 22, str: 18, stage: STAGE_SAMURAI,
+        bio: 'Silent as ink — strikes from the edge of sight.',
+        battleAbility: { type: 'stat_bonus', stat: 'agi', amount: 1, flash: '🥷 Shadow slips through!' },
+      },
+      thunder_shogun: {
+        id: 'thunder_shogun', name: 'Thunder Shogun', icon: '⛈️', emoji: '⛈️', spd: 18, agi: 20, int: 24, str: 23, stage: STAGE_SAMURAI,
+        bio: 'Storm general — one command, one perfect strike.',
+        battleAbility: { type: 'inspire_round', roundIndex: 2, amount: 1, flash: '⛈️ Thunder orders — all as one!' },
+      },
+    },
+  },
+  viking_clans: {
+    label: 'Viking Clans',
+    stage: STAGE_VIKING,
+    intro: 'Sea-raiders and saga spirits — longships, runes, and northern fire.',
+    animals: {
+      berserker: {
+        id: 'berserker', name: 'Berserker', icon: '🪓', emoji: '🪓', spd: 19, agi: 18, int: 17, str: 25, stage: STAGE_VIKING,
+        bio: 'Berserkir tales tell of warriors who fought with wild courage — stories grew bigger than any one battle.',
+        battleAbility: { type: 'stat_bonus', stat: 'str', amount: 1, flash: '🪓 Berserker rage — strength surges!' },
+      },
+      shield_maiden: {
+        id: 'shield_maiden', name: 'Shield Maiden', icon: '🛡️', emoji: '🛡️', spd: 18, agi: 20, int: 21, str: 22, stage: STAGE_VIKING,
+        bio: 'Sagas praise shield-maidens as defenders — history and legend both celebrate brave northern fighters.',
+        battleAbility: { type: 'bonus_after_loss', amount: 1, flash: '🛡️ Shield Maiden stands again!' },
+      },
+      storm_caller: {
+        id: 'storm_caller', name: 'Storm Caller', icon: '⚡', emoji: '⚡', spd: 20, agi: 19, int: 24, str: 19, stage: STAGE_VIKING,
+        bio: 'Thor’s thunder in stories tied storms to travel — lightning meant both danger and awe at sea.',
+        battleAbility: { type: 'stat_pair_bonus', stats: ['int', 'spd'], amount: 1, flash: '⚡ Storm reads the field!' },
+      },
+      wolf_tamer: {
+        id: 'wolf_tamer', name: 'Wolf Tamer', icon: '🐺', emoji: '🐺', spd: 21, agi: 22, int: 20, str: 19, stage: STAGE_VIKING,
+        bio: 'Wolves in Norse tales stood for loyalty and packs — teamwork turned the wild into allies.',
+        battleAbility: { type: 'inspire_round', roundIndex: 1, amount: 1, flash: '🐺 Pack focus — move as one!' },
+      },
+      battle_wolf: {
+        id: 'battle_wolf', name: 'Battle Wolf', icon: '🐺', emoji: '🐺', spd: 22, agi: 21, int: 19, str: 20, stage: STAGE_VIKING,
+        bio: 'Viking Age traders and raiders sailed far — speed on land and sea opened new roads.',
+        battleAbility: { type: 'stat_bonus', stat: 'spd', amount: 1, flash: '🐺 Battle Wolf runs the line!' },
+      },
+      snow_bear: {
+        id: 'snow_bear', name: 'Snow Bear', icon: '🐻', emoji: '🐻', spd: 16, agi: 17, int: 20, str: 25, stage: STAGE_VIKING,
+        bio: 'Scandinavia’s cold coasts and fjords shaped tough ships, tough people, and clever coastal travel.',
+        battleAbility: { type: 'last_stand', minEnemyWins: 2, stat: 'str', amount: 1, flash: '🐻 Snow Bear will not yield!' },
+      },
+      storm_eagle: {
+        id: 'storm_eagle', name: 'Storm Eagle', icon: '🦅', emoji: '🦅', spd: 23, agi: 24, int: 20, str: 17, stage: STAGE_VIKING,
+        bio: 'Odin’s ravens brought news in myth — sharp eyes and fast wings meant seeing danger first.',
+        battleAbility: { type: 'stat_bonus', stat: 'agi', amount: 1, flash: '🦅 Storm Eagle strikes first!' },
+      },
+      longship_captain: {
+        id: 'longship_captain', name: 'Longship Captain', icon: '⛵', emoji: '⛵', spd: 21, agi: 20, int: 23, str: 20, stage: STAGE_VIKING,
+        bio: 'Longships were slim, fast, and could sail coasts or rivers — Viking travel linked seas and inland trade.',
+        battleAbility: { type: 'stat_pair_bonus', stats: ['int', 'agi'], amount: 1, flash: '⛵ Captain charts the clash!' },
+      },
+      skald_spirit: {
+        id: 'skald_spirit', name: 'Skald Spirit', icon: '📜', emoji: '📜', spd: 18, agi: 19, int: 25, str: 18, stage: STAGE_VIKING,
+        bio: 'Skalds were poets who kept history alive — memory and story passed law, legend, and pride.',
+        battleAbility: { type: 'stat_bonus', stat: 'int', amount: 1, flash: '📜 Skald finds the clever line!' },
+      },
+      valkyrie_spirit: {
+        id: 'valkyrie_spirit', name: 'Valkyrie Spirit', icon: '🪽', emoji: '🪽', spd: 20, agi: 23, int: 22, str: 19, stage: STAGE_VIKING,
+        bio: 'Valkyries in myth chose brave souls — their stories honor courage more than perfect armor.',
+        battleAbility: { type: 'stat_bonus', stat: 'agi', amount: 1, flash: '🪽 Valkyrie cuts the angle!' },
+      },
+    },
+  },
 };
 
 /** Flat animal lookup derived from TIER_REGISTRY — backward-compatible. */
@@ -251,6 +488,18 @@ export const SYLLABLES = {
   paladin_guardian:'PalG', shield_knight:'Shld', swordmaster:'Swrd', royal_champion:'RoyC',
   iron_defender:'Iron', templar_knight:'Temp', lance_cavalier:'Lanc', castle_guardian:'Cast',
   holy_crusader:'Crus', dark_knight:'DrkK', kings_champion:'KingC',
+  jupiters_champion:'JupC', neptune_guardian:'Nept', mars_warrior:'Mars', imperial_eagle:'ImpE',
+  legion_titan:'Legi', colosseum_beast:'Colo', arena_sand_spirit:'SandA', shadow_consul:'ShadC',
+  divine_judge:'DivJ', stone_colossus:'Ston',
+  forest_guardian:'ForG', wild_spirit:'Wild', hearth_spirit:'Hearth', night_watcher:'Nite',
+  boar_spirit:'Boar', wood_warden:'WoodW', mist_walker:'Mist', owl_seer:'OwlS',
+  iron_spirit:'IronS', nature_caller:'Natu',
+  dragon_spirit:'DrgS', kitsune:'Kits', oni_warrior:'Oni', blossom_spirit:'Blos',
+  wind_spirit:'Wind', fire_kami:'FireK', water_kami:'WatK', stone_guardian:'StoG',
+  shadow_spirit:'ShadS', thunder_shogun:'Thnd',
+  berserker:'Bers', shield_maiden:'ShldM', storm_caller:'Storm', wolf_tamer:'WolfT',
+  battle_wolf:'BatW', snow_bear:'SnBr', storm_eagle:'StEg', longship_captain:'Long',
+  skald_spirit:'Skal', valkyrie_spirit:'Valk',
   cat:'Kat', dog:'Dog', elephant:'Elph', hippo:'Hip', hyena:'Hyen', panther:'Pan',
 };
 
@@ -263,5 +512,10 @@ export const EGYPTIAN_IDS = Object.keys(TIER_REGISTRY.egyptian.animals);
 
 /** Recruitable knights (excludes boss-only King’s Champion). */
 export const KNIGHT_IDS = Object.keys(TIER_REGISTRY.knights.animals).filter(id => id !== 'kings_champion');
+
+export const ROMAN_IDS = Object.keys(TIER_REGISTRY.roman_empire.animals);
+export const ANGLO_SAXON_IDS = Object.keys(TIER_REGISTRY.anglo_saxons.animals);
+export const SAMURAI_IDS = Object.keys(TIER_REGISTRY.samurai_order.animals);
+export const VIKING_IDS = Object.keys(TIER_REGISTRY.viking_clans.animals);
 
 export const STARTER_BASE_IDS = ['wolf', 'bear', 'eagle'];

@@ -5,15 +5,31 @@
 
 import {
   ANIMALS, STAT_MAX, STAGE_BASE, STAGE_APEX, STAGE_DINO, STAGE_LEGENDARY, STAGE_MYTHICAL, STAGE_EGYPTIAN, STAGE_KNIGHTS,
+  STAGE_ROMAN, STAGE_ANGLO_SAXON, STAGE_SAMURAI, STAGE_VIKING,
 } from './animals.js';
-import { FACTION_EGYPTIAN, FACTION_VIKING, FACTION_KNIGHTS, FACTIONS } from './factions.js';
+import {
+  FACTION_EGYPTIAN, FACTION_VIKING, FACTION_KNIGHTS,
+  FACTION_ROMAN, FACTION_ANGLO_SAXON, FACTION_SAMURAI,
+  FACTIONS,
+} from './factions.js';
 import { getAvailableAnimals } from '../game/progression.js';
 import { STAT_LABELS_SIMPLE } from '../game/battle.js';
 
 const STAT_KEYS = ['spd', 'agi', 'int', 'str'];
 
 /** @type {Record<string, Partial<{ funFact: string; favouredFactionIds: string[]; huntedFactionIds: string[]; huntedCreatureIds: string[] }>>} */
-export const INTEL_OVERRIDES = {};
+export const INTEL_OVERRIDES = {
+  berserker: { funFact: 'Sagas describe berserkers as wildly brave fighters — stories grew bigger than any one battle.' },
+  shield_maiden: { funFact: 'Shield-maidens in tales defend with courage — poets honored brave women as heroes.' },
+  storm_caller: { funFact: 'Thor myths tied thunder and storms to adventure — weather became a character.' },
+  wolf_tamer: { funFact: 'Wolves in Norse stories often mean loyalty and pack teamwork.' },
+  battle_wolf: { funFact: 'Longships let Vikings sail coasts and rivers — shallow drafts meant flexible travel.' },
+  snow_bear: { funFact: 'Scandinavia’s fjords and cold seas shaped tough ships and clever sailors.' },
+  storm_eagle: { funFact: 'Odin’s ravens Huginn and Muninn symbolize thought and memory in myth.' },
+  longship_captain: { funFact: 'Viking crews traded and explored — not every voyage was a raid.' },
+  skald_spirit: { funFact: 'Skalds were poets who carried history in memory before printing spread.' },
+  valkyrie_spirit: { funFact: 'Valkyries in myth honor courage — symbols teach values in one image.' },
+};
 
 /**
  * Theme-based faction favour / hunt (not simulation).
@@ -54,6 +70,26 @@ function defaultFactionsForStage(stage) {
       return {
         favoured: [FACTION_KNIGHTS],
         hunted: [FACTION_VIKING],
+      };
+    case STAGE_ROMAN:
+      return {
+        favoured: [FACTION_ROMAN],
+        hunted: [FACTION_SAMURAI],
+      };
+    case STAGE_ANGLO_SAXON:
+      return {
+        favoured: [FACTION_ANGLO_SAXON],
+        hunted: [FACTION_ROMAN],
+      };
+    case STAGE_SAMURAI:
+      return {
+        favoured: [FACTION_SAMURAI],
+        hunted: [FACTION_ANGLO_SAXON],
+      };
+    case STAGE_VIKING:
+      return {
+        favoured: [FACTION_VIKING],
+        hunted: [FACTION_KNIGHTS],
       };
     default:
       return {
@@ -174,7 +210,11 @@ export function getCreatureIntel(id, ctx) {
           : a.stage === STAGE_LEGENDARY ? 'Legendary Beast'
             : a.stage === STAGE_MYTHICAL ? 'Mythical God'
               : a.stage === STAGE_EGYPTIAN ? 'Egyptian Guardian'
-                : a.stage === STAGE_KNIGHTS ? 'Knight' : 'Creature';
+                : a.stage === STAGE_KNIGHTS ? 'Knight'
+                  : a.stage === STAGE_ROMAN ? 'Roman Empire'
+                    : a.stage === STAGE_ANGLO_SAXON ? 'Anglo-Saxon'
+                      : a.stage === STAGE_SAMURAI ? 'Samurai Order'
+                        : a.stage === STAGE_VIKING ? 'Viking Clans' : 'Creature';
 
   const funFact = ov.funFact || oneSentence(a.bio);
 

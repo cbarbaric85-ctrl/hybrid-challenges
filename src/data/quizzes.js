@@ -1,4 +1,5 @@
 import { QUIZZES_EXTRA } from './quizzes-augment.js';
+import { QUIZZES_FACTION_EXPANSION, PRE_BATTLE_FACTION_EXPANSION } from './quizzes-faction-expansion.js';
 
 const QUIZZES_BASE = {
   // ── APEX PREDATORS ──
@@ -764,6 +765,7 @@ const QUIZZES_BASE = {
       { q: 'Even a grim knight might still keep…', opts: ['A personal code they refuse to break', 'Only bubble gum', 'Zero skills', 'A pet rock only'], correct: 0, fact: 'Codes create drama — breaking them hurts because they meant something.' },
     ],
   },
+  ...QUIZZES_FACTION_EXPANSION,
 };
 
 /** Forge unlock: base + four extra questions per creature (see quizzes-augment.js). */
@@ -1130,4 +1132,5 @@ export const PRE_BATTLE_QUESTIONS = {
     { q: 'The colour most associated with Anubis is…', opts: ['Gold', 'Black — representing the fertile soil and rebirth', 'Red', 'White'], correct: 1, boostStat: 'agi', funFact: 'Black meant renewal, not death — the Nile\'s black soil brought life to Egypt.' },
     { q: 'Anubis was one of the oldest gods in…', opts: ['Greek mythology', 'Norse mythology', 'Egyptian mythology', 'Roman mythology'], correct: 2, boostStat: 'int', funFact: 'Anubis dates back over 5,000 years — one of humanity\'s oldest divine figures.' },
   ],
+  ...PRE_BATTLE_FACTION_EXPANSION,
 };

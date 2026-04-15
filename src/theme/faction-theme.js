@@ -93,22 +93,67 @@ export const FACTION_THEMES = {
     flashTie: 'rgba(180, 190, 210, 0.14)',
     effect: 'banner',
   },
+  roman_empire: {
+    primary: '#c9a227',
+    secondary: '#3d2e1f',
+    accent: '#8b2942',
+    glow: 'rgba(201, 162, 39, 0.34)',
+    arenaBg: [
+      'linear-gradient(165deg, rgba(12, 8, 6, 0.98) 0%, rgba(28, 22, 16, 0.99) 50%, rgba(8, 6, 4, 1) 100%)',
+      'radial-gradient(ellipse 90% 50% at 50% 0%, rgba(201, 162, 39, 0.12) 0%, transparent 55%)',
+      'radial-gradient(ellipse 60% 40% at 85% 90%, rgba(139, 41, 66, 0.08) 0%, transparent 50%)',
+    ].join(', '),
+    bodyOverlay: [
+      'radial-gradient(ellipse 100% 55% at 50% -5%, rgba(201, 162, 39, 0.07) 0%, transparent 48%)',
+      'linear-gradient(180deg, rgba(139, 41, 66, 0.05) 0%, transparent 40%)',
+    ].join(', '),
+    flashWin: 'rgba(201, 162, 39, 0.2)',
+    flashLoss: 'rgba(139, 41, 66, 0.14)',
+    flashTie: 'rgba(180, 160, 120, 0.14)',
+    effect: 'banner',
+  },
+  anglo_saxons: {
+    primary: '#7cb878',
+    secondary: '#2a3828',
+    accent: '#c4a574',
+    glow: 'rgba(124, 184, 120, 0.32)',
+    arenaBg: [
+      'linear-gradient(165deg, rgba(6, 12, 10, 0.98) 0%, rgba(14, 24, 20, 0.99) 50%, rgba(6, 10, 8, 1) 100%)',
+      'radial-gradient(ellipse 85% 48% at 40% 0%, rgba(124, 184, 120, 0.1) 0%, transparent 52%)',
+      'radial-gradient(ellipse 50% 40% at 0% 100%, rgba(196, 165, 116, 0.06) 0%, transparent 50%)',
+    ].join(', '),
+    bodyOverlay: [
+      'radial-gradient(ellipse 90% 50% at 50% 0%, rgba(124, 184, 120, 0.06) 0%, transparent 45%)',
+      'radial-gradient(ellipse 80% 45% at 100% 80%, rgba(196, 165, 116, 0.05) 0%, transparent 50%)',
+    ].join(', '),
+    flashWin: 'rgba(124, 184, 120, 0.2)',
+    flashLoss: 'rgba(90, 120, 90, 0.14)',
+    flashTie: 'rgba(196, 165, 116, 0.14)',
+    effect: 'none',
+  },
+  samurai_order: {
+    primary: '#b91c1c',
+    secondary: '#1a1410',
+    accent: '#f5e6c8',
+    glow: 'rgba(185, 28, 28, 0.34)',
+    arenaBg: [
+      'linear-gradient(165deg, rgba(12, 8, 8, 0.98) 0%, rgba(22, 14, 12, 0.99) 50%, rgba(8, 4, 4, 1) 100%)',
+      'radial-gradient(ellipse 90% 50% at 50% 0%, rgba(185, 28, 28, 0.11) 0%, transparent 52%)',
+      'linear-gradient(90deg, rgba(60, 20, 20, 0.05) 0%, transparent 20%, transparent 80%, rgba(60, 20, 20, 0.05) 100%)',
+    ].join(', '),
+    bodyOverlay: [
+      'radial-gradient(ellipse 90% 50% at 50% 0%, rgba(185, 28, 28, 0.07) 0%, transparent 48%)',
+      'radial-gradient(ellipse 70% 40% at 80% 100%, rgba(245, 230, 200, 0.04) 0%, transparent 50%)',
+    ].join(', '),
+    flashWin: 'rgba(185, 28, 28, 0.2)',
+    flashLoss: 'rgba(80, 60, 60, 0.14)',
+    flashTie: 'rgba(200, 190, 170, 0.14)',
+    effect: 'none',
+  },
 };
 
 /** Future faction ids — not wired to FACTIONS until product adds them */
 export const FACTION_THEME_PRESETS = {
-  samurai_order: {
-    primary: '#b91c1c',
-    secondary: '#1a1a1a',
-    accent: '#f5f5f5',
-    glow: 'rgba(185, 28, 28, 0.3)',
-    arenaBg: 'linear-gradient(180deg, #0a0a0a 0%, #1a1010 100%)',
-    bodyOverlay: 'radial-gradient(ellipse 80% 50% at 50% 0%, rgba(185, 28, 28, 0.08) 0%, transparent 50%)',
-    flashWin: 'rgba(185, 28, 28, 0.18)',
-    flashLoss: 'rgba(80, 80, 80, 0.14)',
-    flashTie: 'rgba(200, 200, 200, 0.12)',
-    effect: 'none',
-  },
   mythical_gods: {
     primary: '#b06aff',
     secondary: '#ffd700',
@@ -128,6 +173,9 @@ const ACCENT_LABELS = {
   egyptian_guardians: 'gold-blue',
   viking_raiders: 'red-ice',
   knights: 'silver-blue',
+  roman_empire: 'gold-crimson',
+  anglo_saxons: 'green-gold',
+  samurai_order: 'crimson-ink',
 };
 
 /**
