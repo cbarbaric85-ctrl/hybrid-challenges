@@ -1,11 +1,16 @@
 /**
- * Fills `public/assets/` — same pattern as faction crests: copy optional SVG sources from `public/`, else write a neutral vector placeholder.
+ * Copies generated SVGs into `public/assets/` (same idea as faction crests — no synthetic placeholders).
  * Run: npm run assets:seed
  *
- * Source layout (optional — add files as you create art):
+ * Put your generated creature icons here (filenames must match animal ids in src/data/animals.js):
  *   public/creature-icons/{animalId}.svg
- *   public/creature-icons/locked/{animalId}_locked.svg
- *   public/faction-characters/{slug}/{animalId}.svg   (faction-themed override; else copies creature-icons/{id}.svg or placeholder)
+ *   public/creature-icons/locked/{animalId}_locked.svg   (optional)
+ *
+ * Faction-themed overrides (optional):
+ *   public/faction-characters/{slug}/{animalId}.svg
+ *
+ * If a file is missing for an id, nothing is written — the app falls back to emoji (see asset-utils onerror).
+ * You can also commit SVGs directly under public/assets/creatures/; this script only copies when sources exist.
  */
 
 import fs from 'fs';
@@ -48,50 +53,6 @@ function ensureDir(d) {
   fs.mkdirSync(d, { recursive: true });
 }
 
-function safeSvgId(s) {
-  return String(s).replace(/[^a-zA-Z0-9_-]/g, '_');
-}
-
-/**
- * Neutral creature placeholder: soft card + filled silhouette (no hollow “picture frame”).
- * Vignette + two blobs read as a vague bust; locked adds dimmer + padlock.
- */
-function placeholderCreatureSvg(animalId, locked) {
-  const gid = safeSvgId(animalId);
-  const lockLayer = locked
-    ? `
-  <rect width="64" height="64" rx="10" fill="rgba(0,0,0,.42)"/>
-  <g transform="translate(32,34)" fill="none" stroke="rgba(255,255,255,.62)" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
-    <path d="M -6 -6 V -11 A 5 5 0 0 1 6 -11 V -6"/>
-    <rect x="-10" y="-6" width="20" height="16" rx="2" fill="rgba(255,255,255,.1)" stroke="rgba(255,255,255,.62)"/>
-  </g>`
-    : '';
-  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-hidden="true">
-  <defs>
-    <linearGradient id="cp-${gid}" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#1a2a3a"/>
-      <stop offset="100%" stop-color="#0c121c"/>
-    </linearGradient>
-    <radialGradient id="cp-${gid}-v" cx="50%" cy="38%" r="58%">
-      <stop offset="0%" stop-color="rgba(120,180,230,.14)"/>
-      <stop offset="50%" stop-color="rgba(255,255,255,.05)"/>
-      <stop offset="100%" stop-color="transparent"/>
-    </radialGradient>
-  </defs>
-  <rect width="64" height="64" rx="10" fill="url(#cp-${gid})" stroke="rgba(255,255,255,.06)" stroke-width="1"/>
-  <rect width="64" height="64" rx="10" fill="url(#cp-${gid}-v)"/>
-  <ellipse cx="32" cy="26" rx="12" ry="10" fill="rgba(255,255,255,.1)"/>
-  <ellipse cx="32" cy="41" rx="18" ry="14" fill="rgba(255,255,255,.07)"/>${lockLayer}
-</svg>
-`;
-}
-
-function writeSvg(relPath, content) {
-  const full = path.join(assetsRoot, relPath);
-  ensureDir(path.dirname(full));
-  fs.writeFileSync(full, content, 'utf8');
-}
-
 /** Copy from `public/{fromRel}` → `public/assets/{toRel}`. Returns true if copied. */
 function copyFileIfExists(fromRel, toRel) {
   const from = path.join(pub, fromRel);
@@ -113,7 +74,7 @@ function copyIfExists(fromRel, toRel) {
   fs.copyFileSync(from, to);
 }
 
-/** Remove legacy PNG creature/faction portraits after migration to SVG. */
+/** Remove legacy PNG portraits if any remain. */
 function deletePngsUnder(relDir) {
   const dir = path.join(assetsRoot, relDir);
   if (!fs.existsSync(dir)) return;
@@ -133,28 +94,37 @@ function deletePngsUnder(relDir) {
 deletePngsUnder('creatures');
 deletePngsUnder('factions');
 
+let copiedOpen = 0;
+let copiedLocked = 0;
+let missingOpen = 0;
+let missingLocked = 0;
+
 ensureDir(path.join(assetsRoot, 'creatures/locked'));
 
 for (const id of Object.keys(ALL_ANIMALS)) {
   const toOpen = `creatures/${id}.svg`;
-  if (!copyFileIfExists(`creature-icons/${id}.svg`, toOpen)) {
-    writeSvg(toOpen, placeholderCreatureSvg(id, false));
-  }
+  if (copyFileIfExists(`creature-icons/${id}.svg`, toOpen)) copiedOpen++;
+  else missingOpen++;
+
   const toLocked = `creatures/locked/${id}_locked.svg`;
-  if (!copyFileIfExists(`creature-icons/locked/${id}_locked.svg`, toLocked)) {
-    writeSvg(toLocked, placeholderCreatureSvg(id, true));
-  }
+  if (copyFileIfExists(`creature-icons/locked/${id}_locked.svg`, toLocked)) copiedLocked++;
+  else missingLocked++;
 }
 
+let copiedFaction = 0;
 for (const [regKey, slug] of Object.entries(FACTION_TIER_KEY_TO_SLUG)) {
   const tier = TIER_REGISTRY[regKey];
   if (!tier?.animals) continue;
   ensureDir(path.join(assetsRoot, 'factions', slug));
   for (const cid of Object.keys(tier.animals)) {
     const to = `factions/${slug}/${cid}.svg`;
-    if (copyFileIfExists(`faction-characters/${slug}/${cid}.svg`, to)) continue;
-    if (copyFileIfExists(`creature-icons/${cid}.svg`, to)) continue;
-    writeSvg(to, placeholderCreatureSvg(cid, false));
+    if (copyFileIfExists(`faction-characters/${slug}/${cid}.svg`, to)) {
+      copiedFaction++;
+      continue;
+    }
+    if (copyFileIfExists(`creature-icons/${cid}.svg`, to)) {
+      copiedFaction++;
+    }
   }
 }
 
@@ -165,4 +135,18 @@ for (const [from, to] of CREST_COPY) {
   copyIfExists(from, to);
 }
 
-console.log('[seed] assets OK →', path.relative(root, assetsRoot));
+console.log(
+  '[seed] assets →',
+  path.relative(root, assetsRoot),
+  '| creature-icons copied:',
+  copiedOpen,
+  '/',
+  Object.keys(ALL_ANIMALS).length,
+  'open,',
+  copiedLocked,
+  'locked (optional); faction paths copied:',
+  copiedFaction,
+  '| no source file:',
+  missingOpen,
+  'open slots (emoji fallback until you add creature-icons/{id}.svg)'
+);

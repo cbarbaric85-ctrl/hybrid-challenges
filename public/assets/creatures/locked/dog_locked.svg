@@ -1,19 +1,17 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-hidden="true">
   <defs>
     <linearGradient id="cp-dog" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#1a2a3a"/>
-      <stop offset="100%" stop-color="#0c121c"/>
+      <stop offset="0%" stop-color="#1a2834"/>
+      <stop offset="100%" stop-color="#0c1018"/>
     </linearGradient>
-    <radialGradient id="cp-dog-v" cx="50%" cy="38%" r="58%">
-      <stop offset="0%" stop-color="rgba(120,180,230,.14)"/>
-      <stop offset="50%" stop-color="rgba(255,255,255,.05)"/>
+    <radialGradient id="cp-dog-v" cx="50%" cy="45%" r="65%">
+      <stop offset="0%" stop-color="rgba(90,140,190,.1)"/>
+      <stop offset="60%" stop-color="rgba(255,255,255,.03)"/>
       <stop offset="100%" stop-color="transparent"/>
     </radialGradient>
   </defs>
-  <rect width="64" height="64" rx="10" fill="url(#cp-dog)" stroke="rgba(255,255,255,.06)" stroke-width="1"/>
+  <rect width="64" height="64" rx="10" fill="url(#cp-dog)"/>
   <rect width="64" height="64" rx="10" fill="url(#cp-dog-v)"/>
-  <ellipse cx="32" cy="26" rx="12" ry="10" fill="rgba(255,255,255,.1)"/>
-  <ellipse cx="32" cy="41" rx="18" ry="14" fill="rgba(255,255,255,.07)"/>
   <rect width="64" height="64" rx="10" fill="rgba(0,0,0,.42)"/>
   <g transform="translate(32,34)" fill="none" stroke="rgba(255,255,255,.62)" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
     <path d="M -6 -6 V -11 A 5 5 0 0 1 6 -11 V -6"/>
