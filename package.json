@@ -7,8 +7,7 @@
     "build": "vite build",
     "preview": "vite preview",
     "assets:seed": "node scripts/seed-asset-placeholders.mjs",
-    "icons:gallery": "node scripts/generate-icon-gallery.mjs",
-    "icons:base-pngs": "node scripts/seed-base-png-icons.mjs"
+    "icons:gallery": "node scripts/generate-icon-gallery.mjs"
   },
   "dependencies": {
     "firebase": "^11.6.0"

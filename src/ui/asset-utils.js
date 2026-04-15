@@ -2,9 +2,8 @@
  * Helpers for `/assets` registry — images with emoji fallback (see `registerAssetImageFallback` in boot).
  */
 
-import { ALL_ANIMALS, BASE_IDS } from '../data/animals.js';
+import { ALL_ANIMALS } from '../data/animals.js';
 import { getCreaturePortraitUrl, getFactionCrestUrl } from '../config/assets.js';
-import { getCreatureIcon } from '../config/creatureIcons.js';
 import { escapeHtml } from './screens.js';
 
 export function registerAssetImageFallback() {
@@ -32,16 +31,6 @@ export function creaturePortraitImgHtml(id, emoji, opts = {}) {
     locked = false,
   } = opts;
   const em = emoji ?? ALL_ANIMALS[id]?.emoji ?? '?';
-  const name = ALL_ANIMALS[id]?.name;
-
-  if (BASE_IDS.includes(id)) {
-    const url = getCreatureIcon(name || id);
-    const load = loading === 'eager' ? 'eager' : 'lazy';
-    const alt = escapeHtml(name || id);
-    const lockedCls = locked ? ' asset-creature--base-locked' : '';
-    return `<img class="${escapeHtml(className)}${lockedCls}" src="${escapeHtml(url)}" alt="${alt}" width="${size}" height="${size}" loading="${load}" decoding="async" data-fallback="${escapeHtml(em)}" data-asset-id="${escapeHtml(id)}" data-base-png="1" onerror="window.__assetImgFallback&&window.__assetImgFallback(this)"/>`;
-  }
-
   const url = getCreaturePortraitUrl(id, { locked });
   if (!url) {
     console.warn(`[assets] missing creature portrait mapping: ${id}`);
