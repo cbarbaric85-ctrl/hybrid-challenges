@@ -7,7 +7,7 @@
 import { ALL_ANIMALS, TIER_REGISTRY } from '../data/animals.js';
 
 /**
- * @param {string} relativePath No leading slash, e.g. `assets/creatures/wolf.png`
+ * @param {string} relativePath No leading slash, e.g. `assets/creatures/wolf.svg`
  * @returns {string}
  */
 export function publicUrl(relativePath) {
@@ -39,13 +39,13 @@ const FACTION_TIER_KEY_TO_SLUG = {
 
 function buildCreatureMap() {
   return Object.fromEntries(
-    Object.keys(ALL_ANIMALS).map(id => [id, publicUrl(`assets/creatures/${id}.png`)])
+    Object.keys(ALL_ANIMALS).map(id => [id, publicUrl(`assets/creatures/${id}.svg`)])
   );
 }
 
 function buildLockedMap() {
   return Object.fromEntries(
-    Object.keys(ALL_ANIMALS).map(id => [id, publicUrl(`assets/creatures/locked/${id}_locked.png`)])
+    Object.keys(ALL_ANIMALS).map(id => [id, publicUrl(`assets/creatures/locked/${id}_locked.svg`)])
   );
 }
 
@@ -65,7 +65,7 @@ function buildFactionsNested() {
     const tier = TIER_REGISTRY[regKey];
     if (!tier?.animals) continue;
     const characters = Object.fromEntries(
-      Object.keys(tier.animals).map(cid => [cid, publicUrl(`assets/factions/${slug}/${cid}.png`)])
+      Object.keys(tier.animals).map(cid => [cid, publicUrl(`assets/factions/${slug}/${cid}.svg`)])
     );
     out[slug] = {
       crest: publicUrl(`assets/faction_crests/${slug}.svg`),
@@ -107,7 +107,7 @@ export function getFactionCharacterUrl(animalId) {
   });
   if (!regKey) return null;
   const slug = FACTION_TIER_KEY_TO_SLUG[regKey];
-  return slug ? publicUrl(`assets/factions/${slug}/${animalId}.png`) : null;
+  return slug ? publicUrl(`assets/factions/${slug}/${animalId}.svg`) : null;
 }
 
 /**
