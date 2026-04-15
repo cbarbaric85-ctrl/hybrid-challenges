@@ -1,10 +1,17 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-hidden="true">
   <defs>
     <linearGradient id="cp-anaconda" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#1a2838"/>
-      <stop offset="100%" stop-color="#0d1520"/>
+      <stop offset="0%" stop-color="#1a2a3a"/>
+      <stop offset="100%" stop-color="#0c121c"/>
     </linearGradient>
+    <radialGradient id="cp-anaconda-v" cx="50%" cy="38%" r="58%">
+      <stop offset="0%" stop-color="rgba(120,180,230,.14)"/>
+      <stop offset="50%" stop-color="rgba(255,255,255,.05)"/>
+      <stop offset="100%" stop-color="transparent"/>
+    </radialGradient>
   </defs>
-  <rect width="64" height="64" rx="8" fill="url(#cp-anaconda)"/>
-  <rect x="12" y="12" width="40" height="40" rx="6" fill="none" stroke="rgba(255,255,255,.14)" stroke-width="2"/>
+  <rect width="64" height="64" rx="10" fill="url(#cp-anaconda)" stroke="rgba(255,255,255,.06)" stroke-width="1"/>
+  <rect width="64" height="64" rx="10" fill="url(#cp-anaconda-v)"/>
+  <ellipse cx="32" cy="26" rx="12" ry="10" fill="rgba(255,255,255,.1)"/>
+  <ellipse cx="32" cy="41" rx="18" ry="14" fill="rgba(255,255,255,.07)"/>
 </svg>
