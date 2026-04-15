@@ -190,6 +190,15 @@ html[data-player-faction] #screen-hub .card::before{background:linear-gradient(9
 .faction-card-benefit{font-family:var(--fb);font-size:.68rem;color:var(--green);line-height:1.35;margin-top:4px}
 .faction-card-meet{font-family:var(--fm);font-size:.6rem;color:var(--text-dim);line-height:1.4;margin-top:6px;word-break:break-word}
 .faction-card-pill{align-self:center;margin-top:8px;font-family:var(--fm);font-size:.52rem;letter-spacing:.12em;text-transform:uppercase;color:var(--green);padding:4px 10px;border-radius:999px;border:1px solid rgba(0,232,122,.45);background:rgba(0,232,122,.1)}
+/* Portrait <img> under emoji wrappers: contrast/saturate filters were for glyphs; they break raster/alpha (solid red blocks). */
+.bac-em:has(img),.bql-em:has(img),.h-emojis:has(img),.a-chip-em:has(img){filter:none!important}
+#bp-em:has(img){filter:none!important;display:flex;flex-wrap:wrap;gap:4px;align-items:center;justify-content:center}
+.a-chip.premium-preview .a-chip-em:has(img){filter:none!important;opacity:.75}
+.bac-quizlock.premium-lock-preview .bql-em:has(img){filter:none!important;opacity:.8}
+.clash-featured-emoji:has(img){filter:none!important}
+.clash-featured--win .clash-featured-emoji:has(img) img{filter:drop-shadow(0 0 14px rgba(0,232,122,.5))}
+.clash-featured--lose .clash-featured-emoji:has(img) img{opacity:.68;filter:grayscale(.2) brightness(.88)}
+img[data-asset-id],img.faction-crest-asset,img.faction-card-crest{border-radius:4px;background:rgba(255,255,255,.07)}
 .faction-card--selected{border-color:rgba(0,232,122,.55);box-shadow:0 0 18px rgba(0,232,122,.22)}
 .faction-card-desc{font-family:var(--fb);font-size:.72rem;color:var(--text-dim);line-height:1.45}
 .faction-card--egyptian_guardians:hover,.faction-card--egyptian_guardians:focus-visible{border-color:rgba(212,175,55,.55);box-shadow:0 0 20px rgba(61,158,255,.18),0 0 14px rgba(212,175,55,.12)}
