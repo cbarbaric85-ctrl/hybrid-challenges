@@ -1,11 +1,21 @@
 /**
- * Central asset registry — paths under `public/assets/` (served as `/assets/...`).
+ * Central asset registry — paths under `public/assets/` (served from site root as `assets/...`).
  * Naming: lowercase, underscores. Placeholders: `npm run assets:seed`.
+ * URLs respect Vite `base` / `import.meta.env.BASE_URL` so assets work when not hosted at `/`.
  */
 
 import { ALL_ANIMALS, TIER_REGISTRY } from '../data/animals.js';
 
-const ROOT = '/assets';
+/**
+ * @param {string} relativePath No leading slash, e.g. `assets/creatures/wolf.png`
+ * @returns {string}
+ */
+export function publicUrl(relativePath) {
+  const p = relativePath.replace(/^\/+/, '');
+  const base = import.meta.env.BASE_URL || '/';
+  const normalized = base.endsWith('/') ? base : `${base}/`;
+  return `${normalized}${p}`;
+}
 
 /** Game faction id → slug (folder under `factions/` and filename in `faction_crests/`) */
 export const FACTION_ID_TO_SLUG = {
@@ -28,22 +38,24 @@ const FACTION_TIER_KEY_TO_SLUG = {
 };
 
 function buildCreatureMap() {
-  return Object.fromEntries(Object.keys(ALL_ANIMALS).map(id => [id, `${ROOT}/creatures/${id}.png`]));
+  return Object.fromEntries(
+    Object.keys(ALL_ANIMALS).map(id => [id, publicUrl(`assets/creatures/${id}.png`)])
+  );
 }
 
 function buildLockedMap() {
   return Object.fromEntries(
-    Object.keys(ALL_ANIMALS).map(id => [id, `${ROOT}/creatures/locked/${id}_locked.png`])
+    Object.keys(ALL_ANIMALS).map(id => [id, publicUrl(`assets/creatures/locked/${id}_locked.png`)])
   );
 }
 
 /** Backgrounds for core progression tiers (vector .svg; swap for .png without API changes). */
 export const tierAssets = {
-  base: `${ROOT}/tiers/base_animals_bg.svg`,
-  apex: `${ROOT}/tiers/apex_predators_bg.svg`,
-  dinosaur: `${ROOT}/tiers/dinosaurs_bg.svg`,
-  legendary: `${ROOT}/tiers/legendary_bg.svg`,
-  mythical: `${ROOT}/tiers/mythical_bg.svg`,
+  base: publicUrl('assets/tiers/base_animals_bg.svg'),
+  apex: publicUrl('assets/tiers/apex_predators_bg.svg'),
+  dinosaur: publicUrl('assets/tiers/dinosaurs_bg.svg'),
+  legendary: publicUrl('assets/tiers/legendary_bg.svg'),
+  mythical: publicUrl('assets/tiers/mythical_bg.svg'),
 };
 
 function buildFactionsNested() {
@@ -53,10 +65,10 @@ function buildFactionsNested() {
     const tier = TIER_REGISTRY[regKey];
     if (!tier?.animals) continue;
     const characters = Object.fromEntries(
-      Object.keys(tier.animals).map(cid => [cid, `${ROOT}/factions/${slug}/${cid}.png`])
+      Object.keys(tier.animals).map(cid => [cid, publicUrl(`assets/factions/${slug}/${cid}.png`)])
     );
     out[slug] = {
-      crest: `${ROOT}/faction_crests/${slug}.svg`,
+      crest: publicUrl(`assets/faction_crests/${slug}.svg`),
       characters,
     };
   }
@@ -78,7 +90,7 @@ export const assets = {
 export function getFactionCrestUrl(factionId) {
   const slug = FACTION_ID_TO_SLUG[factionId];
   if (!slug) return null;
-  return `${ROOT}/faction_crests/${slug}.svg`;
+  return publicUrl(`assets/faction_crests/${slug}.svg`);
 }
 
 /**
@@ -95,11 +107,11 @@ export function getFactionCharacterUrl(animalId) {
   });
   if (!regKey) return null;
   const slug = FACTION_TIER_KEY_TO_SLUG[regKey];
-  return slug ? `${ROOT}/factions/${slug}/${animalId}.png` : null;
+  return slug ? publicUrl(`assets/factions/${slug}/${animalId}.png`) : null;
 }
 
 /**
- * Canonical portrait URL (`/assets/creatures/...` or locked variant).
+ * Canonical portrait URL (`assets/creatures/...` under `publicUrl`, or locked variant).
  * @param {string} animalId
  * @param {{ locked?: boolean }} [opts]
  * @returns {string | null}

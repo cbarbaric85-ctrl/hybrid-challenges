@@ -4,9 +4,7 @@
  * Complements faction-theme.js (does not replace --faction-* vars).
  */
 
-import { tierAssets } from '../config/assets.js';
-
-const ROOT = '/tier-themes';
+import { tierAssets, publicUrl } from '../config/assets.js';
 
 /** @typedef {{ id: string; label: string; background: string; badge: string }} TierTheme */
 
@@ -16,37 +14,37 @@ const THEMES = {
     id: 'base',
     label: 'Base Animals',
     background: tierAssets.base,
-    badge: `${ROOT}/base/badge.svg`,
+    badge: publicUrl('tier-themes/base/badge.svg'),
   },
   apex: {
     id: 'apex',
     label: 'Apex Predators',
     background: tierAssets.apex,
-    badge: `${ROOT}/apex/badge.svg`,
+    badge: publicUrl('tier-themes/apex/badge.svg'),
   },
   dinosaur: {
     id: 'dinosaur',
     label: 'Dinosaur Tier',
     background: tierAssets.dinosaur,
-    badge: `${ROOT}/dinosaur/badge.svg`,
+    badge: publicUrl('tier-themes/dinosaur/badge.svg'),
   },
   legendary: {
     id: 'legendary',
     label: 'Legendary Beasts',
     background: tierAssets.legendary,
-    badge: `${ROOT}/legendary/badge.svg`,
+    badge: publicUrl('tier-themes/legendary/badge.svg'),
   },
   mythical: {
     id: 'mythical',
     label: 'Mythical Gods',
     background: tierAssets.mythical,
-    badge: `${ROOT}/mythical/badge.svg`,
+    badge: publicUrl('tier-themes/mythical/badge.svg'),
   },
   factions: {
     id: 'factions',
     label: 'Factions',
-    background: `${ROOT}/factions/bg.svg`,
-    badge: `${ROOT}/factions/badge.svg`,
+    background: publicUrl('tier-themes/factions/bg.svg'),
+    badge: publicUrl('tier-themes/factions/badge.svg'),
   },
 };
 

@@ -13,8 +13,9 @@ const root = path.join(__dirname, '..');
 const pub = path.join(root, 'public');
 const assetsRoot = path.join(pub, 'assets');
 
+/** Opaque 1×1 gray PNG (avoids transparent-PNG + CSS filter compositing glitches that read as solid red). */
 const PNG_1x1 = Buffer.from(
-  'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==',
+  'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAADElEQVR4nGM4ceIEAAS0AlkWLoFAAAAAAElFTkSuQmCC',
   'base64'
 );
 
